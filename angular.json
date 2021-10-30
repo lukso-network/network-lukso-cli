@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "projects": {
+    "lukso-status": {
+      "projectType": "application",
+      "root": "apps/lukso-status",
+      "sourceRoot": "apps/lukso-status/src",
+      "prefix": "lukso",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/lukso-status",
+            "index": "apps/lukso-status/src/index.html",
+            "main": "apps/lukso-status/src/main.ts",
+            "polyfills": "apps/lukso-status/src/polyfills.ts",
+            "tsConfig": "apps/lukso-status/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "apps/lukso-status/src/favicon.ico",
+              "apps/lukso-status/src/assets"
+            ],
+            "styles": ["apps/lukso-status/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/lukso-status/src/environments/environment.ts",
+                  "with": "apps/lukso-status/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "lukso-status:build:production"
+            },
+            "development": {
+              "browserTarget": "lukso-status:build:development",
+              "proxyConfig": "proxy.conf.json"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "lukso-status:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/lukso-status/src/**/*.ts",
+              "apps/lukso-status/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/lukso-status"],
+          "options": {
+            "jestConfig": "apps/lukso-status/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
+    "lukso-status-e2e": {
+      "root": "apps/lukso-status-e2e",
+      "sourceRoot": "apps/lukso-status-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/lukso-status-e2e/cypress.json",
+            "devServerTarget": "lukso-status:serve:development",
+            "tsConfig": "apps/lukso-status-e2e/tsconfig.json"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "lukso-status:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/lukso-status-e2e/**/*.{js,ts}"]
+          }
+        }
+      },
+      "tags": [],
+      "implicitDependencies": ["lukso-status"]
+    }
+  }
+}
