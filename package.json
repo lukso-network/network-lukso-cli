@@ -20,9 +20,11 @@
     "@angular/platform-browser-dynamic": "^12.2.0",
     "@angular/router": "^12.2.0",
     "@nrwl/angular": "13.1.2",
+    "bulma": "^0.9.3",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.11.4",
+    "set-value": ">=4.0.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.2.0",

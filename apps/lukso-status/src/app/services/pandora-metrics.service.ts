@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, timer } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -8,8 +9,10 @@ import { HttpClient } from '@angular/common/http';
 export class PandoraMetricsService {
   metrics$: Observable<any>;
   constructor(private httpClient: HttpClient) {
-    this.metrics$ = httpClient.get(
-      'http://localhost:4200/pandora/debug/metrics'
+    this.metrics$ = timer(0, 3000).pipe(
+      switchMap(() => {
+        return httpClient.get('/pandora/debug/metrics');
+      })
     );
   }
 

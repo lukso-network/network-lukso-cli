@@ -11,7 +11,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "outputPath": "dist/apps/lukso-status",
+            "outputPath": "server/dist/apps/lukso-status",
             "index": "apps/lukso-status/src/index.html",
             "main": "apps/lukso-status/src/main.ts",
             "polyfills": "apps/lukso-status/src/polyfills.ts",
@@ -21,7 +21,10 @@
               "apps/lukso-status/src/favicon.ico",
               "apps/lukso-status/src/assets"
             ],
-            "styles": ["apps/lukso-status/src/styles.scss"],
+            "styles": [
+              "apps/lukso-status/src/styles.scss",
+              "node_modules/bulma/css/bulma.css"
+            ],
             "scripts": []
           },
           "configurations": {

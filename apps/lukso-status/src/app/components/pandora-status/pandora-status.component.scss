@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  margin-bottom: 40px;
+}
+
+td {
+  vertical-align: top;
+}
+
+.property-name {
+  width: 200px;
+}
+.cmdLine {
+  display: block;
+  td {
+    opacity: 0.5;
+  }
+  td.values {
+    opacity: 1;
+    overflow-wrap: anywhere;
+  }
+}
