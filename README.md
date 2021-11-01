@@ -1,3 +1,3 @@
 # Node-Status
 
-Very vasic Node-Status page. Runs on port `8111`.
+Very basic Node-Status page. Runs on port `8111`.
