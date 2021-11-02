@@ -22,7 +22,7 @@ jobs:
           node-version: 14
           cache: 'npm'
       - run: npm ci
-      - run: npm run build --if-present
+      - run: npm run build --if-present -- --skip-nx-cache
       - uses: wangyoucao577/go-release-action@v1.20
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
