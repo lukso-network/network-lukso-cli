@@ -45,7 +45,7 @@ export class PandoraStatusComponent {
         return {
           'has-background-warning': true,
         };
-      case numberOfPeers < 5:
+      case numberOfPeers <= 5:
         return {
           'has-background-danger': true,
         };
