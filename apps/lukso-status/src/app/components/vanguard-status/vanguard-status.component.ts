@@ -49,25 +49,4 @@ export class VanguardStatusComponent {
       })
     );
   }
-
-  calculatePeersStatus(metrics: any) {
-    const numberOfPeers = metrics['p2p_peer_count{state="Connected"}'];
-    switch (true) {
-      case numberOfPeers >= 10:
-        return {
-          'has-background-success': true,
-        };
-      case numberOfPeers < 10 && numberOfPeers > 5:
-        return {
-          'has-background-warning': true,
-        };
-      case numberOfPeers <= 5:
-        return {
-          'has-background-danger': true,
-        };
-
-      default:
-        return {};
-    }
-  }
 }

@@ -43,24 +43,4 @@ export class PandoraStatusComponent {
       })
     );
   }
-
-  calculatePeersStatus(numberOfPeers: number) {
-    switch (true) {
-      case numberOfPeers >= 10:
-        return {
-          'is-success': true,
-        };
-      case numberOfPeers < 10 && numberOfPeers > 5:
-        return {
-          'is-warning': true,
-        };
-      case numberOfPeers <= 5:
-        return {
-          'is-danger': true,
-        };
-
-      default:
-        return {};
-    }
-  }
 }
