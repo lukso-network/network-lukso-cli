@@ -1,6 +1,11 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+} from 'rxjs/operators';
 import { PandoraMetricsService } from '../../services/pandora-metrics.service';
 import { map } from 'rxjs/operators';
 
@@ -14,6 +19,7 @@ export class PandoraStatusComponent {
   metrics$: Observable<any>;
   filteredMetrics$: Observable<any>;
   searchTerm$ = new BehaviorSubject('');
+  latestBlock = 0;
   constructor(pandorsMetrics: PandoraMetricsService) {
     const searchTerm$ = this.searchTerm$.pipe(
       filter((text) => text.length > 2),
@@ -31,6 +37,9 @@ export class PandoraStatusComponent {
       }),
       map((metrics) => {
         return Object.entries(metrics);
+      }),
+      catchError(() => {
+        return of({});
       })
     );
   }
@@ -39,15 +48,15 @@ export class PandoraStatusComponent {
     switch (true) {
       case numberOfPeers >= 10:
         return {
-          'has-background-success': true,
+          'is-success': true,
         };
       case numberOfPeers < 10 && numberOfPeers > 5:
         return {
-          'has-background-warning': true,
+          'is-warning': true,
         };
       case numberOfPeers <= 5:
         return {
-          'has-background-danger': true,
+          'is-danger': true,
         };
 
       default:

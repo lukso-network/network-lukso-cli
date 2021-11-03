@@ -4,8 +4,11 @@
 :host {
   display: block;
   font-family: sans-serif;
-  min-width: 300px;
-  margin: 0 auto;
+  margin: 0;
+}
+
+.container {
+  max-width: 600px;
 }
 
 nav {

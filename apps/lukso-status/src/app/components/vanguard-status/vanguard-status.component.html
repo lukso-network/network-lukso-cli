@@ -4,12 +4,15 @@
   class="columns"
 >
   <div class="column">
-    <table
-      class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
-    >
-      <tr [ngClass]="calculatePeersStatus(metrics)">
+    <table class="table is-hoverable">
+      <tr>
         <td class="property-name">Peers</td>
-        <td>{{ metrics['p2p_peer_count{state="Connected"}'] }}</td>
+        <td>{{ metrics[peersSelector] }}</td>
+        <td *ngIf="metrics[peersSelector] as peers">
+          <span *ngIf="peers >= 20" class="tag is-success">OK</span>
+          <span *ngIf="peers < 20 && peers > 1" class="tag is-warning">OK</span>
+          <span *ngIf="peers <= 1" class="tag is-danger">Not syncing</span>
+        </td>
       </tr>
       <tr>
         <td class="property-name">Latest Block</td>

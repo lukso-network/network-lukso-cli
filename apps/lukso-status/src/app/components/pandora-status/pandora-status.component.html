@@ -4,18 +4,21 @@
   class="columns"
 >
   <div class="column">
-    <table
-      class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
-    >
-      <tr [ngClass]="calculatePeersStatus(metrics['p2p/peers'])">
+    <table class="table is-hoverable">
+      <tr>
         <td class="property-name">Peers</td>
         <td>{{ metrics['p2p/peers'] }}</td>
+        <td *ngIf="metrics['p2p/peers'] as peers">
+          <span *ngIf="peers >= 20" class="tag is-success">OK</span>
+          <span *ngIf="peers < 20 && peers > 5" class="tag is-success">OK</span>
+          <span *ngIf="peers <= 5" class="tag is-success">OK</span>
+        </td>
       </tr>
       <tr>
         <td class="property-name">Latest Block</td>
         <td>{{ metrics['chain/head/block'] }}</td>
       </tr>
-      <tr>
+      <!-- <tr>
         <td class="property-name">Startup Arguments</td>
         <td class="cmdLine">
           <details>
@@ -28,7 +31,7 @@
             </table>
           </details>
         </td>
-      </tr>
+      </tr> -->
       <!-- <tr>
         <td>
           <div class="control">
