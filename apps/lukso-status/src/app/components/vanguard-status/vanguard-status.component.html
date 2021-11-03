@@ -9,8 +9,8 @@
         <td class="property-name">Peers</td>
         <td>{{ metrics[peersSelector] }}</td>
         <td *ngIf="metrics[peersSelector] as peers">
-          <span *ngIf="peers >= 20" class="tag is-success">OK</span>
-          <span *ngIf="peers < 20 && peers > 1" class="tag is-warning">OK</span>
+          <span *ngIf="peers >= 20" class="tag is-success">Excellent</span>
+          <span *ngIf="peers < 20 && peers > 1" class="tag is-warning">Ok</span>
           <span *ngIf="peers <= 1" class="tag is-danger">Not syncing</span>
         </td>
       </tr>

@@ -39,5 +39,5 @@ testem.log
 Thumbs.db
 
 # Binary
-lukso-status
 server/dist
+server/lukso-status
