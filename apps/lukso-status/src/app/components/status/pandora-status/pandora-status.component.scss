@@ -1,0 +1,30 @@
+:host {
+  display: block;
+  width: 300px;
+  margin: 0 20px 40px 20px;
+}
+
+.title {
+  font-size: 30px;
+}
+
+.card-header span.badge {
+  display: block;
+  float: right;
+}
+
+td {
+  vertical-align: top;
+}
+
+.property-name {
+  width: 200px;
+}
+
+.property-value {
+  text-align: right;
+}
+
+.property--peers {
+  font-size: 30px;
+}

@@ -7,8 +7,19 @@
   margin: 0;
 }
 
-.container {
-  max-width: 600px;
+.lukso-logo {
+  display: block;
+  max-width: 150px;
+}
+
+main {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 100vh;
+  height: -webkit-fill-available;
+  max-height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 nav {

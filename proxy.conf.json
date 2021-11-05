@@ -12,5 +12,19 @@
     "logLevel": "debug",
     "changeOrigin": true,
     "pathRewrite": { "^/vanguard": "" }
+  },
+  "/validator/*": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": { "^/validator": "" }
+  },
+  "/api/*": {
+    "target": "http://localhost:8111",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": { "^/api": "" }
   }
 }

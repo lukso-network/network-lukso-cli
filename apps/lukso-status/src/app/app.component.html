@@ -1,18 +1,72 @@
-<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a class="navbar-item" href="#"> LUKSO Node Status </a>
+<main>
+  <div
+    class="d-flex flex-column flex-shrink-0 p-3 bg-light"
+    style="width: 280px; height: 100vh"
+  >
+    <a
+      href="/"
+      class="
+        d-flex
+        align-items-center
+        mb-3 mb-md-0
+        me-md-auto
+        link-dark
+        text-decoration-none
+      "
+    >
+      <img
+        class="lukso-logo"
+        src="https://lukso.network/images/lukso_wordmark_black.png"
+        alt="LUKSO Logo"
+      />
+    </a>
+    <hr />
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+        <a
+          href="#"
+          class="nav-link"
+          aria-current="page"
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Home
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          href="#"
+          class="nav-link"
+          aria-current="page"
+          routerLink="/status"
+          routerLinkActive="active"
+        >
+          Status
+        </a>
+      </li>
+      <li>
+        <a
+          href="#"
+          class="nav-link link-dark"
+          routerLink="/launchpad"
+          routerLinkActive="active"
+        >
+          Launchpad
+        </a>
+      </li>
+      <li>
+        <a
+          href="#"
+          class="nav-link link-dark"
+          routerLink="/updates"
+          routerLinkActive="active"
+        >
+          Updates
+        </a>
+      </li>
+    </ul>
   </div>
-</nav>
-<div class="container is-max-widescreen">
-  <lukso-pandora-status></lukso-pandora-status>
-  <lukso-vanguard-status></lukso-vanguard-status>
-  <article class="message is-info">
-    <div class="message-header">
-      <p>Info</p>
-    </div>
-    <div class="message-body">
-      If you just started your node, please give it at least an hour to find
-      peers, p2p discovery takes some time.
-    </div>
-  </article>
-</div>
+
+  <router-outlet></router-outlet>
+</main>

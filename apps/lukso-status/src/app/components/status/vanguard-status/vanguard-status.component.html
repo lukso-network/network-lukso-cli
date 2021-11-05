@@ -1,0 +1,25 @@
+<div class="card" *ngIf="metrics$ | async as metrics">
+  <h4 class="card-header">
+    Vanguard
+    <ng-container *ngIf="metrics[peersSelector] as peers">
+      <span *ngIf="peers >= 20" class="badge bg-success">Excellent</span>
+      <span *ngIf="peers < 20 && peers > 1" class="badge bg-warning">Ok</span>
+      <span *ngIf="peers <= 1" class="badge bg-danger">Not syncing</span>
+    </ng-container>
+  </h4>
+
+  <div class="card-body">
+    <table class="table is-hoverable">
+      <tbody>
+        <tr class="property property--peers">
+          <td class="property-name">Peers</td>
+          <td class="property-value">{{ metrics[peersSelector] }}</td>
+        </tr>
+        <tr>
+          <td class="property-name">Latest Block</td>
+          <td class="property-value">{{ metrics['beacon_head_slot'] }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

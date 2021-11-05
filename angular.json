@@ -11,7 +11,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "outputPath": "server/dist/apps/lukso-status",
+            "outputPath": "apps/lukso-manager/src/webserver/dist/apps/lukso-status",
             "index": "apps/lukso-status/src/index.html",
             "main": "apps/lukso-status/src/main.ts",
             "polyfills": "apps/lukso-status/src/polyfills.ts",
@@ -23,9 +23,10 @@
             ],
             "styles": [
               "apps/lukso-status/src/styles.scss",
-              "node_modules/bulma/css/bulma.css"
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css"
             ],
-            "scripts": []
+            "scripts": ["node_modules/bootstrap/dist/js/bootstrap.min.js"]
           },
           "configurations": {
             "production": {
@@ -127,6 +128,35 @@
       },
       "tags": [],
       "implicitDependencies": ["lukso-status"]
+    },
+    "lukso-manager": {
+      "projectType": "application",
+      "root": "apps/lukso-manager",
+      "sourceRoot": "apps/lukso-manager",
+      "architect": {
+        "build": {
+          "builder": "@nx-go/nx-go:build",
+          "options": {
+            "outputPath": "dist/apps/lukso-manager",
+            "main": "apps/lukso-manager/src/main.go"
+          }
+        },
+        "serve": {
+          "builder": "@nx-go/nx-go:serve",
+          "options": {
+            "cmd": "gow",
+            "cwd": ".",
+            "main": "apps/lukso-manager/src/main.go"
+          }
+        },
+        "test": {
+          "builder": "@nx-go/nx-go:test"
+        },
+        "lint": {
+          "builder": "@nx-go/nx-go:lint"
+        }
+      },
+      "tags": []
     }
   }
 }
