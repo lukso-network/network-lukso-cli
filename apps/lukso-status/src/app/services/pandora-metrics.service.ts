@@ -11,10 +11,11 @@ export class PandoraMetricsService {
   constructor(private httpClient: HttpClient) {
     this.metrics$ = timer(0, 3000).pipe(
       switchMap(() => {
-        return httpClient.get('/pandora/debug/metrics');
-      }),
-      catchError(() => {
-        return of({});
+        return httpClient.get('/pandora/debug/metrics').pipe(
+          catchError(() => {
+            return of({});
+          })
+        );
       })
     );
   }

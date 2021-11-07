@@ -1,4 +1,27 @@
-<lukso-pandora-status></lukso-pandora-status>
-<lukso-vanguard-status></lukso-vanguard-status>
-<lukso-orchestrator-status></lukso-orchestrator-status>
-<lukso-validator-status></lukso-validator-status>
+<nav>
+  <ul class="nav d-flex">
+    <li class="nav-item">
+      <button class="btn btn-success" (click)="startClients()">Start</button>
+    </li>
+    <li class="nav-item">
+      <button class="btn btn-danger" (click)="stopClients()">Stop</button>
+    </li>
+    <li class="nav-item ms-auto">
+      <!-- Example single danger button -->
+      <select class="form-select" aria-label="Default select example">
+        <option value="1" selected>L15 Testnet</option>
+        <option value="2" disabled>L16 Testnet</option>
+        <option value="3" disabled>Mainnet</option>
+      </select>
+    </li>
+  </ul>
+</nav>
+<hr />
+<lukso-pandora-status
+  [metrics]="pandoraMetrics$ | async"
+></lukso-pandora-status>
+<lukso-vanguard-status
+  [metrics]="vanguardMetrics$ | async"
+></lukso-vanguard-status>
+<!-- <lukso-orchestrator-status></lukso-orchestrator-status> -->
+<!-- <lukso-validator-status></lukso-validator-status> -->

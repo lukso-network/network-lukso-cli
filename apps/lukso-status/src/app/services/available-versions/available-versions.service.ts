@@ -6,18 +6,16 @@ import { map, switchMap, tap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root',
 })
-export class AvailableVersionsService {
+export class SoftwareService {
   availableSoftware$: Observable<any>;
   downloadedSoftware$: Observable<any>;
   constructor(private httpClient: HttpClient) {
+    this.httpClient = httpClient;
     this.downloadedSoftware$ = httpClient.get('/api/downloaded-versions').pipe(
       map((versions) => {
         return Object.entries(versions).map(([name, versions]) => {
           return { name, versions };
         });
-      }),
-      tap((a) => {
-        console.log(a);
       })
     );
 
@@ -34,11 +32,24 @@ export class AvailableVersionsService {
               .reverse(),
           };
         });
-      }),
-      tap((a) => {
-        console.log(a);
       })
     );
+  }
+
+  downloadClient(client: string, version: string, url: string) {
+    return this.httpClient.post('/api/update-client', {
+      client,
+      version,
+      url,
+    });
+  }
+
+  startClients() {
+    return this.httpClient.post('/api/start-clients', {});
+  }
+
+  stopClients() {
+    return this.httpClient.post('/api/stop-clients', {});
   }
 
   getAvailableVersions$() {

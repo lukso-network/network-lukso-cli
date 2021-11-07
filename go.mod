@@ -12,6 +12,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.3
+	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/h2non/filetype v1.1.1 // indirect
 	github.com/juju/errors v0.0.0-20210818161939-5560c4c073ff // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect

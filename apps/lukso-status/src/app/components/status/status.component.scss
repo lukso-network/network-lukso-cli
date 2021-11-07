@@ -1,4 +1,18 @@
 :host {
   display: block;
-  padding: 40px 20px;
+  width: 100%;
+}
+
+nav {
+  height: 55px;
+  margin: 0 20px;
+
+  ul {
+    padding-top: 10px;
+  }
+}
+
+hr {
+  margin: 5px;
+  margin-bottom: 25px;
 }

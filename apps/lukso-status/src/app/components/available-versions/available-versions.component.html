@@ -10,23 +10,38 @@
     </thead>
     <tbody>
       <tr *ngFor="let item of availableSoftware$ | async">
-        <th scope="row">{{ item.name }}</th>
+        <th scope="row">{{ item.name | titlecase }}</th>
         <td>
           <table class="table table-striped table-bordered">
-            <tr *ngFor="let version of item.versions; let i = index">
-              <td>
-                <div class="tags">
-                  <span class="badge bg-dark">{{ version.tag }} </span>
-                  <span *ngIf="i === 0" class="badge bg-info">latest</span>
-                </div>
-              </td>
-              <td>
-                <a>Install</a>
-              </td>
-              <td>
-                <a>Delete</a>
-              </td>
-            </tr>
+            <tbody>
+              <tr *ngFor="let release of item.versions; let i = index">
+                <td>
+                  <div class="tags">
+                    <span class="badge bg-dark">{{ release.tag }} </span>
+                    <span *ngIf="i === 0" class="badge bg-info">latest</span>
+                  </div>
+                </td>
+                <td>
+                  <button
+                    class="btn btn-primary"
+                    type="button"
+                    [disabled]="release.isDownloading"
+                    (click)="install(item.name, release)"
+                  >
+                    <span
+                      *ngIf="release.isDownloading"
+                      class="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    <span *ngIf="!release.isDownloading">Download</span>
+                  </button>
+                </td>
+                <td>
+                  <a class="btn btn-danger">Delete</a>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </td>
         <td></td>

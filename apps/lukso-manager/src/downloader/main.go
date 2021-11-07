@@ -116,9 +116,6 @@ var ReleaseLocations = map[string]string{
 	"vanguard":     "https://api.github.com/repos/lukso-network/vanguard-consensus-engine/releases",
 	"orchestrator": "https://api.github.com/repos/lukso-network/lukso-orchestrator/releases",
 }
-var DownloadLocations = map[string]string{
-	"lukso-status": "https://github.com/rryter/node-status/releases/download/",
-}
 
 type updateRequestBody struct {
 	Client  string
@@ -184,8 +181,10 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, v := range releases {
-			var a = getDownloadUrlFromAsset(client, v.Assets)
-			confMap[client][v.TagName] = a
+			a := getDownloadUrlFromAsset(client, v.Assets)
+			if a != "" {
+				confMap[client][v.TagName] = a
+			}
 		}
 	}
 	jsonString, err := json.Marshal(confMap)
@@ -198,7 +197,6 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDownloadUrlFromAsset(name string, assets []Assets) string {
-	println(name)
 	var downloadUrl string
 	for i := range assets {
 		if assets[i].Name == name+"-Linux-x86_64" {
@@ -207,8 +205,6 @@ func getDownloadUrlFromAsset(name string, assets []Assets) string {
 			break
 		}
 	}
-	fmt.Println("downloadUrl")
-	fmt.Println(downloadUrl)
 	return downloadUrl
 }
 
@@ -237,10 +233,15 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 		os.Mkdir(clientFolder, 0775)
 	}
 
-	filename := fmt.Sprintf("%s-%s-linux-amd64.tar.gz", t.Client, t.Version)
+	err3 := os.Chmod(clientFolder+t.Version, 0775)
+	if err3 != nil {
+		os.Mkdir(clientFolder+t.Version, 0775)
+	}
 
-	filePath := clientFolder + filename
+	filePath := clientFolder + t.Version + "/" + t.Client
 	fileUrl := t.Url
+	fmt.Println(filePath)
+	fmt.Println(fileUrl)
 
 	err1 := downloadFile(filePath, fileUrl)
 	if err1 != nil {
@@ -254,9 +255,14 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 	// 	panic(err3)
 	// }
 
-	e := os.Remove(filePath)
-	if e != nil {
-		log.Fatal(e)
+	// e := os.Remove(filePath)
+	// if e != nil {
+	// 	log.Fatal(e)
+	// }
+
+	err4 := os.Chmod(filePath, 0775)
+	if err4 != nil {
+		panic(err1)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

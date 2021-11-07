@@ -11,10 +11,11 @@ export class ValidatorMetricsService {
   constructor(private httpClient: HttpClient) {
     this.metrics$ = timer(0, 3000).pipe(
       switchMap(() => {
-        return httpClient.get('/validator/metrics');
-      }),
-      catchError(() => {
-        return of({});
+        return httpClient.get('/validator/metrics').pipe(
+          catchError(() => {
+            return of({});
+          })
+        );
       })
     );
   }

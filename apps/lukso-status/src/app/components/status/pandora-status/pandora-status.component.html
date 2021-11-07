@@ -1,15 +1,26 @@
-<div class="card" *ngIf="metrics$ | async as metrics">
+<div class="card" *ngIf="metrics">
   <h4 class="card-header">
     Pandora
-    <ng-container *ngIf="metrics['p2p/peers'] as peers">
-      <span *ngIf="peers >= 20" class="badge bg-success">Excellent</span>
-      <span *ngIf="peers < 20 && peers > 0" class="badge bg-warning">Ok</span>
-      <span *ngIf="peers <= 0" class="badge bg-danger">Not syncing</span>
+    <ng-container>
+      <span *ngIf="metrics['p2p/peers'] >= 20" class="badge bg-success"
+        >Excellent</span
+      >
+      <span
+        *ngIf="metrics['p2p/peers'] < 20 && metrics['p2p/peers'] > 0"
+        class="badge bg-warning"
+        >Ok</span
+      >
+      <span *ngIf="metrics['p2p/peers'] <= 0" class="badge bg-danger"
+        >Not syncing</span
+      >
     </ng-container>
   </h4>
 
   <div class="card-body">
-    <table class="table">
+    <table
+      *ngIf="!(metrics['p2p/peers'] === undefined); else notRunning"
+      class="table"
+    >
       <tbody>
         <tr class="property property--peers">
           <td class="property-name">Peers</td>
@@ -20,51 +31,7 @@
           <td class="property-value">{{ metrics['chain/head/block'] }}</td>
         </tr>
       </tbody>
-
-      <!-- <tr>
-      <td class="property-name">Startup Arguments</td>
-      <td class="cmdLine">
-        <details>
-          <summary>Show command-line arguments</summary>
-          <table>
-            <tr *ngFor="let item of metrics['cmdline']">
-              <td>{{ item.split('=')[0] }}</td>
-              <td class="values">{{ item.split('=')[1] }}</td>
-            </tr>
-          </table>
-        </details>
-      </td>
-    </tr> -->
-      <!-- <tr>
-      <td>
-        <div class="control">
-          <input
-            #searchbox
-            class="input"
-            type="text"
-            placeholder="Search Metrics"
-            (keyup)="searchTerm$.next(searchbox.value)"
-          />
-        </div>
-      </td>
-      <td>
-        <table
-          *ngIf="this.filteredMetrics$ | async as filteredMetrics"
-          class="
-            table
-            is-bordered is-striped is-narrow is-hoverable is-fullwidth
-          "
-        >
-          <ng-container *ngIf="filteredMetrics.length > 0; else noMatches">
-            <tr *ngFor="let metric of filteredMetrics">
-              <td class="property-name">{{ metric[0] }}</td>
-              <td>{{ metric[1] }}</td>
-            </tr>
-          </ng-container>
-          <ng-template #noMatches>No Matches</ng-template>
-        </table>
-      </td>
-    </tr> -->
     </table>
+    <ng-template #notRunning> Not Running </ng-template>
   </div>
 </div>

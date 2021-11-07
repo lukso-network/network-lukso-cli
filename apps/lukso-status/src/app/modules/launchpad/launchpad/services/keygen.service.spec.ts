@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SoftwareService } from './available-versions.service';
+import { KeygenService } from './keygen.service';
 
-describe('AvailableVersionsService', () => {
-  let service: SoftwareService;
+describe('KeygenService', () => {
+  let service: KeygenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(SoftwareService);
+    service = TestBed.inject(KeygenService);
   });
 
   it('should be created', () => {

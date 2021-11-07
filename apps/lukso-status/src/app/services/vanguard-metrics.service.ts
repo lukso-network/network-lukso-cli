@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, timer } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { Observable, of, timer } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
-export class VanguardServiceService {
+export class VanguardService {
   metrics$: Observable<any>;
   constructor(private httpClient: HttpClient) {
     this.metrics$ = timer(0, 3000).pipe(
@@ -30,6 +30,9 @@ export class VanguardServiceService {
                 acc[key] = value;
                 return acc;
               }, {});
+            }),
+            catchError(() => {
+              return of({});
             })
           );
       })
