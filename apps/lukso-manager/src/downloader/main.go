@@ -208,21 +208,22 @@ func getDownloadUrlFromAsset(name string, assets []Assets) string {
 	return downloadUrl
 }
 
-func DownloadClient(w http.ResponseWriter, r *http.Request) {
+func DownloadClient(w http.ResponseWriter, r *http.Request) (err error) {
 	decoder := json.NewDecoder(r.Body)
 	var t updateRequestBody
-	err := decoder.Decode(&t)
+	err = decoder.Decode(&t)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	dirname, err := os.UserHomeDir()
-	downloads := dirname + "/.lukso/downloads"
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
-	err = os.Chmod(downloads, 0775)
+	downloads := dirname + "/.lukso/downloads"
+
+	_, err = os.Stat(downloads)
 	if err != nil {
 		os.Mkdir(downloads, 0775)
 	}
