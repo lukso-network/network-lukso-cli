@@ -3,7 +3,7 @@ package validator
 import (
 	"encoding/json"
 	"log"
-	"lukso/apps/lukso-manager/src/runner"
+	"lukso/runner"
 	"net/http"
 	"os"
 	"os/exec"
