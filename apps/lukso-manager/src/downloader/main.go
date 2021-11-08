@@ -248,18 +248,6 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 		panic(err1)
 	}
 
-	// data, _ := ioutil.ReadFile(filePath)
-	// buffer := bytes.NewBuffer(data)
-	// err3 := extract.Gz(context.Background(), buffer, clientFolder+"/"+t.Version, nil)
-	// if err3 != nil {
-	// 	panic(err3)
-	// }
-
-	// e := os.Remove(filePath)
-	// if e != nil {
-	// 	log.Fatal(e)
-	// }
-
 	err4 := os.Chmod(filePath, 0775)
 	if err4 != nil {
 		panic(err1)
