@@ -25,9 +25,9 @@ export class LaunchpadComponent {
         .subscribe(() => {
           this.isGeneratingKeys = false;
         });
-    } else {
-      this.showPasswordError = true;
     }
+
+    this.showPasswordError = true;
   }
 
   arePasswordsIdentical(pw1: string, pw2: string) {
