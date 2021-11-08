@@ -1,11 +1,11 @@
 package main
 
 import (
-	"lukso/apps/lukso-manager/src/downloader"
-	"lukso/apps/lukso-manager/src/metrics"
-	"lukso/apps/lukso-manager/src/runner"
-	"lukso/apps/lukso-manager/src/validator"
-	"lukso/apps/lukso-manager/src/webserver"
+	"lukso/downloader"
+	"lukso/metrics"
+	"lukso/runner"
+	"lukso/validator"
+	"lukso/webserver"
 
 	"github.com/gorilla/mux"
 )

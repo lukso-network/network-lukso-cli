@@ -3,12 +3,11 @@ package validator
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/tyler-smith/go-bip39"
 	"log"
-	"lukso/apps/lukso-manager/src/runner"
+	"lukso/runner"
 	"net/http"
 	"os"
-
-	"github.com/tyler-smith/go-bip39"
 )
 
 type generateValidatorKeysRequestBody struct {
