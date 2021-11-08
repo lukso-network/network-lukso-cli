@@ -208,11 +208,12 @@ func getDownloadUrlFromAsset(name string, assets []Assets) string {
 	return downloadUrl
 }
 
-func DownloadClient(w http.ResponseWriter, r *http.Request) (err error) {
+func DownloadClient(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var t updateRequestBody
-	err = decoder.Decode(&t)
+	err := decoder.Decode(&t)
 	if err != nil {
+		w.Write([]byte(err.Error()))
 		return
 	}
 
@@ -229,14 +230,17 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) (err error) {
 	}
 
 	clientFolder := downloads + "/" + t.Client + "/"
-	err2 := os.Chmod(clientFolder, 0775)
-	if err2 != nil {
+
+	_, err = os.Stat(clientFolder)
+	if err != nil {
 		os.Mkdir(clientFolder, 0775)
 	}
 
-	err3 := os.Chmod(clientFolder+t.Version, 0775)
-	if err3 != nil {
-		os.Mkdir(clientFolder+t.Version, 0775)
+	clientFolderWithVersion := downloads + "/" + t.Client + "/"
+
+	_, err = os.Stat(clientFolderWithVersion)
+	if err != nil {
+		os.Mkdir(clientFolderWithVersion, 0775)
 	}
 
 	filePath := clientFolder + t.Version + "/" + t.Client
@@ -244,16 +248,17 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) (err error) {
 	fmt.Println(filePath)
 	fmt.Println(fileUrl)
 
-	err1 := downloadFile(filePath, fileUrl)
-	if err1 != nil {
-		panic(err1)
+	err = downloadFile(filePath, fileUrl)
+	if err != nil {
+		return
 	}
 
-	err4 := os.Chmod(filePath, 0775)
-	if err4 != nil {
-		panic(err1)
+	_, err = os.Stat(filePath)
+	if err != nil {
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(err.Error()))
 }

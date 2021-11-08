@@ -11,7 +11,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "outputPath": "apps/lukso-manager/src/webserver/dist/apps/lukso-status",
+            "outputPath": "apps/lukso-manager/webserver/dist/apps/lukso-status",
             "index": "apps/lukso-status/src/index.html",
             "main": "apps/lukso-status/src/main.ts",
             "polyfills": "apps/lukso-status/src/polyfills.ts",
@@ -141,7 +141,7 @@
           "builder": "@nx-go/nx-go:build",
           "options": {
             "outputPath": "dist/apps/lukso-manager",
-            "main": "apps/lukso-manager/src/main.go"
+            "main": "apps/lukso-manager/main.go"
           }
         },
         "serve": {

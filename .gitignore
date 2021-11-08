@@ -39,4 +39,4 @@ testem.log
 Thumbs.db
 
 # Binary
-apps/lukso-manager/src/webserver/dist
+apps/lukso-manager/webserver/dist
