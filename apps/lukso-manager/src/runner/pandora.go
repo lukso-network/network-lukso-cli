@@ -1,15 +1,36 @@
 package runner
 
+import (
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+)
+
 func startPandora(version string, network string) {
 	client := "pandora"
+	datadir := "/home/rryter/.lukso/networks/" + network + "/datadirs/pandora"
+
+	config, err := ReadConfig(network)
+	if err != nil {
+		fmt.Println("error reading config")
+	}
+
+	statsPrefix := ""
+	if !(network == "l15-prod") {
+		statsPrefix = strings.Split(network, "-")[1] + "."
+	}
+
 	args := []string{
-		"--datadir=/home/rryter/.lukso/networks/" + network + "/datadirs/pandora",
-		"--networkid=231",
+		"--datadir=" + datadir,
+		"--networkid=" + fmt.Sprint(config.NETWORKID),
 		"--port=30405",
 		"--http",
 		"--http.addr=127.0.0.1",
 		"--http.port=8545",
-		"--bootnodes=enode://f9c894b27de56e0a96d849e5a9878cf1baa8c9fbcb7f7fd60e2694398afbb00569e530242470d46bf53749ca2329bc13fddf99b63236ef7463ea9a369a29acfa@34.90.108.99:30405,enode://bd425e22328db3c6979342c3001bb0fbec9559718e079552a9846126a6c313a34e9da6857e2b1f1d0219fbd08b43daa658b9ebcd7b51cff16d97e41cd4c3dd2a@35.204.144.37:30405,enode://3390c97e8252fff4a9262a9f11092b10b985319c7e5e8f1549caabc2f08de0fe87c7f74f6daf17f6867011d190413a47c27b879e2093df306516227db2a874f5@34.90.102.27:30405",
+		"--bootnodes=" + config.PANDORABOOTNODES,
 		"--ws",
 		"--ws.addr=127.0.0.1",
 		"--ws.port=8546",
@@ -24,8 +45,33 @@ func startPandora(version string, network string) {
 		"--metrics.expensive",
 		"--pprof",
 		"--pprof.addr=127.0.0.1",
-		"--ethstats=l15-rryter-gui:6Tcpc53R5V763Aur9LgD@dev.stats.pandora.l15.lukso.network",
+		"--ethstats=l15-rryter-gui:6Tcpc53R5V763Aur9LgD@" + statsPrefix + "stats.pandora.l15.lukso.network",
 	}
+
+	fmt.Println("/home/rryter/.lukso/downloads/" + client + "/" + version + "/" + client + " --datadir " + datadir + " init /opt/lukso/networks/" + network + "/config/pandora-genesis.json &>/dev/null")
+	cmnd := exec.Command("bash", "-c", "/home/rryter/.lukso/downloads/"+client+"/"+version+"/"+client+" --datadir "+datadir+" init /opt/lukso/networks/"+network+"/config/pandora-genesis.json &>/dev/null")
+	if startError := cmnd.Start(); startError != nil {
+		log.Println("ERROR STARTING " + client + "@" + version)
+		log.Fatal(startError)
+	}
+
+	cmnd.Wait()
+
+	in, err := os.Open("/opt/lukso/networks/" + network + "/config/pandora-nodes.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer in.Close()
+
+	fmt.Println(datadir + "/geth/static-nodes.json")
+	out, err := os.Create(datadir + "/geth/static-nodes.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer out.Close()
+
+	io.Copy(in, out)
+	out.Close()
 
 	StartBinary(client, version, args)
 }

@@ -12,7 +12,7 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Starting Clients")
 	fmt.Println("              ")
 
-	network := "l15-dev"
+	network := "l15-staging"
 
 	startVanguard("v0.5.1-develop", network)
 	startOrchestrator("v0.5.4-develop", network)
@@ -33,20 +33,10 @@ func StartBinary(client string, version string, args []string) {
 	fmt.Println("/home/rryter/.lukso/downloads/" + client + "/" + version + "/" + client)
 
 	cmnd := exec.Command("/home/rryter/.lukso/downloads/"+client+"/"+version+"/"+client, args...)
-	stdout, _ := cmnd.StdoutPipe()
-	cmnd.Stderr = cmnd.Stdout
 
 	if startError := cmnd.Start(); startError != nil {
 		log.Println("ERROR STARTING " + client + "@" + version)
 		log.Fatal(startError)
 	}
 
-	for {
-		tmp := make([]byte, 1024)
-		_, err := stdout.Read(tmp)
-		fmt.Print(string(tmp))
-		if err != nil {
-			break
-		}
-	}
 }

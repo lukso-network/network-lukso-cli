@@ -1,3 +1,98 @@
-<button type="button" class="btn btn-primary" (click)="genereateKeys()">
-  Generate Keys
-</button>
+<h1 class="title">Become a Validator</h1>
+<form>
+  <div class="mb-3">
+    <label class="form-label" for="howManyValidatorsWouldYouLikeToRun"
+      >How many validators would you like to run?</label
+    >
+    <input
+      class="form-control"
+      id="howManyValidatorsWouldYouLikeToRun"
+      type="number"
+      placeholder="1"
+      data-sb-validations="required"
+    />
+    <div
+      class="invalid-feedback"
+      data-sb-feedback="howManyValidatorsWouldYouLikeToRun:required"
+    >
+      This field is required.
+    </div>
+  </div>
+  <div class="mb-3">
+    <label for="inputPassword1">Password</label>
+    <div class="input-group">
+      <input
+        #pw1
+        type="password"
+        id="inputPassword1"
+        class="form-control"
+        aria-describedby="passwordHelpBlock"
+        autocomplete="new-password"
+        required
+      />
+      <div class="input-group-apend">
+        <span class="input-group-text" id="inputGroupPrepend2">
+          <i
+            class="bi bi-eye-fill"
+            (click)="
+              pw1.type === 'text'
+                ? (pw1.type = 'password')
+                : (pw1.type = 'text')
+            "
+          ></i>
+        </span>
+      </div>
+    </div>
+    <small id="passwordHelpBlock" class="form-text text-muted">
+      Your password must be 8-20 characters long, contain letters, numbers, and
+      special characters.
+    </small>
+  </div>
+  <div class="mb-3">
+    <label for="inputPassword2">Repeat Password</label>
+    <div class="input-group">
+      <input
+        #pw2
+        type="password"
+        id="inputPassword2"
+        class="form-control"
+        aria-describedby="passwordHelpBlock"
+        autocomplete="new-password"
+        required
+      />
+      <div class="input-group-apend">
+        <span class="input-group-text" id="inputGroupPrepend2">
+          <i
+            class="bi bi-eye-fill"
+            (click)="
+              pw2.type === 'text'
+                ? (pw2.type = 'password')
+                : (pw2.type = 'text')
+            "
+          ></i>
+        </span>
+      </div>
+    </div>
+    <small id="passwordHelpBlock" class="form-text text-muted">
+      Please repeat the password to make sure it is correct.
+    </small>
+  </div>
+  Password not identical or not meeting requirements: {{ showPasswordError }}
+  <div>
+    <button
+      type="button"
+      class="btn btn-primary btn--generate-keys"
+      (click)="genereateKeys(pw1.value, pw2.value)"
+    >
+      <span *ngIf="isGeneratingKeys">
+        <span
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        <span class="visually-hidden">Loading...</span></span
+      >
+      <span *ngIf="!isGeneratingKeys"> Generate Keys</span>
+    </button>
+  </div>
+</form>
