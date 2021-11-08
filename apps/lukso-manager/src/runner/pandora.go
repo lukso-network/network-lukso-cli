@@ -49,13 +49,13 @@ func startPandora(version string, network string) {
 	}
 
 	fmt.Println("/home/rryter/.lukso/downloads/" + client + "/" + version + "/" + client + " --datadir " + datadir + " init /opt/lukso/networks/" + network + "/config/pandora-genesis.json &>/dev/null")
-	cmnd := exec.Command("bash", "-c", "/home/rryter/.lukso/downloads/"+client+"/"+version+"/"+client+" --datadir "+datadir+" init /opt/lukso/networks/"+network+"/config/pandora-genesis.json &>/dev/null")
-	if startError := cmnd.Start(); startError != nil {
+	command := exec.Command("bash", "-c", "/home/rryter/.lukso/downloads/"+client+"/"+version+"/"+client+" --datadir "+datadir+" init /opt/lukso/networks/"+network+"/config/pandora-genesis.json &>/dev/null")
+	if startError := command.Start(); startError != nil {
 		log.Println("ERROR STARTING " + client + "@" + version)
 		log.Fatal(startError)
 	}
 
-	cmnd.Wait()
+	command.Wait()
 
 	in, err := os.Open("/opt/lukso/networks/" + network + "/config/pandora-nodes.json")
 	if err != nil {
@@ -63,7 +63,6 @@ func startPandora(version string, network string) {
 	}
 	defer in.Close()
 
-	fmt.Println(datadir + "/geth/static-nodes.json")
 	out, err := os.Create(datadir + "/geth/static-nodes.json")
 	if err != nil {
 		fmt.Println(err)

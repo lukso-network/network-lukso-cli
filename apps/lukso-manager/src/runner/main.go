@@ -20,9 +20,9 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 }
 
 func StopClients(w http.ResponseWriter, r *http.Request) {
-	cmnd := exec.Command("lukso", "stop")
+	command := exec.Command("lukso", "stop")
 
-	if err := cmnd.Start(); err != nil {
+	if err := command.Start(); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -32,9 +32,9 @@ func StartBinary(client string, version string, args []string) {
 	fmt.Println("STARTING " + client + "@" + version)
 	fmt.Println("/home/rryter/.lukso/downloads/" + client + "/" + version + "/" + client)
 
-	cmnd := exec.Command("/home/rryter/.lukso/downloads/"+client+"/"+version+"/"+client, args...)
+	command := exec.Command("/home/rryter/.lukso/downloads/"+client+"/"+version+"/"+client, args...)
 
-	if startError := cmnd.Start(); startError != nil {
+	if startError := command.Start(); startError != nil {
 		log.Println("ERROR STARTING " + client + "@" + version)
 		log.Fatal(startError)
 	}
