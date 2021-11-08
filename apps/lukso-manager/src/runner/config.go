@@ -23,11 +23,11 @@ func ReadConfig(network string) (*NetworkConfig, error) {
 		return nil, err
 	}
 
-	c := &NetworkConfig{}
-	err = yaml.Unmarshal(buf, c)
+	config := &NetworkConfig{}
+	err = yaml.Unmarshal(buf, config)
 	if err != nil {
 		return nil, fmt.Errorf("in file %q: %v", fileName, err)
 	}
 
-	return c, nil
+	return config, nil
 }
