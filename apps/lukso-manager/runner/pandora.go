@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"lukso/shared"
 	"os"
 	"os/exec"
 	"strings"
@@ -11,7 +12,7 @@ import (
 
 func startPandora(version string, network string) {
 	client := "pandora"
-	datadir := "/home/rryter/.lukso/networks/" + network + "/datadirs/pandora"
+	datadir := shared.NetworkDir + network + "/datadirs/" + client
 
 	config, err := ReadConfig(network)
 	if err != nil {
@@ -48,8 +49,8 @@ func startPandora(version string, network string) {
 		"--ethstats=l15-rryter-gui:6Tcpc53R5V763Aur9LgD@" + statsPrefix + "stats.pandora.l15.lukso.network",
 	}
 
-	fmt.Println("/home/rryter/.lukso/downloads/" + client + "/" + version + "/" + client + " --datadir " + datadir + " init /opt/lukso/networks/" + network + "/config/pandora-genesis.json &>/dev/null")
-	command := exec.Command("bash", "-c", "/home/rryter/.lukso/downloads/"+client+"/"+version+"/"+client+" --datadir "+datadir+" init /opt/lukso/networks/"+network+"/config/pandora-genesis.json &>/dev/null")
+	fmt.Println(shared.BinaryDir + client + "/" + version + "/" + client + " --datadir " + datadir + " init /opt/lukso/networks/" + network + "/config/pandora-genesis.json &>/dev/null")
+	command := exec.Command("bash", "-c", shared.BinaryDir+client+"/"+version+"/"+client+" --datadir "+datadir+" init /opt/lukso/networks/"+network+"/config/pandora-genesis.json &>/dev/null")
 	if startError := command.Start(); startError != nil {
 		log.Println("ERROR STARTING " + client + "@" + version)
 		log.Fatal(startError)

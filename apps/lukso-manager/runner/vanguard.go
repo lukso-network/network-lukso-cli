@@ -2,6 +2,7 @@ package runner
 
 import (
 	"fmt"
+	"lukso/shared"
 	"strings"
 )
 
@@ -19,7 +20,7 @@ func startVanguard(version string, network string) {
 		"--accept-terms-of-use",
 		"--chain-id=" + fmt.Sprint(config.CHAINID),
 		"--network-id=" + fmt.Sprint(config.NETWORKID),
-		"--datadir=/home/rryter/.lukso/networks/" + network + "/datadirs/vanguard",
+		"--datadir=" + shared.NetworkDir + network + "/datadirs/vanguard",
 		"--genesis-state=/opt/lukso/networks/" + network + "/config/vanguard-genesis.ssz",
 		"--chain-config-file=/opt/lukso/networks/" + network + "/config/vanguard-config.yaml",
 		"--bootstrap-node=" + bootnodes[0],

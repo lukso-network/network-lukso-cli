@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"lukso/shared"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -126,12 +127,7 @@ type updateRequestBody struct {
 func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 	var DownloadedVerions = map[string][]string{}
 
-	dirname, errHome := os.UserHomeDir()
-	if errHome != nil {
-		log.Println(errHome)
-	}
-
-	downloads := dirname + "/.lukso/downloads"
+	downloads := shared.UserHomeDir + "/.lukso/downloads"
 
 	err := filepath.Walk(downloads,
 		func(path string, info os.FileInfo, err error) error {
@@ -217,26 +213,19 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dirname, err := os.UserHomeDir()
+	_, err = os.Stat(shared.BinaryDir)
 	if err != nil {
-		return
+		os.Mkdir(shared.BinaryDir, 0775)
 	}
 
-	downloads := dirname + "/.lukso/downloads"
-
-	_, err = os.Stat(downloads)
-	if err != nil {
-		os.Mkdir(downloads, 0775)
-	}
-
-	clientFolder := downloads + "/" + t.Client + "/"
+	clientFolder := shared.BinaryDir + "/" + t.Client + "/"
 
 	_, err = os.Stat(clientFolder)
 	if err != nil {
 		os.Mkdir(clientFolder, 0775)
 	}
 
-	clientFolderWithVersion := downloads + "/" + t.Client + "/"
+	clientFolderWithVersion := shared.BinaryDir + "/" + t.Client + "/"
 
 	_, err = os.Stat(clientFolderWithVersion)
 	if err != nil {
@@ -245,8 +234,6 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 
 	filePath := clientFolder + t.Version + "/" + t.Client
 	fileUrl := t.Url
-	fmt.Println(filePath)
-	fmt.Println(fileUrl)
 
 	err = downloadFile(filePath, fileUrl)
 	if err != nil {
@@ -260,5 +247,5 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(err.Error()))
+	w.Write([]byte(filePath))
 }

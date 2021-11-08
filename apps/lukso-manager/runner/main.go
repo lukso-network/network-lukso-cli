@@ -3,6 +3,7 @@ package runner
 import (
 	"fmt"
 	"log"
+	"lukso/shared"
 	"net/http"
 	"os/exec"
 )
@@ -29,10 +30,7 @@ func StopClients(w http.ResponseWriter, r *http.Request) {
 
 func StartBinary(client string, version string, args []string) {
 
-	fmt.Println("STARTING " + client + "@" + version)
-	fmt.Println("/home/rryter/.lukso/downloads/" + client + "/" + version + "/" + client)
-
-	command := exec.Command("/home/rryter/.lukso/downloads/"+client+"/"+version+"/"+client, args...)
+	command := exec.Command(shared.BinaryDir+client+"/"+version+"/"+client, args...)
 
 	if startError := command.Start(); startError != nil {
 		log.Println("ERROR STARTING " + client + "@" + version)
