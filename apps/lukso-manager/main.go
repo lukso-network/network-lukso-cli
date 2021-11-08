@@ -28,6 +28,8 @@ func main() {
 		Router: mux.NewRouter(),
 	}
 
+	app.Router.Methods("GET").Path("/health").HandlerFunc(metrics.VanguardMetrics)
+
 	app.Router.Methods("GET").Path("/vanguard/metrics").HandlerFunc(metrics.VanguardMetrics)
 	app.Router.Methods("GET").Path("/validator/metrics").HandlerFunc(metrics.ValidatorMetrics)
 	app.Router.Methods("GET").Path("/pandora/debug/metrics").HandlerFunc(metrics.PandoraMetrics)
