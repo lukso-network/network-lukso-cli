@@ -1,3 +1,4 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AvailableVersionsComponent } from './available-versions.component';
@@ -8,9 +9,9 @@ describe('AvailableVersionsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AvailableVersionsComponent ]
-    })
-    .compileComponents();
+      imports: [HttpClientTestingModule],
+      declarations: [AvailableVersionsComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
