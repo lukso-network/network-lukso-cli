@@ -159,11 +159,16 @@ func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	confMap := map[string]map[string]string{}
 	for client, url := range ReleaseLocations {
 		r, err := http.Get(url + "?per_page=3")
 		if err != nil {
 			log.Fatalln("Request to "+url+" failed.", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Request to " + url + " failed."))
+			return
 		}
 
 		confMap[client] = make(map[string]string)
@@ -174,6 +179,9 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 		err2 := decoder.Decode(&releases)
 		if err2 != nil {
 			log.Fatalln(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Can not decode releases"))
+			return
 		}
 
 		for _, v := range releases {
@@ -186,7 +194,11 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 	jsonString, err := json.Marshal(confMap)
 	if err != nil {
 		log.Fatalln(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("invalid json"))
+		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonString)
@@ -205,6 +217,8 @@ func getDownloadUrlFromAsset(name string, assets []Assets) string {
 }
 
 func DownloadClient(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	decoder := json.NewDecoder(r.Body)
 	var t updateRequestBody
 	err := decoder.Decode(&t)
@@ -215,20 +229,24 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 
 	_, err = os.Stat(shared.BinaryDir)
 	if err != nil {
+		fmt.Println("CREATE BINARY DIRECTORY", shared.BinaryDir)
 		os.Mkdir(shared.BinaryDir, 0775)
 	}
 
-	clientFolder := shared.BinaryDir + "/" + t.Client + "/"
+	clientFolder := shared.BinaryDir + t.Client + "/"
 
 	_, err = os.Stat(clientFolder)
 	if err != nil {
+		fmt.Println("CREATE CLIENT DIRECTORY", clientFolder)
 		os.Mkdir(clientFolder, 0775)
 	}
 
-	clientFolderWithVersion := shared.BinaryDir + "/" + t.Client + "/"
+	clientFolderWithVersion := clientFolder + t.Version
+	fmt.Println(clientFolderWithVersion)
 
 	_, err = os.Stat(clientFolderWithVersion)
 	if err != nil {
+		fmt.Println("CREATE CLIENT DIRECTORY", clientFolderWithVersion)
 		os.Mkdir(clientFolderWithVersion, 0775)
 	}
 
@@ -237,15 +255,22 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 
 	err = downloadFile(filePath, fileUrl)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("File " + fileUrl + " could not be downloaded: " + err.Error()))
 		return
 	}
 
 	_, err = os.Stat(filePath)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("File " + fileUrl + " not found"))
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	os.Chmod(filePath, 0775)
+
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(filePath))
+	if err := json.NewEncoder(w).Encode("Download Successful"); err != nil {
+		panic(err)
+	}
 }

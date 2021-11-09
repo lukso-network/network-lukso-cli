@@ -6,12 +6,13 @@ import (
 	"strings"
 )
 
-func startVanguard(version string, network string) {
+func startVanguard(version string, network string) (err error) {
 	client := "vanguard"
 
 	config, err := ReadConfig(network)
 	if err != nil {
 		fmt.Println("error reading config")
+		return
 	}
 
 	bootnodes := strings.Split(config.VANGUARDBOOTNODES, ",")
@@ -44,4 +45,6 @@ func startVanguard(version string, network string) {
 	}
 
 	StartBinary(client, version, args)
+
+	return
 }

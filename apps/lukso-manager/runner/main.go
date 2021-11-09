@@ -9,15 +9,35 @@ import (
 )
 
 func StartClients(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	fmt.Println("              ")
 	fmt.Println("Starting Clients")
 	fmt.Println("              ")
 
 	network := "l15-staging"
 
-	startVanguard("v0.5.1-develop", network)
-	startOrchestrator("v0.5.4-develop", network)
-	startPandora("v0.5.3-develop", network)
+	errVanguard := startVanguard("v0.5.1-develop", network)
+	if errVanguard != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(errVanguard.Error()))
+	}
+
+	errOrchestrator := startOrchestrator("v0.5.4-develop", network)
+	if errOrchestrator != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(errOrchestrator.Error()))
+	}
+
+	errPandora := startPandora("v0.5.3-develop", network)
+	if errPandora != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(errPandora.Error()))
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Successfully started all the clients."))
+
 }
 
 func StopClients(w http.ResponseWriter, r *http.Request) {

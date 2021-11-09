@@ -10,13 +10,19 @@ import (
 	"strings"
 )
 
-func startPandora(version string, network string) {
+func startPandora(version string, network string) (err error) {
 	client := "pandora"
 	datadir := shared.NetworkDir + network + "/datadirs/" + client
+	hostname, hostNameError := os.Hostname()
+	if hostNameError != nil {
+		return
+	}
+
+	hostname = "l15-" + hostname
 
 	config, err := ReadConfig(network)
 	if err != nil {
-		fmt.Println("error reading config")
+		return
 	}
 
 	statsPrefix := ""
@@ -46,14 +52,13 @@ func startPandora(version string, network string) {
 		"--metrics.expensive",
 		"--pprof",
 		"--pprof.addr=127.0.0.1",
-		"--ethstats=l15-rryter-gui:6Tcpc53R5V763Aur9LgD@" + statsPrefix + "stats.pandora.l15.lukso.network",
+		"--ethstats=" + hostname + ":6Tcpc53R5V763Aur9LgD@" + statsPrefix + "stats.pandora.l15.lukso.network",
 	}
 
-	fmt.Println(shared.BinaryDir + client + "/" + version + "/" + client + " --datadir " + datadir + " init /opt/lukso/networks/" + network + "/config/pandora-genesis.json &>/dev/null")
 	command := exec.Command("bash", "-c", shared.BinaryDir+client+"/"+version+"/"+client+" --datadir "+datadir+" init /opt/lukso/networks/"+network+"/config/pandora-genesis.json &>/dev/null")
 	if startError := command.Start(); startError != nil {
-		log.Println("ERROR STARTING " + client + "@" + version)
 		log.Fatal(startError)
+		return
 	}
 
 	command.Wait()
@@ -61,12 +66,14 @@ func startPandora(version string, network string) {
 	in, err := os.Open("/opt/lukso/networks/" + network + "/config/pandora-nodes.json")
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	defer in.Close()
 
 	out, err := os.Create(datadir + "/geth/static-nodes.json")
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	defer out.Close()
 
@@ -74,4 +81,6 @@ func startPandora(version string, network string) {
 	out.Close()
 
 	StartBinary(client, version, args)
+
+	return
 }
