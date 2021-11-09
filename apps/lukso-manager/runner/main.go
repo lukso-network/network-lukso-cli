@@ -1,7 +1,7 @@
 package runner
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
 	"lukso/shared"
 	"net/http"
@@ -10,10 +10,6 @@ import (
 
 func StartClients(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
-	fmt.Println("              ")
-	fmt.Println("Starting Clients")
-	fmt.Println("              ")
 
 	network := "l15-staging"
 
@@ -36,8 +32,9 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Successfully started all the clients."))
-
+	if err := json.NewEncoder(w).Encode("Successfully started all the clients."); err != nil {
+		panic(err)
+	}
 }
 
 func StopClients(w http.ResponseWriter, r *http.Request) {
