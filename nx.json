@@ -18,12 +18,7 @@
     "default": {
       "runner": "@nrwl/nx-cloud",
       "options": {
-        "cacheableOperations": [
-          "build",
-          "lint",
-          "test",
-          "e2e"
-        ],
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
         "accessToken": "MTM1MTI5YTAtNzg4ZS00MWE3LTg5NjgtNTFiZDdmYjg0ODBifHJlYWQtd3JpdGU="
       }
     }
@@ -48,8 +43,10 @@
       "linter": "eslint",
       "unitTestRunner": "jest"
     },
-    "@nrwl/angular:component": {
-      "style": "scss"
+    "@schematics/angular:component": {
+      "style": "scss",
+      "displayBlock": true,
+      "prefix": "lukso"
     }
   },
   "defaultProject": "lukso-status"
