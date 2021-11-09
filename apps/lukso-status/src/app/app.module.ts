@@ -11,6 +11,9 @@ import { StatusComponent } from './components/status/status.component';
 import { InstallComponent } from './components/install/install.component';
 import { OrchestratorStatusComponent } from './components/status/orchestrator-status/orchestrator-status.component';
 import { ValidatorStatusComponent } from './components/status/validator-status/validator-status.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { InitialSetupComponent } from './components/install/initial-setup/initial-setup.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -22,8 +25,15 @@ import { ValidatorStatusComponent } from './components/status/validator-status/v
     InstallComponent,
     OrchestratorStatusComponent,
     ValidatorStatusComponent,
+    SettingsComponent,
+    InitialSetupComponent,
   ],
-  imports: [AppRoutingModule, BrowserModule, HttpClientModule],
+  imports: [
+    AppRoutingModule,
+    BrowserModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

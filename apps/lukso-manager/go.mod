@@ -3,6 +3,7 @@ module lukso
 go 1.16
 
 require (
+	github.com/boltdb/bolt v1.3.1
 	github.com/c9s/gomon v1.3.0 // indirect
 	github.com/canthefason/go-watcher v0.2.4 // indirect
 	github.com/codeclysm/extract v2.2.0+incompatible // indirect

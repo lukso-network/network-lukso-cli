@@ -1,8 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { switchMap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { SoftwareService } from '../../services/available-versions/available-versions.service';
 import { VanguardService } from '../../services/vanguard-metrics.service';
 import { PandoraMetricsService } from '../../services/pandora-metrics.service';
+import { Settings } from '../../interfaces/settings';
 
 @Component({
   selector: 'lukso-status',
@@ -25,8 +27,15 @@ export class StatusComponent {
     this.vanguardMetrics$ = vanguardService.getMetrics$();
   }
 
-  startClients() {
-    this.softwareService.startClients().subscribe();
+  startClients(network: string) {
+    this.softwareService
+      .getConfig(network)
+      .pipe(
+        switchMap((settings: Settings) => {
+          return this.softwareService.startClients(network, settings);
+        })
+      )
+      .subscribe();
   }
 
   stopClients() {

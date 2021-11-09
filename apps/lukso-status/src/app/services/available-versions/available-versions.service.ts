@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
+import { Settings } from '../../interfaces/settings';
 
 @Injectable({
   providedIn: 'root',
@@ -9,6 +10,7 @@ import { map, switchMap, tap } from 'rxjs/operators';
 export class SoftwareService {
   availableSoftware$: Observable<any>;
   downloadedSoftware$: Observable<any>;
+
   constructor(private httpClient: HttpClient) {
     this.httpClient = httpClient;
     this.downloadedSoftware$ = httpClient.get('/api/downloaded-versions').pipe(
@@ -44,12 +46,31 @@ export class SoftwareService {
     });
   }
 
-  startClients() {
-    return this.httpClient.post('/api/start-clients', {});
+  startClients(network: string, settings: Settings) {
+    return this.httpClient.post('/api/start-clients', {
+      network,
+      settings,
+    }) as Observable<string>;
   }
 
   stopClients() {
     return this.httpClient.post('/api/stop-clients', {});
+  }
+
+  getConfig(network: string) {
+    return this.httpClient.get('/api/settings', {
+      params: {
+        network,
+      },
+    }) as Observable<Settings>;
+  }
+
+  setConfig(network: string, settings: Settings) {
+    console.log(settings);
+    return this.httpClient.post('/api/settings', {
+      network,
+      settings,
+    }) as Observable<Settings>;
   }
 
   getAvailableVersions$() {

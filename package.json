@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
-    "start": "nx run-many --target=serve --all --parallel",
+    "start": "nx serve lukso-status --host 0.0.0.0",
     "build": "nx build",
     "test": "nx test"
   },

@@ -1,14 +1,17 @@
 package main
 
 import (
+	"log"
 	"lukso/downloader"
 	"lukso/metrics"
 	"lukso/runner"
+	"lukso/settings"
 	"lukso/shared"
 	"lukso/validator"
 	"lukso/webserver"
 	"os"
 
+	"github.com/boltdb/bolt"
 	"github.com/gorilla/mux"
 )
 
@@ -18,9 +21,16 @@ func init() {
 		panic("Can not get the UserHomeDir")
 	}
 
-	shared.UserHomeDir = userHomeDir
-	shared.BinaryDir = userHomeDir + "/.lukso/binaries/"
-	shared.NetworkDir = userHomeDir + "/.lukso/networks/"
+	shared.LuksoHomeDir = userHomeDir + "/.lukso"
+	shared.BinaryDir = shared.LuksoHomeDir + "/binaries/"
+	shared.NetworkDir = shared.LuksoHomeDir + "/networks/"
+
+	db, err := bolt.Open(shared.LuksoHomeDir+"/settings.db", 0640, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	shared.SettingsDB = db
+
 }
 
 func main() {
@@ -40,6 +50,8 @@ func main() {
 	app.Router.Methods("POST").Path("/start-clients").HandlerFunc(runner.StartClients)
 	app.Router.Methods("POST").Path("/stop-clients").HandlerFunc(runner.StopClients)
 	app.Router.Methods("POST").Path("/launchpad/generate-keys").HandlerFunc(validator.GenerateValidatorKeys)
+	app.Router.Methods("POST").Path("/settings").HandlerFunc(settings.SaveSettingsEndpoint)
+	app.Router.Methods("GET").Path("/settings").HandlerFunc(settings.GetSettingsEndpoint)
 
 	app.Start()
 }

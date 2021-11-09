@@ -10,12 +10,12 @@ import (
 	"strings"
 )
 
-func startPandora(version string, network string) (err error) {
+func startPandora(version string, network string, hostname string) (err error) {
 	client := "pandora"
 	datadir := shared.NetworkDir + network + "/datadirs/" + client
-	hostname, hostNameError := os.Hostname()
-	if hostNameError != nil {
-		return
+
+	if hostname == "" {
+		hostname, _ = os.Hostname()
 	}
 
 	hostname = "l15-" + hostname

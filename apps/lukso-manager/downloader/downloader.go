@@ -127,7 +127,7 @@ type updateRequestBody struct {
 func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 	var DownloadedVerions = map[string][]string{}
 
-	downloads := shared.UserHomeDir + "/.lukso/downloads"
+	downloads := shared.LuksoHomeDir + "/.lukso/downloads"
 
 	err := filepath.Walk(downloads,
 		func(path string, info os.FileInfo, err error) error {

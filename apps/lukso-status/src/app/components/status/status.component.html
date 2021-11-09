@@ -1,15 +1,19 @@
 <nav>
   <ul class="nav d-flex">
     <li class="nav-item">
-      <button class="btn btn-success" (click)="startClients()">Start</button>
+      <button class="btn btn-success" (click)="startClients(network.value)">
+        Start
+      </button>
     </li>
     <li class="nav-item">
       <button class="btn btn-danger" (click)="stopClients()">Stop</button>
     </li>
     <li class="nav-item ms-auto">
       <!-- Example single danger button -->
-      <select class="form-select" aria-label="Default select example">
-        <option value="1" selected>L15 Testnet</option>
+      <select #network class="form-select" aria-label="Default select example">
+        <option value="l15-dev" selected>L15 Dev</option>
+        <option value="l15-staging">L15 Staging</option>
+        <option value="l15-prod">L15 Prod</option>
         <option value="2" disabled>L16 Testnet</option>
         <option value="3" disabled>Mainnet</option>
       </select>
