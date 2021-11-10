@@ -68,6 +68,8 @@ param (
     [String]${van-max-p2p-peers},
     [String]${van-ethstats},
     [String]$validator,
+    [String]${validator-beacon-rpc-provider},
+    [String]${validator-pandora-http-provider},
     [String]${validator-verbosity},
     [String]${cors-domain},
     [String]${external-ip},
@@ -134,9 +136,18 @@ If ($network) {
     $NetworkConfig = ConvertFrom-Yaml $(Get-Content -Raw $NetworkConfigFile)
 }
 
+${pan-http-addr} = If (${pan-http-addr}) {${pan-http-addr}} ElseIf ($ConfigFile.PANDORA_HTTP_ADDR) {$ConfigFile.PANDORA_HTTP_ADDR} Else {"127.0.0.1"}
+${pan-http-port} = If (${pan-http-port}) {${pan-http-port}} ElseIf ($ConfigFile.PANDORA_HTTP_PORT) {$ConfigFile.PANDORA_HTTP_PORT} Else {"8545"}
+
+${vanguard-rpc-host} = If (${vanguard-rpc-host}) {${vanguard-rpc-host}} ElseIf ($ConfigFile.VANGUARD_RPC_HOST) {$ConfigFile.VANGUARD_RPC_HOST} Else {"127.0.0.1"}
+${van-rpc-port} = If (${van-rpc-port}) {${van-rpc-port}} ElseIf ($ConfigFile.VANGUARD_RPC_PORT) {$ConfigFile.VANGUARD_RPC_PORT} Else {"4000"}
+
+${vanguard-rpc} = "${vanguard-rpc-host}:${van-rpc-port}"
+${pandora-rpc} = "${pan-http-addr}:${pan-http-port}"
+
 $deposit = If ($deposit) {$deposit} ElseIf ($ConfigFile.DEPOSIT) {$ConfigFile.DEPOSIT} Else {"v1.2.6-LUKSO"}
 $eth2stats = If ($eth2stats) {$eth2stats} ElseIf ($ConfigFile.ETH2STATS) {$ConfigFile.ETH2STATS} Else {""}
-${eth2stats-beacon-addr} = If (${eth2stats-beacon-addr}) {${eth2stats-beacon-addr}} ElseIf ($ConfigFile.ETH2STATS_BEACON_ADDR) {$ConfigFile.ETH2STATS_BEACON_ADDR} Else {"127.0.0.1:4000"}
+${eth2stats-beacon-addr} = If (${eth2stats-beacon-addr}) {${eth2stats-beacon-addr}} ElseIf ($ConfigFile.ETH2STATS_BEACON_ADDR) {$ConfigFile.ETH2STATS_BEACON_ADDR} Else {${vanguard-rpc}}
 ${lukso-home} = If (${lukso-home}) {${lukso-home}} ElseIf ($ConfigFile.LUKSO_HOME) {$ConfigFile.LUKSO_HOME} Else {"$HOME\.lukso"}
 $datadir = If ($datadir) {$datadir} ElseIf ($ConfigFile.DATADIR) {$ConfigFile.DATADIR} Else {"${lukso-home}\$network\datadir"}
 $logsdir = If ($logsdir) {$logsdir} ElseIf ($ConfigFile.LOGSDIR) {$ConfigFile.LOGSDIR} Else {"${lukso-home}\$network\logs"}
@@ -154,7 +165,7 @@ ${orc-http-port} = If (${orc-http-port}) {${orc-http-port}} ElseIf ($ConfigFile.
 ${orc-ws-address} = If (${orc-ws-address}) {${orc-ws-address}} ElseIf ($ConfigFile.ORC_WS_ADDR) {$ConfigFile.ORC_WS_ADDR} Else {"127.0.0.1"}
 ${orc-ws-port} = If (${orc-ws-port}) {${orc-ws-port}} ElseIf ($ConfigFile.ORC_WS_PORT) {$ConfigFile.ORC_WS_PORT} Else {"7878"}
 ${orchestrator-pandora-rpc-endpoint} = If (${orchestrator-pandora-rpc-endpoint}) {${orchestrator-pandora-rpc-endpoint}} ElseIf ($ConfigFile.ORCHESTRATOR_PANDORA_RPC_ENDPOINT) {$ConfigFile.ORCHESTRATOR_PANDORA_RPC_ENDPOINT} Else {"ws://127.0.0.1:8546"}
-${orchestrator-vanguard-rpc-endpoint} = If (${orchestrator-vanguard-rpc-endpoint}) {${orchestrator-vanguard-rpc-endpoint}} ElseIf ($ConfigFile.ORCHESTRATOR_VANGUARD_RPC_ENDPOINT) {$ConfigFile.ORCHESTRATOR_VANGUARD_RPC_ENDPOINT} Else {"127.0.0.1:4000"}
+${orchestrator-vanguard-rpc-endpoint} = If (${orchestrator-vanguard-rpc-endpoint}) {${orchestrator-vanguard-rpc-endpoint}} ElseIf ($ConfigFile.ORCHESTRATOR_VANGUARD_RPC_ENDPOINT) {$ConfigFile.ORCHESTRATOR_VANGUARD_RPC_ENDPOINT} Else {${vanguard-rpc}}
 ${orchestrator-verbosity} = If (${orchestrator-verbosity}) {${orchestrator-verbosity}} ElseIf ($ConfigFile.ORCHESTRATOR_VERBOSITY) {$ConfigFile.ORCHESTRATOR_VERBOSITY} Else {"info"}
 $pandora = If ($pandora) {$pandora} ElseIf ($ConfigFile.PANDORA) {$ConfigFile.PANDORA} Else {""}
 ${pandora-bootnodes} = If (${pandora-bootnodes}) {${pandora-bootnodes}} ElseIf ($ConfigFile.PANDORA_BOOTNODES) {$ConfigFile.PANDORA_BOOTNODES} Else {$NetworkConfig.PANDORA_BOOTNODES}
@@ -167,8 +178,6 @@ ${pandora-unsafe-expose} = If (${pandora-unsafe-expose}) {${pandora-unsafe-expos
 ${pandora-verbosity} = If (${pandora-verbosity}) {${pandora-verbosity}} ElseIf ($ConfigFile.PANDORA_VERBOSITY) {$ConfigFile.PANDORA_VERBOSITY} Else {"info"}
 #${pandora-http-port} = If (${pandora-http-port}) {${pandora-http-port}} ElseIf ($ConfigFile.PANDORA_HTTP_PORT) {$ConfigFile.PANDORA_HTTP_PORT} Else {"8545"}
 ${pan-port} = If (${pan-port}) {${pan-port}} ElseIf ($ConfigFile.PANDORA_PORT) {$ConfigFile.PANDORA_PORT} Else {"30405"}
-${pan-http-addr} = If (${pan-http-addr}) {${pan-http-addr}} ElseIf ($ConfigFile.PANDORA_HTTP_ADDR) {$ConfigFile.PANDORA_HTTP_ADDR} Else {"127.0.0.1"}
-${pan-http-port} = If (${pan-http-port}) {${pan-http-port}} ElseIf ($ConfigFile.PANDORA_HTTP_PORT) {$ConfigFile.PANDORA_HTTP_PORT} Else {"8545"}
 ${pan-http-miner-addr} = If (${pan-http-miner-addr}) {${pan-http-miner-addr}} ElseIf ($ConfigFile.PANDORA_HTTP_MINER_ADDR) {$ConfigFile.PANDORA_HTTP_MINER_ADDR} Else {"ws://127.0.0.1:7877"}
 ${pan-ws-addr} = If (${pan-ws-addr}) {${pan-ws-addr}} ElseIf ($ConfigFile.PANDORA_WS_ADDR) {$ConfigFile.PANDORA_WS_ADDR} Else {"127.0.0.1"}
 ${pan-ws-port} = If (${pan-ws-port}) {${pan-ws-port}} ElseIf ($ConfigFile.PANDORA_WS_PORT) {$ConfigFile.PANDORA_WS_PORT} Else {"8546"}
@@ -179,13 +188,11 @@ ${vanguard-bootnodes} = If (${vanguard-bootnodes}) {${vanguard-bootnodes}} ElseI
 ${vanguard-p2p-priv-key} = If (${vanguard-p2p-priv-key}) {${vanguard-p2p-priv-key}} ElseIf ($ConfigFile.VANGUARD_P2P_PRIV_KEY) {$ConfigFile.VANGUARD_P2P_PRIV_KEY} Else {""}
 ${vanguard-external-ip} = If (${vanguard-external-ip}) {${vanguard-external-ip}} ElseIf ($ConfigFile.VANGUARD_EXTERNAL_IP) {$ConfigFile.VANGUARD_EXTERNAL_IP} Else {""}
 ${vanguard-p2p-host-dns} = If (${vanguard-p2p-host-dns}) {${vanguard-p2p-host-dns}} ElseIf ($ConfigFile.VANGUARD_P2P_HOST_DNS) {$ConfigFile.VANGUARD_P2P_HOST_DNS} Else {""}
-${vanguard-rpc-host} = If (${vanguard-rpc-host}) {${vanguard-rpc-host}} ElseIf ($ConfigFile.VANGUARD_RPC_HOST) {$ConfigFile.VANGUARD_RPC_HOST} Else {""}
 ${vanguard-monitoring-host} = If (${vanguard-monitoring-host}) {${vanguard-monitoring-host}} ElseIf ($ConfigFile.VANGUARD_MONITORING_HOST) {$ConfigFile.VANGUARD_MONITORING_HOST} Else {""}
 ${vanguard-http-web3provider} = If (${vanguard-http-web3provider}) {${vanguard-http-web3provider}} ElseIf ($ConfigFile.VANGUARD_HTTP_WEB3PROVIDER) {$ConfigFile.VANGUARD_HTTP_WEB3PROVIDER} Else {"http://127.0.0.1:8545"}
 ${vanguard-orc-rpc-provider} = If (${vanguard-orc-rpc-provider}) {${vanguard-orc-rpc-provider}} ElseIf ($ConfigFile.VANGUARD_ORC_RPC_PROVIDER) {$ConfigFile.VANGUARD_ORC_RPC_PROVIDER} Else {"http://127.0.0.1:7877"}
 ${vanguard-verbosity} = If (${vanguard-verbosity}) {${vanguard-verbosity}} ElseIf ($ConfigFile.VANGUARD_VERBOSITY) {$ConfigFile.VANGUARD_VERBOSITY} Else {"info"}
 ${van-ethstats-metrics} = If (${van-ethstats-metrics}) {${van-ethstats-metrics}} ElseIf ($ConfigFile.VANGUARD_ETHSTATS_METRICS) {$ConfigFile.VANGUARD_ETHSTATS_METRICS} Else {"http://127.0.0.1:8080/metrics"}
-${van-rpc-port} = If (${van-rpc-port}) {${van-rpc-port}} ElseIf ($ConfigFile.VANGUARD_RPC_PORT) {$ConfigFile.VANGUARD_RPC_PORT} Else {"4000"}
 ${van-udp-port} = If (${van-udp-port}) {${van-udp-port}} ElseIf ($ConfigFile.VANGUARD_UDP_PORT) {$ConfigFile.VANGUARD_UDP_PORT} Else {"12000"}
 ${van-tcp-port} = If (${van-tcp-port}) {${van-tcp-port}} ElseIf ($ConfigFile.VANGUARD_TCP_PORT) {$ConfigFile.VANGUARD_TCP_PORT} Else {"13000"}
 ${van-grpc-gateway-port} = If (${van-grpc-gateway-port}) {${van-grpc-gateway-port}} ElseIf ($ConfigFile.VANGUARD_GRPC_GATEWAY_PORT) {$ConfigFile.VANGUARD_GRPC_GATEWAY_PORT} Else {"3500"}
@@ -193,6 +200,8 @@ ${van-min-sync-peers} = If (${van-min-sync-peers}) {${van-min-sync-peers}} ElseI
 ${van-max-p2p-peers} = If (${van-max-p2p-peers}) {${van-max-p2p-peers}} ElseIf ($ConfigFile.VANGUARD_MAX_P2P_PEERS) {$ConfigFile.VANGUARD_MAX_P2P_PEERS} Else {"50"}
 ${van-ethstats} = If (${van-ethstats}) {${van-ethstats}} ElseIf ($ConfigFile.VAN_ETHSTATS) {$ConfigFile.VAN_ETHSTATS} Else {"34.141.156.125:9090"}
 $validator = If ($validator) {$validator} ElseIf ($ConfigFile.VALIDATOR) {$ConfigFile.VALIDATOR} Else {"v0.2.0-rc.1"}
+${validator-beacon-rpc-provider} = If (${validator-beacon-rpc-provider}) {${validator-beacon-rpc-provider}} ElseIf ($ConfigFile.VALIDATOR_BEACON_RPC_PROVIDER) {$ConfigFile.VALIDATOR_BEACON_RPC_PROVIDER} Else {${vanguard-rpc}}
+${validator-pandora-http-provider} = If (${validator-pandora-http-provider}) {${validator-pandora-http-provider}} ElseIf ($ConfigFile.VALIDATOR_PANDORA_HTTP_PROVIDER) {$ConfigFile.VALIDATOR_PANDORA_HTTP_PROVIDER} Else {${pandora-rpc}}
 ${validator-verbosity} = If (${validator-verbosity}) {${validator-verbosity}} ElseIf ($ConfigFile.VALIDATOR_VERBOSITY) {$ConfigFile.VALIDATOR_VERBOSITY} Else {"info"}
 ${cors-domain} = If (${cors-domain}) {${cors-domain}} ElseIf ($ConfigFile.CORS_DOMAIN) {$ConfigFile.CORS_DOMAIN} Else {""}
 ${external-ip} = If (${external-ip}) {${external-ip}} ElseIf ($ConfigFile.EXTERNAL_IP) {$ConfigFile.EXTERNAL_IP} Else {""}
@@ -566,9 +575,10 @@ function start_validator() {
     $Arguments = New-Object System.Collections.Generic.List[System.Object]
     $Arguments.Add("--datadir=$datadir\validator")
     $Arguments.Add("--accept-terms-of-use")
-    $Arguments.Add("--beacon-rpc-provider=localhost:4000")
+    $Arguments.Add("--beacon-rpc-provider=$(${validator-beacon-rpc-provider})")
     $Arguments.Add("--chain-config-file=$InstallDir\networks\$network\config\vanguard-config.yaml")
     $Arguments.Add("--verbosity=$(${validator-verbosity})")
+    $Arguments.Add("--pandora-http-provider=$(${validator-pandora-http-provider})")
     $Arguments.Add("--wallet-dir=$(${wallet-dir})")
     $Arguments.Add("--rpc")
     $Arguments.Add("--log-file=$logsdir\validator\validator_$runDate.log")
