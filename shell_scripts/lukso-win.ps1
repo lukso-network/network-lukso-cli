@@ -54,6 +54,8 @@ param (
     [String]${vanguard-external-ip},
     [String]${vanguard-p2p-host-dns},
     [String]${vanguard-rpc-host},
+    [String]${vanguard-http-web3provider},
+    [String]${vanguard-orc-rpc-provider},
     [String]${vanguard-monitoring-host},
     [String]${vanguard-verbosity},
     [String]${van-ethstats-metrics},
@@ -177,6 +179,8 @@ ${vanguard-external-ip} = If (${vanguard-external-ip}) {${vanguard-external-ip}}
 ${vanguard-p2p-host-dns} = If (${vanguard-p2p-host-dns}) {${vanguard-p2p-host-dns}} ElseIf ($ConfigFile.VANGUARD_P2P_HOST_DNS) {$ConfigFile.VANGUARD_P2P_HOST_DNS} Else {""}
 ${vanguard-rpc-host} = If (${vanguard-rpc-host}) {${vanguard-rpc-host}} ElseIf ($ConfigFile.VANGUARD_RPC_HOST) {$ConfigFile.VANGUARD_RPC_HOST} Else {""}
 ${vanguard-monitoring-host} = If (${vanguard-monitoring-host}) {${vanguard-monitoring-host}} ElseIf ($ConfigFile.VANGUARD_MONITORING_HOST) {$ConfigFile.VANGUARD_MONITORING_HOST} Else {""}
+${vanguard-http-web3provider} = If (${vanguard-http-web3provider}) {${vanguard-http-web3provider}} ElseIf ($ConfigFile.VANGUARD_HTTP_WEB3PROVIDER) {$ConfigFile.VANGUARD_HTTP_WEB3PROVIDER} Else {"http://127.0.0.1:8545"}
+${vanguard-orc-rpc-provider} = If (${vanguard-orc-rpc-provider}) {${vanguard-orc-rpc-provider}} ElseIf ($ConfigFile.VANGUARD_ORC_RPC_PROVIDER) {$ConfigFile.VANGUARD_ORC_RPC_PROVIDER} Else {"http://127.0.0.1:7877"}
 ${vanguard-verbosity} = If (${vanguard-verbosity}) {${vanguard-verbosity}} ElseIf ($ConfigFile.VANGUARD_VERBOSITY) {$ConfigFile.VANGUARD_VERBOSITY} Else {"info"}
 ${van-ethstats-metrics} = If (${van-ethstats-metrics}) {${van-ethstats-metrics}} ElseIf ($ConfigFile.VANGUARD_ETHSTATS_METRICS) {$ConfigFile.VANGUARD_ETHSTATS_METRICS} Else {"http://127.0.0.1:8080/metrics"}
 ${van-rpc-port} = If (${van-rpc-port}) {${van-rpc-port}} ElseIf ($ConfigFile.VANGUARD_RPC_PORT) {$ConfigFile.VANGUARD_RPC_PORT} Else {"4000"}
@@ -509,7 +513,7 @@ function start_vanguard() {
     foreach ($Bootnode in $BootnodesArray) {
         $Arguments.Add("--bootstrap-node=$Bootnode")
     }
-    $Arguments.Add("--http-web3provider=http://127.0.0.1:${pandora-http-port}")
+    $Arguments.Add("--http-web3provider=$(${vanguard-http-web3provider})")
     $Arguments.Add("--deposit-contract=0x000000000000000000000000000000000000cafe")
     $Arguments.Add("--contract-deployment-block=0")
     $Arguments.Add("--rpc-host=0.0.0.0")
@@ -517,7 +521,7 @@ function start_vanguard() {
     $Arguments.Add("--verbosity=${vanguard-verbosity}")
     $Arguments.Add("--min-sync-peers=$(${van-min-sync-peers})")
     $Arguments.Add("--p2p-max-peers=$(${van-max-p2p-peers})")
-    $Arguments.Add("--orc-http-provider=http://127.0.0.1:7877")
+    $Arguments.Add("--orc-http-provider=$(${vanguard-orc-rpc-provider})")
     $Arguments.Add("--rpc-port=$(${van-rpc-port})")
     $Arguments.Add("--p2p-udp-port=$(${van-udp-port})")
     $Arguments.Add("--p2p-tcp-port=$(${van-tcp-port})")
