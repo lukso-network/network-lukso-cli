@@ -28,6 +28,8 @@ param (
     [String]${orc-http-port},
     [String]${orc-ws-address},
     [String]${orc-ws-port},
+    [String]${orchestrator-pandora-rpc-endpoint},
+    [String]${orchestrator-vanguard-rpc-endpoint},
     [String]${orchestrator-verbosity},
     [String]$pandora,
     [String]${pandora-bootnodes},
@@ -147,6 +149,8 @@ ${orc-http-address} = If (${orc-http-address}) {${orc-http-address}} ElseIf ($Co
 ${orc-http-port} = If (${orc-http-port}) {${orc-http-port}} ElseIf ($ConfigFile.ORC_HTTP_PORT) {$ConfigFile.ORC_HTTP_PORT} Else {"7877"}
 ${orc-ws-address} = If (${orc-ws-address}) {${orc-ws-address}} ElseIf ($ConfigFile.ORC_WS_ADDR) {$ConfigFile.ORC_WS_ADDR} Else {"127.0.0.1"}
 ${orc-ws-port} = If (${orc-ws-port}) {${orc-ws-port}} ElseIf ($ConfigFile.ORC_WS_PORT) {$ConfigFile.ORC_WS_PORT} Else {"7878"}
+${orchestrator-pandora-rpc-endpoint} = If (${orchestrator-pandora-rpc-endpoint}) {${orchestrator-pandora-rpc-endpoint}} ElseIf ($ConfigFile.ORCHESTRATOR_PANDORA_RPC_ENDPOINT) {$ConfigFile.ORCHESTRATOR_PANDORA_RPC_ENDPOINT} Else {"ws://127.0.0.1:8546"}
+${orchestrator-vanguard-rpc-endpoint} = If (${orchestrator-vanguard-rpc-endpoint}) {${orchestrator-vanguard-rpc-endpoint}} ElseIf ($ConfigFile.ORCHESTRATOR_VANGUARD_RPC_ENDPOINT) {$ConfigFile.ORCHESTRATOR_VANGUARD_RPC_ENDPOINT} Else {"127.0.0.1:4000"}
 ${orchestrator-verbosity} = If (${orchestrator-verbosity}) {${orchestrator-verbosity}} ElseIf ($ConfigFile.ORCHESTRATOR_VERBOSITY) {$ConfigFile.ORCHESTRATOR_VERBOSITY} Else {"info"}
 $pandora = If ($pandora) {$pandora} ElseIf ($ConfigFile.PANDORA) {$ConfigFile.PANDORA} Else {""}
 ${pandora-bootnodes} = If (${pandora-bootnodes}) {${pandora-bootnodes}} ElseIf ($ConfigFile.PANDORA_BOOTNODES) {$ConfigFile.PANDORA_BOOTNODES} Else {$NetworkConfig.PANDORA_BOOTNODES}
@@ -364,14 +368,14 @@ Function start_orchestrator()
 
     $arguments = @(
     "--datadir=$datadir\orchestrator"
-    "--vanguard-grpc-endpoint=127.0.0.1:4000"
+    "--vanguard-grpc-endpoint=$(${orchestrator-vanguard-rpc-endpoint})"
     "--http"
     "--http.addr=$(${orc-http-address})"
     "--http.port=$(${orc-http-port})"
     "--ws"
     "--ws.addr=$(${orc-ws-address})"
     "--ws.port=$(${orc-ws-port})"
-    "--pandora-rpc-endpoint=ws://127.0.0.1:8546"
+    "--pandora-rpc-endpoint=$(${orchestrator-pandora-rpc-endpoint})"
     "--verbosity=trace"
     )
 
