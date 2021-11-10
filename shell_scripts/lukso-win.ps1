@@ -8,6 +8,7 @@ param (
     [Parameter(Position = 1)][String]$argument,
     [String]$deposit,
     [String]$eth2stats,
+    [String]${eth2stats-beacon-addr},
     [String]$network,
     [String]${lukso-home},
     [String]$datadir,
@@ -135,6 +136,7 @@ If ($network) {
 
 $deposit = If ($deposit) {$deposit} ElseIf ($ConfigFile.DEPOSIT) {$ConfigFile.DEPOSIT} Else {"v1.2.6-LUKSO"}
 $eth2stats = If ($eth2stats) {$eth2stats} ElseIf ($ConfigFile.ETH2STATS) {$ConfigFile.ETH2STATS} Else {""}
+${eth2stats-beacon-addr} = If (${eth2stats-beacon-addr}) {${eth2stats-beacon-addr}} ElseIf ($ConfigFile.ETH2STATS_BEACON_ADDR) {$ConfigFile.ETH2STATS_BEACON_ADDR} Else {"127.0.0.1:4000"}
 ${lukso-home} = If (${lukso-home}) {${lukso-home}} ElseIf ($ConfigFile.LUKSO_HOME) {$ConfigFile.LUKSO_HOME} Else {"$HOME\.lukso"}
 $datadir = If ($datadir) {$datadir} ElseIf ($ConfigFile.DATADIR) {$ConfigFile.DATADIR} Else {"${lukso-home}\$network\datadir"}
 $logsdir = If ($logsdir) {$logsdir} ElseIf ($ConfigFile.LOGSDIR) {$ConfigFile.LOGSDIR} Else {"${lukso-home}\$network\logs"}
@@ -599,7 +601,7 @@ function start_eth2stats_client() {
     $Arguments = New-Object System.Collections.Generic.List[System.Object]
 
     $Arguments.Add("--beacon.type=`"prysm`"")
-    $Arguments.Add("--beacon.addr=`"$ETH2STATS_BEACON_ADDR`"")
+    $Arguments.Add("--beacon.addr=`"$(${eth2stats-beacon-addr})`"")
     $Arguments.Add("--beacon.metrics-addr=`"$(${van-ethstats-metrics})`"")
     $Arguments.Add("--data.folder=$datadir\eth2stats-client")
     $Arguments.Add("--eth2stats.node-name=`"$(${node-name})`"")
