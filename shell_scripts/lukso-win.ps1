@@ -27,7 +27,7 @@ param (
     [String]${orchestrator-verbosity},
     [String]$pandora,
     [String]${pandora-bootnodes},
-    [String]${pandora-http-port},
+#    [String]${pandora-http-port},
     [Switch]${pandora-metrics},
     [String]${pandora-nodekey},
     [String]${pandora-rpcvhosts},
@@ -35,6 +35,11 @@ param (
     [Switch]${pandora-universal-profile-expose},
     [Switch]${pandora-unsafe-expose},
     [String]${pandora-verbosity},
+    [String]${pan-http-addr},
+    [String]${pan-http-port},
+    [String]${pan-http-miner-addr},
+    [String]${pan-ws-addr},
+    [String]${pan-ws-miner-addr},
     [String]${pan-ethstats},
     [String]$vanguard,
     [String]${vanguard-bootnodes},
@@ -49,6 +54,7 @@ param (
     [String]${van-udp-port},
     [String]${van-tcp-port},
     [String]${van-grpc-gateway-port},
+    [String]${van-ethstats},
     [String]$validator,
     [String]${validator-verbosity},
     [String]${cors-domain},
@@ -133,7 +139,6 @@ $orchestrator = If ($orchestrator) {$orchestrator} ElseIf ($ConfigFile.ORCHESTRA
 ${orchestrator-verbosity} = If (${orchestrator-verbosity}) {${orchestrator-verbosity}} ElseIf ($ConfigFile.ORCHESTRATOR_VERBOSITY) {$ConfigFile.ORCHESTRATOR_VERBOSITY} Else {"info"}
 $pandora = If ($pandora) {$pandora} ElseIf ($ConfigFile.PANDORA) {$ConfigFile.PANDORA} Else {""}
 ${pandora-bootnodes} = If (${pandora-bootnodes}) {${pandora-bootnodes}} ElseIf ($ConfigFile.PANDORA_BOOTNODES) {$ConfigFile.PANDORA_BOOTNODES} Else {$NetworkConfig.PANDORA_BOOTNODES}
-${pandora-http-port} = If (${pandora-http-port}) {${pandora-http-port}} ElseIf ($ConfigFile.PANDORA_HTTP_PORT) {$ConfigFile.PANDORA_HTTP_PORT} Else {"8545"}
 ${pandora-metrics} = If (${pandora-metrics}) {${pandora-metrics}} ElseIf ($ConfigFile.PANDORA_METRICS) {$ConfigFile.PANDORA_METRICS} Else {$false}
 ${pandora-nodekey} = If (${pandora-nodekey}) {${pandora-nodekey}} ElseIf ($ConfigFile.PANDORA_NODEKEY) {$ConfigFile.PANDORA_NODEKEY} Else {""}
 ${pandora-rpcvhosts} = If (${pandora-rpcvhosts}) {${pandora-rpcvhosts}} ElseIf ($ConfigFile.PANDORA_RPCVHOSTS) {$ConfigFile.PANDORA_RPCVHOSTS} Else {""}
@@ -141,6 +146,13 @@ ${pandora-external-ip} = If (${pandora-external-ip}) {${pandora-external-ip}} El
 ${pandora-universal-profile-expose} = If (${pandora-universal-profile-expose}) {${pandora-universal-profile-expose}} ElseIf ($ConfigFile.PANDORA_UNIVERSAL_PROFILE_EXPOSE) {$ConfigFile.PANDORA_UNIVERSAL_PROFILE_EXPOSE} Else {$false}
 ${pandora-unsafe-expose} = If (${pandora-unsafe-expose}) {${pandora-unsafe-expose}} ElseIf ($ConfigFile.PANDORA_UNSAFE_EXPOSE) {$ConfigFile.PANDORA_UNSAFE_EXPOSE} Else {$false}
 ${pandora-verbosity} = If (${pandora-verbosity}) {${pandora-verbosity}} ElseIf ($ConfigFile.PANDORA_VERBOSITY) {$ConfigFile.PANDORA_VERBOSITY} Else {"info"}
+#${pandora-http-port} = If (${pandora-http-port}) {${pandora-http-port}} ElseIf ($ConfigFile.PANDORA_HTTP_PORT) {$ConfigFile.PANDORA_HTTP_PORT} Else {"8545"}
+${pan-http-addr} = If (${pan-http-addr}) {${pan-http-addr}} ElseIf ($ConfigFile.PANDORA_HTTP_ADDR) {$ConfigFile.PANDORA_HTTP_ADDR} Else {"127.0.0.1"}
+${pan-http-port} = If (${pan-http-port}) {${pan-http-port}} ElseIf ($ConfigFile.PANDORA_HTTP_PORT) {$ConfigFile.PANDORA_HTTP_PORT} Else {"8545"}
+${pan-http-miner-addr} = If (${pan-http-miner-addr}) {${pan-http-miner-addr}} ElseIf ($ConfigFile.PANDORA_HTTP_MINER_ADDR) {$ConfigFile.PANDORA_HTTP_MINER_ADDR} Else {"ws://127.0.0.1:7877"}
+${pan-ws-addr} = If (${pan-ws-addr}) {${pan-ws-addr}} ElseIf ($ConfigFile.PANDORA_WS_ADDR) {$ConfigFile.PANDORA_WS_ADDR} Else {"127.0.0.1"}
+${pan-ws-port} = If (${pan-ws-port}) {${pan-ws-port}} ElseIf ($ConfigFile.PANDORA_WS_PORT) {$ConfigFile.PANDORA_WS_PORT} Else {"8546"}
+${pan-ws-miner-addr} = If (${pan-ws-miner-addr}) {${pan-ws-miner-addr}} ElseIf ($ConfigFile.PANDORA_WS_MINER_ADDR) {$ConfigFile.PANDORA_WS_MINER_ADDR} Else {"ws://127.0.0.1:7878"}
 ${pan-ethstats} = If (${pan-ethstats}) {${pan-ethstats}} ElseIf ($ConfigFile.PANDORA_ETHSTATS) {$ConfigFile.PANDORA_ETHSTATS} Else {"6Tcpc53R5V763Aur9LgD@stats.pandora.l15.lukso.network"}
 $vanguard = If ($vanguard) {$vanguard} ElseIf ($ConfigFile.VANGUARD) {$ConfigFile.VANGUARD} Else {""}
 ${vanguard-bootnodes} = If (${vanguard-bootnodes}) {${vanguard-bootnodes}} ElseIf ($ConfigFile.VANGUARD_BOOTNODES) {$ConfigFile.VANGUARD_BOOTNODES} Else {$NetworkConfig.VANGUARD_BOOTNODES}
@@ -155,6 +167,7 @@ ${van-rpc-port} = If (${van-rpc-port}) {${van-rpc-port}} ElseIf ($ConfigFile.VAN
 ${van-udp-port} = If (${van-udp-port}) {${van-udp-port}} ElseIf ($ConfigFile.VANGUARD_UDP_PORT) {$ConfigFile.VANGUARD_UDP_PORT} Else {"12000"}
 ${van-tcp-port} = If (${van-tcp-port}) {${van-tcp-port}} ElseIf ($ConfigFile.VANGUARD_TCP_PORT) {$ConfigFile.VANGUARD_TCP_PORT} Else {"13000"}
 ${van-grpc-gateway-port} = If (${van-grpc-gateway-port}) {${van-grpc-gateway-port}} ElseIf ($ConfigFile.VANGUARD_GRPC_GATEWAY_PORT) {$ConfigFile.VANGUARD_GRPC_GATEWAY_PORT} Else {"3500"}
+${van-ethstats} = If (${van-ethstats}) {${van-ethstats}} ElseIf ($ConfigFile.VAN_ETHSTATS) {$ConfigFile.VAN_ETHSTATS} Else {"34.141.156.125:9090"}
 $validator = If ($validator) {$validator} ElseIf ($ConfigFile.VALIDATOR) {$ConfigFile.VALIDATOR} Else {"v0.2.0-rc.1"}
 ${validator-verbosity} = If (${validator-verbosity}) {${validator-verbosity}} ElseIf ($ConfigFile.VALIDATOR_VERBOSITY) {$ConfigFile.VALIDATOR_VERBOSITY} Else {"info"}
 ${cors-domain} = If (${cors-domain}) {${cors-domain}} ElseIf ($ConfigFile.CORS_DOMAIN) {$ConfigFile.CORS_DOMAIN} Else {""}
@@ -415,21 +428,26 @@ function start_pandora()
     }
     $Arguments.Add("--port=30405")
     $Arguments.Add("--http")
-    $Arguments.Add("--http.addr=0.0.0.0")
-    $Arguments.Add("--http.port=${pandora-http-port}")
+    $Arguments.Add("--http.addr=$(${pan-http-addr})")
+    $Arguments.Add("--http.port=$(${pan-http-port})")
     $Arguments.Add("--http.api=admin,net,eth,debug,miner,personal,txpool,web3")
     $Arguments.Add("--http.corsdomain=*")
-    $Arguments.Add("--bootnodes=${pandora-bootnodes}")
+    $Arguments.Add("--bootnodes=$(${pandora-bootnodes})")
     $Arguments.Add("--ws")
-    $Arguments.Add("--ws.port=8546")
+    $Arguments.Add("--ws.addr=$(${pan-ws-addr})")
+    $Arguments.Add("--ws.port=$(${pan-ws-port})")
     $Arguments.Add("--ws.api=admin,net,eth,debug,miner,personal,txpool,web3")
     $Arguments.Add("--ws.origins=*")
-    $Arguments.Add("--mine")
-    $Arguments.Add("--miner.notify=ws://127.0.0.1:7878,http://127.0.0.1:7877")
-    $Arguments.Add("--miner.etherbase=$coinbase")
+    $Arguments.Add("--miner.notify=$(${pan-ws-miner-addr}),$(${pan-http-miner-addr})")
     $Arguments.Add("--syncmode=full")
     $Arguments.Add("--allow-insecure-unlock")
     $Arguments.Add("--verbosity=${pandora-verbosity}")
+
+    if ($coinbase) {
+        $Arguments.Add("--mine")
+        $Arguments.Add("--miner.etherbase=$coinbase")
+    }
+
     if (${pandora-external-ip}) {
         $Arguments.Add("--nat=extip:${pandora-external-ip}")
     }
@@ -563,7 +581,7 @@ function start_eth2stats_client() {
     $Arguments.Add("--beacon.metrics-addr=`"$(${van-ethstats-metrics})`"")
     $Arguments.Add("--data.folder=$datadir\eth2stats-client")
     $Arguments.Add("--eth2stats.node-name=`"$(${node-name})`"")
-    $Arguments.Add("--eth2stats.addr=`"$VAN_ETHSTATS`"")
+    $Arguments.Add("--eth2stats.addr=`"$(${van-ethstats})`"")
     $Arguments.Add("--eth2stats.tls=`"false`"")
 
 
