@@ -24,6 +24,10 @@ param (
     [String]${node-name},
     [Switch]$validate,
     [String]$orchestrator,
+    [String]${orc-http-address},
+    [String]${orc-http-port},
+    [String]${orc-ws-address},
+    [String]${orc-ws-port},
     [String]${orchestrator-verbosity},
     [String]$pandora,
     [String]${pandora-bootnodes},
@@ -35,6 +39,7 @@ param (
     [Switch]${pandora-universal-profile-expose},
     [Switch]${pandora-unsafe-expose},
     [String]${pandora-verbosity},
+    [String]${pan-port},
     [String]${pan-http-addr},
     [String]${pan-http-port},
     [String]${pan-http-miner-addr},
@@ -54,6 +59,8 @@ param (
     [String]${van-udp-port},
     [String]${van-tcp-port},
     [String]${van-grpc-gateway-port},
+    [String]${van-min-sync-peers},
+    [String]${van-max-p2p-peers},
     [String]${van-ethstats},
     [String]$validator,
     [String]${validator-verbosity},
@@ -136,6 +143,10 @@ $coinbase = If ($coinbase) {$coinbase} ElseIf ($ConfigFile.COINBASE) {$ConfigFil
 ${node-name} = If (${node-name}) {${node-name}} ElseIf ($ConfigFile.NODE_NAME) {$ConfigFile.NODE_NAME} Else {""}
 $validate = If ($validate) {$validate} ElseIf ($ConfigFile.VALIDATE) {$ConfigFile.VALIDATE} Else {$false}
 $orchestrator = If ($orchestrator) {$orchestrator} ElseIf ($ConfigFile.ORCHESTRATOR) {$ConfigFile.ORCHESTRATOR} Else {""}
+${orc-http-address} = If (${orc-http-address}) {${orc-http-address}} ElseIf ($ConfigFile.ORC_HTTP_ADDR) {$ConfigFile.ORC_HTTP_ADDR} Else {"127.0.0.1"}
+${orc-http-port} = If (${orc-http-port}) {${orc-http-port}} ElseIf ($ConfigFile.ORC_HTTP_PORT) {$ConfigFile.ORC_HTTP_PORT} Else {"7877"}
+${orc-ws-address} = If (${orc-ws-address}) {${orc-ws-address}} ElseIf ($ConfigFile.ORC_WS_ADDR) {$ConfigFile.ORC_WS_ADDR} Else {"127.0.0.1"}
+${orc-ws-port} = If (${orc-ws-port}) {${orc-ws-port}} ElseIf ($ConfigFile.ORC_WS_PORT) {$ConfigFile.ORC_WS_PORT} Else {"7878"}
 ${orchestrator-verbosity} = If (${orchestrator-verbosity}) {${orchestrator-verbosity}} ElseIf ($ConfigFile.ORCHESTRATOR_VERBOSITY) {$ConfigFile.ORCHESTRATOR_VERBOSITY} Else {"info"}
 $pandora = If ($pandora) {$pandora} ElseIf ($ConfigFile.PANDORA) {$ConfigFile.PANDORA} Else {""}
 ${pandora-bootnodes} = If (${pandora-bootnodes}) {${pandora-bootnodes}} ElseIf ($ConfigFile.PANDORA_BOOTNODES) {$ConfigFile.PANDORA_BOOTNODES} Else {$NetworkConfig.PANDORA_BOOTNODES}
@@ -147,6 +158,7 @@ ${pandora-universal-profile-expose} = If (${pandora-universal-profile-expose}) {
 ${pandora-unsafe-expose} = If (${pandora-unsafe-expose}) {${pandora-unsafe-expose}} ElseIf ($ConfigFile.PANDORA_UNSAFE_EXPOSE) {$ConfigFile.PANDORA_UNSAFE_EXPOSE} Else {$false}
 ${pandora-verbosity} = If (${pandora-verbosity}) {${pandora-verbosity}} ElseIf ($ConfigFile.PANDORA_VERBOSITY) {$ConfigFile.PANDORA_VERBOSITY} Else {"info"}
 #${pandora-http-port} = If (${pandora-http-port}) {${pandora-http-port}} ElseIf ($ConfigFile.PANDORA_HTTP_PORT) {$ConfigFile.PANDORA_HTTP_PORT} Else {"8545"}
+${pan-port} = If (${pan-port}) {${pan-port}} ElseIf ($ConfigFile.PANDORA_PORT) {$ConfigFile.PANDORA_PORT} Else {"30405"}
 ${pan-http-addr} = If (${pan-http-addr}) {${pan-http-addr}} ElseIf ($ConfigFile.PANDORA_HTTP_ADDR) {$ConfigFile.PANDORA_HTTP_ADDR} Else {"127.0.0.1"}
 ${pan-http-port} = If (${pan-http-port}) {${pan-http-port}} ElseIf ($ConfigFile.PANDORA_HTTP_PORT) {$ConfigFile.PANDORA_HTTP_PORT} Else {"8545"}
 ${pan-http-miner-addr} = If (${pan-http-miner-addr}) {${pan-http-miner-addr}} ElseIf ($ConfigFile.PANDORA_HTTP_MINER_ADDR) {$ConfigFile.PANDORA_HTTP_MINER_ADDR} Else {"ws://127.0.0.1:7877"}
@@ -167,6 +179,8 @@ ${van-rpc-port} = If (${van-rpc-port}) {${van-rpc-port}} ElseIf ($ConfigFile.VAN
 ${van-udp-port} = If (${van-udp-port}) {${van-udp-port}} ElseIf ($ConfigFile.VANGUARD_UDP_PORT) {$ConfigFile.VANGUARD_UDP_PORT} Else {"12000"}
 ${van-tcp-port} = If (${van-tcp-port}) {${van-tcp-port}} ElseIf ($ConfigFile.VANGUARD_TCP_PORT) {$ConfigFile.VANGUARD_TCP_PORT} Else {"13000"}
 ${van-grpc-gateway-port} = If (${van-grpc-gateway-port}) {${van-grpc-gateway-port}} ElseIf ($ConfigFile.VANGUARD_GRPC_GATEWAY_PORT) {$ConfigFile.VANGUARD_GRPC_GATEWAY_PORT} Else {"3500"}
+${van-min-sync-peers} = If (${van-min-sync-peers}) {${van-min-sync-peers}} ElseIf ($ConfigFile.VANGUARD_MIN_SYNC_PEERS) {$ConfigFile.VANGUARD_MIN_SYNC_PEERS} Else {"2"}
+${van-max-p2p-peers} = If (${van-max-p2p-peers}) {${van-max-p2p-peers}} ElseIf ($ConfigFile.VANGUARD_MAX_P2P_PEERS) {$ConfigFile.VANGUARD_MAX_P2P_PEERS} Else {"50"}
 ${van-ethstats} = If (${van-ethstats}) {${van-ethstats}} ElseIf ($ConfigFile.VAN_ETHSTATS) {$ConfigFile.VAN_ETHSTATS} Else {"34.141.156.125:9090"}
 $validator = If ($validator) {$validator} ElseIf ($ConfigFile.VALIDATOR) {$ConfigFile.VALIDATOR} Else {"v0.2.0-rc.1"}
 ${validator-verbosity} = If (${validator-verbosity}) {${validator-verbosity}} ElseIf ($ConfigFile.VALIDATOR_VERBOSITY) {$ConfigFile.VALIDATOR_VERBOSITY} Else {"info"}
@@ -352,11 +366,11 @@ Function start_orchestrator()
     "--datadir=$datadir\orchestrator"
     "--vanguard-grpc-endpoint=127.0.0.1:4000"
     "--http"
-    "--http.addr=0.0.0.0"
-    "--http.port=7877"
+    "--http.addr=$(${orc-http-address})"
+    "--http.port=$(${orc-http-port})"
     "--ws"
-    "--ws.addr=0.0.0.0"
-    "--ws.port=7878"
+    "--ws.addr=$(${orc-ws-address})"
+    "--ws.port=$(${orc-ws-port})"
     "--pandora-rpc-endpoint=ws://127.0.0.1:8546"
     "--verbosity=trace"
     )
@@ -426,7 +440,7 @@ function start_pandora()
     if (${pan-ethstats}) {
         $Arguments.Add("--ethstats=$(${node-name}):@$(${pan-ethstats})")
     }
-    $Arguments.Add("--port=30405")
+    $Arguments.Add("--port=$(${pan-port})")
     $Arguments.Add("--http")
     $Arguments.Add("--http.addr=$(${pan-http-addr})")
     $Arguments.Add("--http.port=$(${pan-http-port})")
@@ -497,8 +511,8 @@ function start_vanguard() {
     $Arguments.Add("--rpc-host=0.0.0.0")
     $Arguments.Add("--monitoring-host=0.0.0.0")
     $Arguments.Add("--verbosity=${vanguard-verbosity}")
-    $Arguments.Add("--min-sync-peers=2")
-    $Arguments.Add("--p2p-max-peers=50")
+    $Arguments.Add("--min-sync-peers=$(${van-min-sync-peers})")
+    $Arguments.Add("--p2p-max-peers=$(${van-max-p2p-peers})")
     $Arguments.Add("--orc-http-provider=http://127.0.0.1:7877")
     $Arguments.Add("--rpc-port=$(${van-rpc-port})")
     $Arguments.Add("--p2p-udp-port=$(${van-udp-port})")
