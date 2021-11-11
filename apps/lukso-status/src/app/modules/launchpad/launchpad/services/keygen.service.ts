@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { DepositData } from '../helpers/create-keys';
 
 @Injectable({
   providedIn: 'root',
@@ -16,5 +18,36 @@ export class KeygenService {
       network,
       amountOfValidators,
     });
+  }
+
+  importKeys(walletPassword: string, network: string) {
+    return this.httpClient.post(
+      '/api/launchpad/import-keys',
+      {
+        walletPassword,
+        network,
+      },
+      {
+        responseType: 'blob',
+      }
+    );
+  }
+
+  getDepositData(network: string) {
+    return this.httpClient
+      .get<DepositData[]>('/api/deposit-data', {
+        params: {
+          network,
+        },
+      })
+      .pipe(
+        map((val) => {
+          return val.map((value) => {
+            console.log(value);
+
+            return value;
+          });
+        })
+      );
   }
 }

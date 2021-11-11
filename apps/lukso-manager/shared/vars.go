@@ -5,6 +5,7 @@ import "github.com/boltdb/bolt"
 var LuksoHomeDir = ""
 var BinaryDir = ""
 var NetworkDir = ""
+var OutboundIP = ""
 
 var SettingsDB *bolt.DB
 

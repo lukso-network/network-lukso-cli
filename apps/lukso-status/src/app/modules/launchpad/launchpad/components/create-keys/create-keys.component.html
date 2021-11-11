@@ -1,0 +1,171 @@
+<div class="key-infos">
+  <h5 class="title">Keys</h5>
+  <p class="text-secondary">
+    To become a validator you'll need to know about managing keys and protecting
+    a mnemonic. If you are not yet familiar with keys and mnemomics, please do
+    not proceed.
+  </p>
+</div>
+
+<div class="key-form">
+  <form [formGroup]="form" (submit)="onSubmit()" novalidate>
+    <div class="mb-4">
+      <label class="form-label" for="network-select">Network</label>
+      <select
+        class="form-select form-select-lg"
+        id="network-select"
+        formControlName="network"
+      >
+        <option value="l15-dev">L15 Development</option>
+        <option value="l15-staging">L15 Staging</option>
+        <option value="l15-prod">L15 Production</option>
+      </select>
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label" for="amountOfValidators">Validators</label>
+      <input
+        class="form-control form-control-lg"
+        id="amountOfValidators"
+        type="number"
+        formControlName="amountOfValidators"
+        placeholder="0"
+        [ngClass]="{
+          'is-valid':
+            form.controls.amountOfValidators.dirty &&
+            form.controls.amountOfValidators.valid,
+          'is-invalid': submitted && form.controls.amountOfValidators.invalid
+        }"
+        required
+      />
+
+      <div
+        *ngIf="
+          submitted &&
+          form.controls.amountOfValidators.errors?.required === true
+        "
+        class="invalid-feedback"
+      >
+        This field is required.
+      </div>
+    </div>
+
+    <div class="password-container">
+      <div class="mb-4">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group input-group-lg">
+          <input
+            #pw1
+            type="password"
+            id="password"
+            formControlName="password"
+            class="form-control form-control-lg"
+            [ngClass]="{
+              'is-invalid': submitted && form.controls.password?.errors,
+              'is-valid': !form.controls.password?.errors
+            }"
+            autocomplete="new-password"
+            required
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            id="button-addon1"
+            (click)="
+              pw1.type === 'text'
+                ? (pw1.type = 'password')
+                : (pw1.type = 'text');
+              pw2.type === 'text'
+                ? (pw2.type = 'password')
+                : (pw2.type = 'text')
+            "
+          >
+            <i
+              class="bi"
+              [ngClass]="pw1.type === 'text' ? 'bi-eye-slash' : 'bi-eye-fill'"
+            ></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <div class="input-group input-group-lg">
+          <input
+            #pw2
+            type="password"
+            id="confirmPassword"
+            class="form-control form-control-lg"
+            [ngClass]="{
+              'is-invalid': submitted && form.controls.confirmPassword?.errors,
+              'is-valid': !form.controls.confirmPassword?.errors
+            }"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            required
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            id="button-addon2"
+            (click)="
+              pw1.type === 'text'
+                ? (pw1.type = 'password')
+                : (pw1.type = 'text');
+              pw2.type === 'text'
+                ? (pw2.type = 'password')
+                : (pw2.type = 'text')
+            "
+          >
+            <i
+              class="bi"
+              [ngClass]="pw2.type === 'text' ? 'bi-eye-slash' : 'bi-eye-fill'"
+            ></i>
+          </button>
+        </div>
+        <div
+          *ngIf="
+            submitted && form.controls.confirmPassword.errors?.required === true
+          "
+          class="invalid-feedback"
+        >
+          This field is required.
+        </div>
+
+        <small id="passwordHelpBlock" class="form-text text-muted">
+          Please repeat the password to make sure it is correct.
+        </small>
+      </div>
+      <lukso-password-checker
+        [password]="form.controls.password.value"
+      ></lukso-password-checker>
+    </div>
+
+    <div>
+      <button
+        type="submit"
+        class="btn btn-primary btn-lg btn--generate-keys"
+        [disabled]="!(currentTask.status === 'Generate')"
+      >
+        <ng-container *ngIf="!(currentTask.status === 'Generate')">
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+            *ngIf="
+              currentTask.status === 'Generating' ||
+              currentTask.status === 'Importing'
+            "
+          ></span>
+          <span> {{ currentTask.status }}</span>
+        </ng-container>
+        <ng-container
+          class="key-button align-middle"
+          *ngIf="currentTask.status === 'Generate'"
+        >
+          <i class="bi bi-key-fill"></i> Generate
+        </ng-container>
+      </button>
+    </div>
+  </form>
+</div>

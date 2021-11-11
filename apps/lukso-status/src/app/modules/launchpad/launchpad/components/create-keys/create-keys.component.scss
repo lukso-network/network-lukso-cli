@@ -1,0 +1,39 @@
+:host {
+  display: flex;
+  background: white;
+  padding: 30px;
+}
+
+.key-infos {
+  flex: 0 0 400px;
+  padding-right: 30px;
+}
+
+.key-form {
+  flex: 0 0 500px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.password-container {
+  position: relative;
+}
+
+lukso-password-checker {
+  position: absolute;
+  top: 33px;
+  left: calc(100% + 40px);
+  width: 400px;
+}
+
+.bi-key-fill {
+  color: white;
+  padding-left: 5px;
+  padding-right: 5px;
+  &::before {
+    transform: scale(1.4);
+  }
+}

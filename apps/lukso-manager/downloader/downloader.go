@@ -112,22 +112,55 @@ func downloadFile(filepath string, url string) error {
 	return err
 }
 
-var ReleaseLocations = map[string]string{
-	"pandora":      "https://api.github.com/repos/lukso-network/pandora-execution-engine/releases",
-	"vanguard":     "https://api.github.com/repos/lukso-network/vanguard-consensus-engine/releases",
-	"orchestrator": "https://api.github.com/repos/lukso-network/lukso-orchestrator/releases",
+type release struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
+type downloadInfo struct {
+	Tag         string `json:"tag"`
+	DownloadURL string `json:"downloadUrl"`
+}
+
+type clientInfo struct {
+	Name              string                  `json:"name"`
+	HumanReadableName string                  `json:"humanReadableName"`
+	DownloadInfo      map[string]downloadInfo `json:"downloadInfo"`
+}
+
+var ReleaseLocations = map[string]release{
+	"pandora": {
+		Name: "Pandora",
+		URL:  "https://api.github.com/repos/lukso-network/pandora-execution-engine/releases",
+	},
+	"vanguard": {
+		Name: "Vanguard",
+		URL:  "https://api.github.com/repos/lukso-network/vanguard-consensus-engine/releases",
+	},
+	"lukso-orchestrator": {
+		Name: "Orchestrator",
+		URL:  "https://api.github.com/repos/lukso-network/lukso-orchestrator/releases",
+	},
+	"lukso-deposit-cli": {
+		Name: "Deposit CLI",
+		URL:  "https://api.github.com/repos/lukso-network/network-deposit-cli/releases",
+	},
+	"lukso-validator": {
+		Name: "Validator",
+		URL:  "https://api.github.com/repos/lukso-network/vanguard-consensus-engine/releases",
+	},
 }
 
 type updateRequestBody struct {
-	Client  string
-	Version string
-	Url     string
+	Client  string `json:"client"`
+	Version string `json:"version"`
+	Url     string `json:"url"`
 }
 
 func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 	var DownloadedVerions = map[string][]string{}
 
-	downloads := shared.LuksoHomeDir + "/.lukso/downloads"
+	downloads := shared.BinaryDir
 
 	err := filepath.Walk(downloads,
 		func(path string, info os.FileInfo, err error) error {
@@ -135,9 +168,8 @@ func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 				return err
 			}
 			if !info.IsDir() {
-				fmt.Println("path, info.Size()")
-				fmt.Println(path, info.Size())
-				pathParts := strings.Split(path, "downloads")
+				pathParts := strings.Split(path, "binaries")
+				fmt.Println(pathParts)
 				fileNameParts := strings.Split(pathParts[1], "/")
 				DownloadedVerions[fileNameParts[1]] = append(DownloadedVerions[fileNameParts[1]], fileNameParts[2])
 			}
@@ -161,17 +193,21 @@ func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	confMap := map[string]map[string]string{}
-	for client, url := range ReleaseLocations {
-		r, err := http.Get(url + "?per_page=3")
+	confMap := map[string]clientInfo{}
+	for client, release := range ReleaseLocations {
+		r, err := http.Get(release.URL + "?per_page=20")
 		if err != nil {
-			log.Fatalln("Request to "+url+" failed.", err)
+			fmt.Println("Request to "+release.URL+" failed.", err)
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Request to " + url + " failed."))
+			w.Write([]byte(err.Error()))
 			return
 		}
 
-		confMap[client] = make(map[string]string)
+		confMap[client] = clientInfo{
+			Name:              client,
+			HumanReadableName: release.Name,
+			DownloadInfo:      make(map[string]downloadInfo),
+		}
 
 		decoder := json.NewDecoder(r.Body)
 		var releases GithubReleases
@@ -185,13 +221,27 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, v := range releases {
-			a := getDownloadUrlFromAsset(client, v.Assets)
-			if a != "" {
-				confMap[client][v.TagName] = a
+			assetURL := getDownloadUrlFromAsset(client, v.Assets)
+			if assetURL != "" {
+				confMap[client].DownloadInfo[v.TagName] = downloadInfo{
+					Tag:         v.TagName,
+					DownloadURL: assetURL,
+				}
 			}
 		}
+
 	}
+
+	fmt.Println("confMap")
+	fmt.Println(confMap)
+	fmt.Println("confMap")
+
 	jsonString, err := json.Marshal(confMap)
+
+	fmt.Println("jsonString")
+	fmt.Println(string(jsonString))
+	fmt.Println("jsonString")
+
 	if err != nil {
 		log.Fatalln(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -208,7 +258,6 @@ func getDownloadUrlFromAsset(name string, assets []Assets) string {
 	var downloadUrl string
 	for i := range assets {
 		if assets[i].Name == name+"-Linux-x86_64" {
-			fmt.Println(assets[i].BrowserDownloadURL)
 			downloadUrl = assets[i].BrowserDownloadURL
 			break
 		}

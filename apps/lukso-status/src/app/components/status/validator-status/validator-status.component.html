@@ -1,7 +1,26 @@
-<div class="card">
+<div class="card" *ngIf="metrics">
   <h4 class="card-header">Validator</h4>
-
   <div class="card-body">
-    <button type="button" class="btn btn-primary">Become a validator</button>
+    <table
+      *ngIf="
+        !(metrics['process_cpu_seconds_total'] === undefined);
+        else notRunning
+      "
+      class="table is-hoverable"
+    >
+      <tbody>
+        <tr>
+          <td class="property-name">process_cpu_seconds_total</td>
+          <td class="property-value">
+            {{ metrics['process_cpu_seconds_total'] }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #notRunning>
+      <button type="button" class="btn btn-primary" routerLink="/launchpad">
+        Become a validator
+      </button></ng-template
+    >
   </div>
 </div>

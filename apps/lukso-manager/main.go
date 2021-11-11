@@ -9,6 +9,7 @@ import (
 	"lukso/shared"
 	"lukso/validator"
 	"lukso/webserver"
+	"net"
 	"os"
 
 	"github.com/boltdb/bolt"
@@ -30,7 +31,20 @@ func init() {
 		log.Fatal(err)
 	}
 	shared.SettingsDB = db
+	shared.OutboundIP = getOutboundIP().String()
 
+}
+
+func getOutboundIP() net.IP {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+
+	return localAddr.IP
 }
 
 func main() {
@@ -45,11 +59,13 @@ func main() {
 	app.Router.Methods("GET").Path("/pandora/debug/metrics").HandlerFunc(metrics.PandoraMetrics)
 	app.Router.Methods("GET").Path("/downloaded-versions").HandlerFunc(downloader.GetDownloadedVersions)
 	app.Router.Methods("GET").Path("/available-versions").HandlerFunc(downloader.GetAvailableVersions)
+	app.Router.Methods("GET").Path("/deposit-data").HandlerFunc(validator.GetDepositData)
 
 	app.Router.Methods("POST").Path("/update-client").HandlerFunc(downloader.DownloadClient)
 	app.Router.Methods("POST").Path("/start-clients").HandlerFunc(runner.StartClients)
 	app.Router.Methods("POST").Path("/stop-clients").HandlerFunc(runner.StopClients)
 	app.Router.Methods("POST").Path("/launchpad/generate-keys").HandlerFunc(validator.GenerateValidatorKeys)
+	app.Router.Methods("POST").Path("/launchpad/import-keys").HandlerFunc(validator.ImportValidatorKeys)
 	app.Router.Methods("POST").Path("/settings").HandlerFunc(settings.SaveSettingsEndpoint)
 	app.Router.Methods("GET").Path("/settings").HandlerFunc(settings.GetSettingsEndpoint)
 

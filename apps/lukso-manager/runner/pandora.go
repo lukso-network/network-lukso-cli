@@ -4,21 +4,22 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"lukso/settings"
 	"lukso/shared"
 	"os"
 	"os/exec"
 	"strings"
 )
 
-func startPandora(version string, network string, hostname string) (err error) {
+func startPandora(version string, network string, settings settings.Settings) (err error) {
 	client := "pandora"
 	datadir := shared.NetworkDir + network + "/datadirs/" + client
 
-	if hostname == "" {
-		hostname, _ = os.Hostname()
+	if settings.HostName == "" {
+		settings.HostName, _ = os.Hostname()
 	}
 
-	hostname = "l15-" + hostname
+	hostname := "l15-" + settings.HostName
 
 	config, err := ReadConfig(network)
 	if err != nil {
@@ -43,11 +44,11 @@ func startPandora(version string, network string, hostname string) (err error) {
 		"--ws.port=8546",
 		"--mine",
 		"--miner.notify=ws://127.0.0.1:7878,http://127.0.0.1:7877",
-		"--miner.etherbase=0x6Af9552d70F943378820edc3095A6bb0279051ff",
+		"--miner.etherbase=" + settings.Coinbase,
 		"--miner.gaslimit=80000000",
 		"--syncmode=full",
 		"--verbosity=4",
-		"--nat=extip:46.127.26.82",
+		"--nat=extip:" + shared.OutboundIP,
 		"--metrics",
 		"--metrics.expensive",
 		"--pprof",

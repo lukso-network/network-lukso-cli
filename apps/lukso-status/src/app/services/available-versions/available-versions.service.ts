@@ -1,41 +1,48 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
+import {
+  AvailableSoftwareBackendResponse,
+  DownloadInfo,
+  Releases,
+} from '../../interfaces/available-software';
 import { Settings } from '../../interfaces/settings';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SoftwareService {
-  availableSoftware$: Observable<any>;
+  availableSoftware$: Observable<Releases[]>;
   downloadedSoftware$: Observable<any>;
 
   constructor(private httpClient: HttpClient) {
     this.httpClient = httpClient;
-    this.downloadedSoftware$ = httpClient.get('/api/downloaded-versions').pipe(
-      map((versions) => {
-        return Object.entries(versions).map(([name, versions]) => {
-          return { name, versions };
-        });
-      })
-    );
+    this.downloadedSoftware$ = httpClient.get('/api/downloaded-versions');
 
-    this.availableSoftware$ = httpClient.get('/api/available-versions').pipe(
-      map((versions) => {
-        console.log(versions);
-        return Object.entries(versions).map(([name, versions]) => {
-          return {
-            name,
-            versions: Object.entries(versions)
-              .map(([tag, url]) => {
-                return { tag, url };
-              })
-              .reverse(),
-          };
-        });
-      })
-    );
+    this.availableSoftware$ = httpClient
+      .get<AvailableSoftwareBackendResponse>('/api/available-versions')
+      .pipe(
+        map((availableSoftware) => {
+          console.log(availableSoftware);
+          return Object.entries(availableSoftware).map(([name, release]) => {
+            console.log(release);
+            return {
+              name,
+              humanReadableName: release.humanReadableName,
+              downloadInfo: Object.entries(release.downloadInfo)
+                .map(([tag, { downloadUrl }]) => {
+                  console.log(downloadUrl);
+                  return { tag, name, downloadUrl } as DownloadInfo;
+                })
+                .reverse(),
+            } as Releases;
+          });
+        }),
+        tap((res) => {
+          console.log(res);
+        })
+      );
   }
 
   downloadClient(client: string, version: string, url: string) {

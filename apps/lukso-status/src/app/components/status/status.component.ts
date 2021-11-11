@@ -5,6 +5,7 @@ import { SoftwareService } from '../../services/available-versions/available-ver
 import { VanguardService } from '../../services/vanguard-metrics.service';
 import { PandoraMetricsService } from '../../services/pandora-metrics.service';
 import { Settings } from '../../interfaces/settings';
+import { ValidatorMetricsService } from '../../services/validator-metrics.service';
 
 @Component({
   selector: 'lukso-status',
@@ -16,15 +17,18 @@ export class StatusComponent {
   softwareService: SoftwareService;
   vanguardMetrics$: Observable<any>;
   pandoraMetrics$: Observable<any>;
+  validatorMetrics$: Observable<any>;
 
   constructor(
     softwareService: SoftwareService,
     vanguardService: VanguardService,
+    validatorService: ValidatorMetricsService,
     pandoraService: PandoraMetricsService
   ) {
     this.softwareService = softwareService;
     this.pandoraMetrics$ = pandoraService.getMetrics$();
     this.vanguardMetrics$ = vanguardService.getMetrics$();
+    this.validatorMetrics$ = validatorService.getMetrics$();
   }
 
   startClients(network: string) {

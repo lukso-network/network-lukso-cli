@@ -1,34 +1,129 @@
 <div class="container px-5 my-5">
-  <form [formGroup]="setupForm" (ngSubmit)="onSubmit()">
-    <div class="mb-3">
-      <label class="form-label" for="hostName">Host Name</label>
-      <input
-        class="form-control"
-        id="hostName"
-        type="text"
-        placeholder="Host Name"
-        data-sb-validations="required"
-        formControlName="hostname"
-      />
-      <div class="invalid-feedback" data-sb-feedback="hostName:required">
-        Host Name is required.
+  <form
+    [formGroup]="setupForm"
+    (ngSubmit)="onSubmit()"
+    class="needs-validation"
+  >
+    <fieldset>
+      <legend>Settings</legend>
+      <div class="form-floating mb-3">
+        <input
+          class="form-control"
+          id="hostName"
+          type="text"
+          placeholder="Host Name"
+          data-sb-validations="required"
+          aria-describedby="hostNameHelpBlock"
+          [formControl]="hostName"
+        />
+        <label class="form-label" for="hostName"
+          >Host Name
+          <span
+            class="badge bg-danger"
+            *ngIf="hostName.errors?.['required'] && (hostName.dirty || hostName.touched)"
+            >Required</span
+          >
+        </label>
+        <div id="hostNameHelpBlock" class="form-text">
+          This is the name that will be displayed on the
+          <a href="https://stats.pandora.l15.lukso.network">Stats Page</a>
+        </div>
       </div>
-    </div>
 
-    <!-- <div class="mb-3">
-      <label class="form-label" for="coinbase">Coinbase</label>
-      <input
-        class="form-control"
-        id="coinbase"
-        type="text"
-        placeholder="Coinbase"
-        data-sb-validations="required"
-        formControlName="coinbase"
-      />
-      <div class="invalid-feedback" data-sb-feedback="hostName:required">
-        Coinbase is required.
+      <div
+        class="form-floating mb-3"
+        [ngClass]="
+          setupForm.controls.coinbase.errors &&
+          (coinbase.dirty || coinbase.touched)
+            ? 'danger'
+            : 'success'
+        "
+      >
+        <input
+          class="form-control"
+          id="coinbase"
+          type="text"
+          placeholder="Coinbase"
+          data-sb-validations="required"
+          formControlName="coinbase"
+        />
+        <label class="form-label" for="coinbase">
+          Coinbase
+          <span
+            class="badge bg-danger"
+            *ngIf="coinbase.errors?.['required'] && (coinbase.dirty || coinbase.touched)"
+          >
+            Required
+          </span>
+        </label>
+        <div id="hostNameHelpBlock" class="form-text">
+          This address will receive the transaction fees of blocks that the
+          validator client has produced.
+        </div>
+        <div
+          *ngIf="coinbase.invalid && (coinbase.dirty || coinbase.touched)"
+          class="is-danger"
+        >
+          <div
+            *ngIf="coinbase.errors?.['valid_eth1_address']"
+            class="form-text error"
+          >
+            This must be a valid public key / address.
+          </div>
+        </div>
       </div>
-    </div> -->
+    </fieldset>
+
+    <fieldset>
+      <legend>Versions</legend>
+      <div class="form-floating mb-3">
+        <select class="form-select" [formControl]="vanguard">
+          <option
+            *ngFor="let version of vanguardVersions$ | async"
+            [value]="version"
+          >
+            {{ version }}
+          </option>
+        </select>
+        <label for="newField">Vanguard</label>
+      </div>
+
+      <div class="form-floating mb-3">
+        <select class="form-select" [formControl]="pandora">
+          <option
+            *ngFor="let version of pandoraVersions$ | async"
+            [value]="version"
+          >
+            {{ version }}
+          </option>
+        </select>
+        <label for="newField">Pandora</label>
+      </div>
+
+      <div class="form-floating mb-3">
+        <select class="form-select" [formControl]="orchestrator">
+          <option
+            *ngFor="let version of orchestratorVersions$ | async"
+            [value]="version"
+          >
+            {{ version }}
+          </option>
+        </select>
+        <label for="newField">Orchestrator</label>
+      </div>
+
+      <div class="form-floating mb-3">
+        <select class="form-select" [formControl]="validator">
+          <option
+            *ngFor="let version of validatorVersions$ | async"
+            [value]="version"
+          >
+            {{ version }}
+          </option>
+        </select>
+        <label for="newField">Validator</label>
+      </div>
+    </fieldset>
 
     <div class="d-none" id="submitSuccessMessage">
       <div class="text-center mb-3">
@@ -43,12 +138,7 @@
       <div class="text-center text-danger mb-3">Error sending message!</div>
     </div>
     <div class="d-grid">
-      <button
-        class="btn btn-primary"
-        id="submitButton"
-        type="submit"
-        [disabled]="!setupForm.valid"
-      >
+      <button class="btn btn-primary" id="submitButton" type="submit">
         Save Settings
       </button>
     </div>

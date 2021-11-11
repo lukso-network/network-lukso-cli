@@ -1,3 +1,22 @@
 :host {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 600px;
+  margin: 0 auto;
+}
+
+.form-text {
+  font-size: 12px;
+  padding: 0 5px;
+}
+
+.danger {
+  .form-text.error {
+    color: #dc3545;
+  }
+
+  input {
+    background: #dc35466b;
+  }
 }

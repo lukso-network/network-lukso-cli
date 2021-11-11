@@ -10,9 +10,21 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+type Client string
+
+const (
+	Vanguard     Client = "vanguard"
+	Pandora      Client = "pandora"
+	Orchestrator Client = "orchestrator"
+	Validator    Client = "validator"
+)
+
 type Settings struct {
-	HostName string `json:"hostName"`
-	Coinbase string `json:"coinbase"`
+	HostName         string            `json:"hostName"`
+	Coinbase         string            `json:"coinbase"`
+	ExternalIP       string            `json:"externalIp"`
+	Versions         map[Client]string `json:"versions"`
+	ValidatorEnabled bool              `json:"validatorEnabled"`
 }
 
 type saveSettingsRequestBody struct {
@@ -23,9 +35,12 @@ type saveSettingsRequestBody struct {
 func SaveSettingsEndpoint(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var body saveSettingsRequestBody
+
+	if body.Settings.ExternalIP == "" {
+		body.Settings.ExternalIP = shared.OutboundIP
+	}
+
 	errJson := decoder.Decode(&body)
-	fmt.Println("body")
-	fmt.Println(body.Settings.HostName)
 	if errJson != nil {
 		panic(errJson)
 	}
@@ -71,17 +86,12 @@ func GetSettingsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	network := keys[0]
 
-	log.Println("Url Param 'network' is: " + string(network))
-
 	settings, err := getSettings(shared.SettingsDB, network)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Println("returned settings")
-	fmt.Println(settings)
 
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(settings); err != nil {

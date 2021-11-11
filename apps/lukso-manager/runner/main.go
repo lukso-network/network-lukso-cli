@@ -27,23 +27,31 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 
 	network := body.Network
 
-	errVanguard := startVanguard("v0.5.1-develop", network)
+	errVanguard := startVanguard(body.Settings.Versions[settings.Vanguard], network)
 	if errVanguard != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errVanguard.Error()))
 	}
 
-	errOrchestrator := startOrchestrator("v0.5.4-develop", network)
+	errOrchestrator := startOrchestrator(body.Settings.Versions[settings.Orchestrator], network)
 	if errOrchestrator != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errOrchestrator.Error()))
 	}
 
-	errPandora := startPandora("v0.5.3-develop", network, body.Settings.HostName)
+	errPandora := startPandora(body.Settings.Versions[settings.Pandora], network, body.Settings)
 	if errPandora != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errPandora.Error()))
 	}
+
+	// if body.Settings.ValidatorEnabled {
+	errValidator := startValidator(body.Settings.Versions[settings.Validator], network)
+	if errValidator != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(errValidator.Error()))
+	}
+	// }
 
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode("Successfully started all the clients."); err != nil {

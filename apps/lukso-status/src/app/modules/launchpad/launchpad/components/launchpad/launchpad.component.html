@@ -1,0 +1,10 @@
+<lukso-create-keys
+  class="shadow-sm p-5 mb-5 bg-body rounded"
+  (createKeys)="createKeys($event)"
+  [currentTask]="currentTask"
+></lukso-create-keys>
+
+<lukso-send-transactions
+  [depositData]="depositData$ | async"
+  class="shadow-sm p-5 mb-5 bg-body rounded"
+></lukso-send-transactions>

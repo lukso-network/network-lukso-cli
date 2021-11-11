@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
+import { DownloadInfo, Releases } from '../../interfaces/available-software';
 import { SoftwareService } from '../../services/available-versions/available-versions.service';
 
 @Component({
@@ -10,7 +11,7 @@ import { SoftwareService } from '../../services/available-versions/available-ver
 export class AvailableVersionsComponent {
   softwareService: SoftwareService;
   downloadedSoftware$: Observable<any>;
-  availableSoftware$: Observable<any>;
+  availableSoftware$: Observable<Releases[]>;
 
   isDownloading = false;
 
@@ -20,13 +21,12 @@ export class AvailableVersionsComponent {
     this.availableSoftware$ = softwareService.getAvailableVersions$();
   }
 
-  install(client: string, release: any) {
+  install(client: string, release: DownloadInfo) {
     release.isDownloading = true;
     this.softwareService
-      .downloadClient(client, release.tag, release.url)
+      .downloadClient(client, release.tag, release.downloadUrl)
       .subscribe(() => {
         release.isDownloading = false;
-        console.log('success');
       });
   }
 }

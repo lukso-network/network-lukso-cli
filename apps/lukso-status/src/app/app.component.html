@@ -1,72 +1,71 @@
-<main>
-  <div
-    class="d-flex flex-column flex-shrink-0 p-3 bg-light"
-    style="width: 280px; height: 100vh"
-  >
-    <a
-      href="/"
-      class="
-        d-flex
-        align-items-center
-        mb-3 mb-md-0
-        me-md-auto
-        link-dark
-        text-decoration-none
-      "
-    >
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
       <img
         class="lukso-logo"
         src="https://lukso.network/images/lukso_wordmark_black.png"
         alt="LUKSO Logo"
       />
     </a>
-    <hr />
-    <ul class="nav nav-pills flex-column mb-auto">
-      <li class="nav-item">
-        <a
-          href="#"
-          class="nav-link"
-          aria-current="page"
-          routerLink="/"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          Home
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          href="#"
-          class="nav-link"
-          aria-current="page"
-          routerLink="/status"
-          routerLinkActive="active"
-        >
-          Status
-        </a>
-      </li>
-      <li>
-        <a
-          href="#"
-          class="nav-link link-dark"
-          routerLink="/launchpad"
-          routerLinkActive="active"
-        >
-          Launchpad
-        </a>
-      </li>
-      <li>
-        <a
-          href="#"
-          class="nav-link link-dark"
-          routerLink="/updates"
-          routerLinkActive="active"
-        >
-          Updates
-        </a>
-      </li>
-    </ul>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a
+            href="#"
+            class="nav-link"
+            aria-current="page"
+            routerLink="/"
+            routerLinkActive="active"
+          >
+            Status
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="nav-link link-dark"
+            routerLink="/launchpad"
+            routerLinkActive="active"
+          >
+            Validator
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="nav-link link-dark"
+            routerLink="/settings"
+            routerLinkActive="active"
+          >
+            Settings
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="nav-link link-dark"
+            routerLink="/updates"
+            routerLinkActive="active"
+          >
+            Updates
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
+</nav>
 
+<main>
   <router-outlet></router-outlet>
 </main>

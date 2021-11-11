@@ -9,19 +9,10 @@
 
 .lukso-logo {
   display: block;
-  max-width: 150px;
+  max-height: 20px;
+  margin: 0 20px;
 }
 
 main {
-  display: flex;
-  flex-wrap: nowrap;
-  height: 100vh;
-  height: -webkit-fill-available;
-  max-height: 100vh;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-nav {
-  margin-bottom: 40px;
+  display: block;
 }

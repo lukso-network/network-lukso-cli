@@ -1,16 +1,21 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LaunchpadComponent } from './launchpad/components/launchpad.component';
-import { TestComponent } from './test/test.component';
+import { CreateKeysComponent } from './launchpad/components/create-keys/create-keys.component';
+import { LaunchpadComponent } from './launchpad/components/launchpad/launchpad.component';
+import { SendTransactionsComponent } from './launchpad/components/send-transactions/send-transactions.component';
 
 const routes: Routes = [
   {
-    path: 'keys',
+    path: '',
     component: LaunchpadComponent,
   },
   {
-    path: 'test',
-    component: TestComponent,
+    path: 'keys',
+    component: CreateKeysComponent,
+  },
+  {
+    path: 'transactions',
+    component: SendTransactionsComponent,
   },
 ];
 
