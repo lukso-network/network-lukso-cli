@@ -398,8 +398,8 @@ Function start_orchestrator()
     Start-Process -FilePath lukso-orchestrator `
     -ArgumentList $arguments `
     -NoNewWindow `
-    -RedirectStandardOutput "orchestrator_$runDate.out" `
-    -RedirectStandardError "orchestrator_$runDate.err" `
+    -RedirectStandardOutput "$logsdir\orchestrator\orchestrator_$runDate.out" `
+    -RedirectStandardError "$logsdir\orchestrator\orchestrator_$runDate.err" `
 }
 
 function start_pandora()
@@ -610,6 +610,7 @@ function start_eth2stats_client() {
 
     $Arguments = New-Object System.Collections.Generic.List[System.Object]
 
+    $Arguments.Add("run")
     $Arguments.Add("--beacon.type=`"prysm`"")
     $Arguments.Add("--beacon.addr=`"$(${eth2stats-beacon-addr})`"")
     $Arguments.Add("--beacon.metrics-addr=`"$(${van-ethstats-metrics})`"")
@@ -618,7 +619,7 @@ function start_eth2stats_client() {
     $Arguments.Add("--eth2stats.addr=`"$(${van-ethstats})`"")
     $Arguments.Add("--eth2stats.tls=`"false`"")
 
-
+    echo $Arguments
 
     Start-Process -FilePath "eth2stats-client" `
     -ArgumentList $Arguments `
@@ -636,7 +637,7 @@ function start_all() {
     start_orchestrator
     start_pandora
     start_vanguard
-    start_eth2stats
+    start_eth2stats_client
 }
 
 # "start" is a reserved keyword in PowerShell
