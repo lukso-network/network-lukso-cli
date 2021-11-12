@@ -340,29 +340,44 @@ Function setup_config()
 
 Function check_validator_requirements()
 {
+    $CanValidate = $true
 
-  if (${wallet-dir}) {
-      if (!(Test-Path ${wallet-dir})) {
-          Write-Output "ERROR! Cannot Validate, wallet not found"
-          exit
-      }
+  if ( ($argument -ne "validator") -and (!($coinbase)) ) {
+       Write-Output "Please provide coinbase: -coinbase 0x<ETH1_ADDRESS>"
   }
 
-   if (${wallet-password-file}) {
-      if (!(Test-Path ${wallet-password-file})) {
+  if ( ($argument -eq "validator") -and (!($coinbase)) ) {
+
+
+    if (!($(powershell.exe -command $("$InstallDir\binaries\pandora\v0.2.0-rc.1\pandora-Windows-x86_64.exe attach ipc:\\.\pipe\geth.ipc --exec 'eth.coinbase'")) -match '^\"0x[a-fA-F0-9]{40}\"$')) {
+        Write-Output "ERROR: Coinbase is not set on already running pandora. Please provide it using:"
+        Write-Output "--coinbase 0x<ETH1_ADDRESS>"
+        $CanValidate = $false
+    }
+  }
+
+  if ( (${wallet-dir}) -and (!(Test-Path ${wallet-dir})) ) {
+          Write-Output "Cannot validate, wallet not found. Your wallet directory is: ${wallet-dir}"
+          Write-Output "Create new wallet using: `"lukso wallet`" "
+          $CanValidate = $false
+  }
+
+   if ( (${wallet-password-file}) -and (!(Test-Path ${wallet-password-file})) ) {
           Write-Output "ERROR! Cannot Validate, password file not found"
-          exit
-      }
+          $CanValidate = $false
    }
 
+   if (!($CanValidate)) {
+       exit 1
+   }
 
 
   if (!${wallet-password-file}) {
       $securedValue = Read-Host -AsSecureString -Prompt "Enter validator password"
       $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($securedValue)
       $value = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
-      $filename = "$Env:APPDATA\LUKSO\temp_pass.txt"
-      [IO.File]::WriteAllLines($filename, $value)
+      $TempPassFile = "$Env:APPDATA\LUKSO\temp_pass.txt"
+      [IO.File]::WriteAllLines($TempPassFile, $value)
   }
 }
 
