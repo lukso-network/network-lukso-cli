@@ -373,11 +373,19 @@ Function check_validator_requirements()
 
 
   if (!${wallet-password-file}) {
-      $securedValue = Read-Host -AsSecureString -Prompt "Enter validator password"
-      $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($securedValue)
-      $value = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
-      $TempPassFile = "$Env:APPDATA\LUKSO\temp_pass.txt"
-      [IO.File]::WriteAllLines($TempPassFile, $value)
+      $PasswordCheck = $false
+      while (!($PasswordCheck)) {
+        $securedValue = Read-Host -AsSecureString -Prompt "Enter validator password"
+        $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($securedValue)
+        $value = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+        $TempPassFile = "$Env:APPDATA\LUKSO\temp_pass.txt"
+        [IO.File]::WriteAllLines($TempPassFile, $value)
+        powershell.exe -command $("$InstallDir\binaries\lukso-validator\v0.2.0-rc.1\lukso-validator-Windows-x86_64.exe accounts list --wallet-dir ${wallet-dir} --wallet-password-file $TempPassFile")
+        $PasswordCheck = $?
+        if (!($PasswordCheck)) {
+            Write-Output "Wrong password for wallet in ${wallet-dir}"
+        }
+      }
   }
 }
 
@@ -580,6 +588,12 @@ function start_vanguard() {
 }
 
 function start_validator() {
+
+    if (($argument -eq "validator") -and ($coinbase)) {
+        powershell.exe -command $("$InstallDir\binaries\pandora\v0.2.0-rc.1\pandora-Windows-x86_64.exe attach ipc:\\.\pipe\geth.ipc --exec miner.setEtherbase(`"$COINBASE`")")
+        powershell.exe -command $("$InstallDir\binaries\pandora\v0.2.0-rc.1\pandora-Windows-x86_64.exe attach ipc:\\.\pipe\geth.ipc --exec miner.start()")
+    }
+
     if (!(Test-Path $logsdir\validator))
     {
         New-Item -ItemType Directory -Force -Path $logsdir\validator
@@ -603,7 +617,7 @@ function start_validator() {
       $Arguments.Add("--wallet-password-file=${wallet-password-file}")
     }
 
-    if (!${wallet-password-file}) {
+    if ($TempPassFile) {
       $Arguments.Add("--wallet-password-file=$Env:APPDATA\LUKSO\temp_pass.txt")
     }
 
