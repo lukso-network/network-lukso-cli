@@ -8,6 +8,13 @@
 </div>
 <div class="key-form">
   <h5 class="title">Transactions</h5>
-  <pre>{{ depositData | json }}</pre>
-  <button class="btn btn-primary btn-lg">Send Transactions</button>
+  <div *ngFor="let deposit of depositData">
+    <strong>0x{{ truncate(deposit.pubkey, 8, 8, 20) }}</strong>
+    &nbsp;
+    <span>32 LYXt</span>
+    &nbsp; Status
+  </div>
+  <button class="btn btn-primary btn-lg" (click)="sendTransactions()">
+    Send Transactions
+  </button>
 </div>
