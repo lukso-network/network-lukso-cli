@@ -3,7 +3,6 @@
    */
 :host {
   display: block;
-  font-family: sans-serif;
   margin: 0;
 }
 
@@ -15,4 +14,14 @@
 
 main {
   display: block;
+}
+
+.navbar {
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.navbar-light .navbar-nav .nav-link {
+  padding-right: 30px;
+  padding-left: 30px;
 }
