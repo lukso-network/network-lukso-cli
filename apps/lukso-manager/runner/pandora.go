@@ -56,7 +56,7 @@ func startPandora(version string, network string, settings settings.Settings) (e
 		"--ethstats=" + hostname + ":6Tcpc53R5V763Aur9LgD@" + statsPrefix + "stats.pandora.l15.lukso.network",
 	}
 
-	command := exec.Command("bash", "-c", shared.BinaryDir+client+"/"+version+"/"+client+" --datadir "+datadir+" init /opt/lukso/networks/"+network+"/config/pandora-genesis.json &>/dev/null")
+	command := exec.Command("bash", "-c", shared.BinaryDir+client+"/"+version+"/"+client+" --datadir "+datadir+" init "+shared.NetworkDir+network+"/config/pandora-genesis.json &>/dev/null")
 	if startError := command.Start(); startError != nil {
 		log.Fatal(startError)
 		return
@@ -64,7 +64,7 @@ func startPandora(version string, network string, settings settings.Settings) (e
 
 	command.Wait()
 
-	in, err := os.Open("/opt/lukso/networks/" + network + "/config/pandora-nodes.json")
+	in, err := os.Open(shared.NetworkDir + network + "/config/pandora-nodes.json")
 	if err != nil {
 		fmt.Println(err)
 		return

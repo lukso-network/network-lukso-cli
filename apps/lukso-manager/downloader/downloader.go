@@ -276,28 +276,12 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = os.Stat(shared.BinaryDir)
-	if err != nil {
-		fmt.Println("CREATE BINARY DIRECTORY", shared.BinaryDir)
-		os.Mkdir(shared.BinaryDir, 0775)
-	}
-
 	clientFolder := shared.BinaryDir + t.Client + "/"
-
-	_, err = os.Stat(clientFolder)
-	if err != nil {
-		fmt.Println("CREATE CLIENT DIRECTORY", clientFolder)
-		os.Mkdir(clientFolder, 0775)
-	}
-
 	clientFolderWithVersion := clientFolder + t.Version
-	fmt.Println(clientFolderWithVersion)
 
-	_, err = os.Stat(clientFolderWithVersion)
-	if err != nil {
-		fmt.Println("CREATE CLIENT DIRECTORY", clientFolderWithVersion)
-		os.Mkdir(clientFolderWithVersion, 0775)
-	}
+	createDirIfNotExists(shared.BinaryDir)
+	createDirIfNotExists(clientFolder)
+	createDirIfNotExists(clientFolderWithVersion)
 
 	filePath := clientFolder + t.Version + "/" + t.Client
 	fileUrl := t.Url
@@ -322,4 +306,23 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode("Download Successful"); err != nil {
 		panic(err)
 	}
+}
+
+func createDirIfNotExists(folder string) {
+	_, err := os.Stat(folder)
+	if err != nil {
+		os.Mkdir(folder, 0775)
+	}
+}
+
+func DownloadConfigFiles(network string) {
+	CDN := "https://storage.googleapis.com/l15-cdn/networks/" + network
+	folder := shared.NetworkDir + network + "/config"
+	createDirIfNotExists(folder)
+
+	downloadFile(folder+"/network-config.yaml", CDN+"/network-config.yaml?ignoreCache=1")
+	downloadFile(folder+"/pandora-genesis.json", CDN+"/pandora-genesis.json?ignoreCache=1")
+	downloadFile(folder+"/vanguard-genesis.ssz", CDN+"/vanguard-genesis.ssz?ignoreCache=1")
+	downloadFile(folder+"/vanguard-config.yaml", CDN+"/vanguard-config.yaml?ignoreCache=1")
+	downloadFile(folder+"/pandora-nodes.json", CDN+"/pandora-nodes.json?ignoreCache=1")
 }

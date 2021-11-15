@@ -3,6 +3,7 @@ package runner
 import (
 	"encoding/json"
 	"log"
+	"lukso/downloader"
 	"lukso/settings"
 	"lukso/shared"
 	"net/http"
@@ -26,6 +27,8 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	}
 
 	network := body.Network
+
+	downloader.DownloadConfigFiles(network)
 
 	errVanguard := startVanguard(body.Settings.Versions[settings.Vanguard], network)
 	if errVanguard != nil {

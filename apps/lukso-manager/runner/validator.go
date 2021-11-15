@@ -9,7 +9,7 @@ func startValidator(version string, network string) (err error) {
 		"--datadir=" + shared.NetworkDir + network + "/datadirs/validator",
 		"--accept-terms-of-use",
 		"--beacon-rpc-provider=127.0.0.1:4000",
-		"--chain-config-file=/opt/lukso/networks/" + network + "/config/vanguard-config.yaml",
+		"--chain-config-file=" + shared.NetworkDir + network + "/config/vanguard-config.yaml",
 		"--verbosity=info",
 		"--pandora-http-provider=http://127.0.0.1:8545",
 		"--wallet-dir=" + shared.NetworkDir + network + "/vanguard_wallet",
