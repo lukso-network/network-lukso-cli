@@ -815,7 +815,24 @@ function _reset($client) {
     }
 }
 
-Function _logs() {
+Function _logs($client) {
+    
+    Workflow MultipleTail
+    {
+        Param([string[]] $Path)
+        $ProgressPreference='SilentlyContinue'
+        foreach -parallel ($file in $path)
+        {
+            Get-Content -Path $file -Tail 1 -Wait
+        }
+    }
+
+    $CurrentLogs = (Get-Content $logsdir\$client\current.tmp -Raw).Trim()
+    $logfiles = @(
+        "$logsdir\$client\$client"+"_$CurrentLogs.out"
+        "$logsdir\$client\$client"+"_$CurrentLogs.err"
+    )
+    MultipleTail($logfiles)
 
 }
 
@@ -1005,8 +1022,8 @@ switch ($command)
     }
 
     "logs" {
-        Write-Output "Work in progress. To get the logs go to $USER\.lukso\$network\logs\<client>"
-#        logs $argument
+        # Write-Output "Work in progress. To get the logs go to $USER\.lukso\$network\logs\<client>"
+        _logs $argument
     }
 
     "version" {
@@ -1014,7 +1031,7 @@ switch ($command)
     }
 
     "attach" {
-        pandora attach ipc:\\.\pipe\geth.ipc
+        powershell.exe -command $((Get-Item "$InstallDir\globalPath\pandora").Target) "attach ipc:\\.\pipe\geth.ipc"
     }
 
     "bind-binaries" {
