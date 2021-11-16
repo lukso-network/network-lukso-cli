@@ -34,6 +34,8 @@ if (Test-Path "$InstallDir\globalPath\lukso") {
 
 Write-Output "powershell.exe -File $InstallDir\lukso.ps1 %*" | Out-File -Encoding ASCII -FilePath "$InstallDir\globalPath\lukso.bat"
 
+$Env:Path += ";$InstallDir\globalPath"
+
 lukso bind-binaries `
 -orchestrator v0.2.0-rc.1 `
 -pandora v0.2.0-rc.1 `

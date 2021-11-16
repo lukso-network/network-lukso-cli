@@ -143,9 +143,9 @@ ${vanguard-rpc-host} = If (${vanguard-rpc-host}) {${vanguard-rpc-host}} ElseIf (
 ${van-rpc-port} = If (${van-rpc-port}) {${van-rpc-port}} ElseIf ($ConfigFile.VANGUARD_RPC_PORT) {$ConfigFile.VANGUARD_RPC_PORT} Else {"4000"}
 
 ${vanguard-rpc} = "${vanguard-rpc-host}:${van-rpc-port}"
-${pandora-rpc} = "${pan-http-addr}:${pan-http-port}"
+${pandora-rpc} = "http://${pan-http-addr}:${pan-http-port}"
 
-$deposit = If ($deposit) {$deposit} ElseIf ($ConfigFile.DEPOSIT) {$ConfigFile.DEPOSIT} Else {"v1.2.6-LUKSO"}
+$deposit = If ($deposit) {$deposit} ElseIf ($ConfigFile.DEPOSIT) {$ConfigFile.DEPOSIT} Else {""}
 $eth2stats = If ($eth2stats) {$eth2stats} ElseIf ($ConfigFile.ETH2STATS) {$ConfigFile.ETH2STATS} Else {""}
 ${eth2stats-beacon-addr} = If (${eth2stats-beacon-addr}) {${eth2stats-beacon-addr}} ElseIf ($ConfigFile.ETH2STATS_BEACON_ADDR) {$ConfigFile.ETH2STATS_BEACON_ADDR} Else {${vanguard-rpc}}
 ${lukso-home} = If (${lukso-home}) {${lukso-home}} ElseIf ($ConfigFile.LUKSO_HOME) {$ConfigFile.LUKSO_HOME} Else {"$HOME\.lukso"}
@@ -199,7 +199,7 @@ ${van-grpc-gateway-port} = If (${van-grpc-gateway-port}) {${van-grpc-gateway-por
 ${van-min-sync-peers} = If (${van-min-sync-peers}) {${van-min-sync-peers}} ElseIf ($ConfigFile.VANGUARD_MIN_SYNC_PEERS) {$ConfigFile.VANGUARD_MIN_SYNC_PEERS} Else {"2"}
 ${van-max-p2p-peers} = If (${van-max-p2p-peers}) {${van-max-p2p-peers}} ElseIf ($ConfigFile.VANGUARD_MAX_P2P_PEERS) {$ConfigFile.VANGUARD_MAX_P2P_PEERS} Else {"50"}
 ${van-ethstats} = If (${van-ethstats}) {${van-ethstats}} ElseIf ($ConfigFile.VAN_ETHSTATS) {$ConfigFile.VAN_ETHSTATS} Else {"34.141.156.125:9090"}
-$validator = If ($validator) {$validator} ElseIf ($ConfigFile.VALIDATOR) {$ConfigFile.VALIDATOR} Else {"v0.2.0-rc.1"}
+$validator = If ($validator) {$validator} ElseIf ($ConfigFile.VALIDATOR) {$ConfigFile.VALIDATOR} Else {""}
 ${validator-beacon-rpc-provider} = If (${validator-beacon-rpc-provider}) {${validator-beacon-rpc-provider}} ElseIf ($ConfigFile.VALIDATOR_BEACON_RPC_PROVIDER) {$ConfigFile.VALIDATOR_BEACON_RPC_PROVIDER} Else {${vanguard-rpc}}
 ${validator-pandora-http-provider} = If (${validator-pandora-http-provider}) {${validator-pandora-http-provider}} ElseIf ($ConfigFile.VALIDATOR_PANDORA_HTTP_PROVIDER) {$ConfigFile.VALIDATOR_PANDORA_HTTP_PROVIDER} Else {${pandora-rpc}}
 ${validator-verbosity} = If (${validator-verbosity}) {${validator-verbosity}} ElseIf ($ConfigFile.VALIDATOR_VERBOSITY) {$ConfigFile.VALIDATOR_VERBOSITY} Else {"info"}
@@ -208,7 +208,7 @@ ${external-ip} = If (${external-ip}) {${external-ip}} ElseIf ($ConfigFile.EXTERN
 ${allow-respin} = If (${allow-respin}) {${allow-respin}} ElseIf ($ConfigFile.ALLOW_RESPIN) {$ConfigFile.ALLOW_RESPIN} Else {$false}
 $force = If ($force) {$force} ElseIf ($ConfigFile.FORCE) {$ConfigFile.FORCE} Else {$false}
 
-
+$TempPassFile = ""
 
 
 
@@ -311,7 +311,8 @@ Function generate_keys()
   $Arguments.Add("--folder $(${keys-dir})")
   $Arguments.Add("--num_validators $ValidatorsNumber")
 
-  powershell.exe -command $("$InstallDir\binaries\lukso-deposit-cli\$deposit\lukso-deposit-cli-Windows-x86_64.exe $Arguments")
+  $depositPath = $(Get-Item "$InstallDir\globalPath\lukso-deposit-cli").Target
+  powershell.exe -command "$depositPath $Arguments"
 }
 
 Function import_accounts() {
@@ -378,9 +379,9 @@ Function check_validator_requirements()
         $securedValue = Read-Host -AsSecureString -Prompt "Enter validator password"
         $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($securedValue)
         $value = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
-        $TempPassFile = "$Env:APPDATA\LUKSO\temp_pass.txt"
-        [IO.File]::WriteAllLines($TempPassFile, $value)
-        powershell.exe -command $("$InstallDir\binaries\lukso-validator\v0.2.0-rc.1\lukso-validator-Windows-x86_64.exe accounts list --wallet-dir ${wallet-dir} --wallet-password-file $TempPassFile")
+        $global:TempPassFile = "$Env:APPDATA\LUKSO\temp_pass.txt"
+        [IO.File]::WriteAllLines($global:TempPassFile, $value)
+        powershell.exe -command $("$InstallDir\binaries\lukso-validator\v0.2.0-rc.1\lukso-validator-Windows-x86_64.exe accounts list --wallet-dir ${wallet-dir} --wallet-password-file $global:TempPassFile")
         $PasswordCheck = $?
         if (!($PasswordCheck)) {
             Write-Output "Wrong password for wallet in ${wallet-dir}"
@@ -617,7 +618,7 @@ function start_validator() {
       $Arguments.Add("--wallet-password-file=${wallet-password-file}")
     }
 
-    if ($TempPassFile) {
+    if ($global:TempPassFile) {
       $Arguments.Add("--wallet-password-file=$Env:APPDATA\LUKSO\temp_pass.txt")
     }
 
@@ -647,8 +648,6 @@ function start_eth2stats_client() {
     $Arguments.Add("--eth2stats.node-name=`"$(${node-name})`"")
     $Arguments.Add("--eth2stats.addr=`"$(${van-ethstats})`"")
     $Arguments.Add("--eth2stats.tls=`"false`"")
-
-    echo $Arguments
 
     Start-Process -FilePath "eth2stats-client" `
     -ArgumentList $Arguments `
@@ -816,14 +815,14 @@ function _reset($client) {
 }
 
 Function _logs($client) {
-    
+
     Workflow MultipleTail
     {
         Param([string[]] $Path)
         $ProgressPreference='SilentlyContinue'
         foreach -parallel ($file in $path)
         {
-            Get-Content -Path $file -Tail 1 -Wait
+            Get-Content -Path $file -Tail 10 -Wait
         }
     }
 
