@@ -2,21 +2,9 @@
   display: block;
   width: 100%;
 }
-
-nav {
-  height: 55px;
-  margin: 0 20px;
-
-  ul {
-    padding-top: 10px;
-  }
+.container > .row {
+  margin-top: 25px;
 }
-
-hr {
-  margin: 5px;
-  margin-bottom: 25px;
-}
-
 .container .row + .row {
   margin-top: 25px;
 }

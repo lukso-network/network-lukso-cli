@@ -18,7 +18,9 @@
         <tr *ngFor="let validator of validatorData">
           <td class="property-name">
             <a
-              href="https://staging.explorer.vanguard.l15.lukso.network/validator/{{
+              href="https://{{
+                env
+              }}explorer.vanguard.l15.lukso.network/validator/{{
                 validator.key
               }}"
               target="_blank"
@@ -26,7 +28,9 @@
             >
           </td>
           <td>
-            {{ getValidatorStatus(validator.key) }}
+            <span class="badge bg-dark">{{
+              getValidatorStatus(validator.key)
+            }}</span>
           </td>
         </tr>
       </table>

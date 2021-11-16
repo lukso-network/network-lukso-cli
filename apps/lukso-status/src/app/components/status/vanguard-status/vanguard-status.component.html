@@ -12,10 +12,8 @@
 
     <div class="status d-flex flex-row">
       <div>
-        <div class="label">LAST BLOCK</div>
-        <span class="latest-block">
-          {{ metrics['beacon_head_slot'] | currency: '#':'symbol':'1.0' }}</span
-        >
+        <div class="label">LAST SLOT</div>
+        <span class="latest-block"> {{ metrics['beacon_head_slot'] }}</span>
       </div>
       <div class="ms-auto">
         <div class="label">STATUS</div>

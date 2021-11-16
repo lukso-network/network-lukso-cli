@@ -26,11 +26,13 @@ const VALIDATOR_STATUSES: { [key: string]: string } = {
 export class ValidatorStatusComponent implements OnChanges {
   validatorData: KeyValue<string, string>[] = [];
   @Input() metrics: any = {};
+  @Input() network = '';
 
+  env = '';
   VALIDATOR_STATUSES = VALIDATOR_STATUSES;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.metrics) {
+    if (changes.metrics.currentValue) {
       this.validatorData = Object.entries(this.metrics)
         .filter(([key]) => {
           return key.includes('validator_statuses');
@@ -40,6 +42,10 @@ export class ValidatorStatusComponent implements OnChanges {
           const match = key.match(regex) as RegExpMatchArray;
           return { key: match[1], value } as KeyValue<string, string>;
         });
+    }
+
+    if (changes.env?.currentValue !== null) {
+      this.env = this.getEnv(changes.network.currentValue);
     }
   }
 
@@ -62,5 +68,19 @@ export class ValidatorStatusComponent implements OnChanges {
       return start + '...' + end;
     }
     return text;
+  }
+
+  private getEnv(network: string) {
+    const namespace = network.split('-')[1];
+
+    if (namespace === 'dev') {
+      return 'dev.';
+    }
+
+    if (namespace === 'staging') {
+      return 'staging.';
+    }
+
+    return '';
   }
 }

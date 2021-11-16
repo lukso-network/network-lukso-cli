@@ -1,33 +1,3 @@
-<nav>
-  <ul class="nav d-flex">
-    <li class="nav-item">
-      <button class="btn btn-success" (click)="startClients(network.value)">
-        <i class="bi bi-power"></i> Start
-      </button>
-      <!-- </li>
-    <li class="nav-item">
-      <button class="btn btn-danger" (click)="stopClients()">Stop</button>
-    </li> -->
-    </li>
-
-    <li class="nav-item ms-auto">
-      <!-- Example single danger button -->
-      <select
-        #network
-        class="form-select"
-        aria-label="Default select example"
-        (change)="selectNetwork(network.value)"
-      >
-        <option [value]="NETWORKS.L15_DEV" selected>L15 Development</option>
-        <option [value]="NETWORKS.L15_STAGING">L15 Staging</option>
-        <option [value]="NETWORKS.L15_PROD">L15 Production</option>
-      </select>
-    </li>
-  </ul>
-</nav>
-
-<hr />
-
 <div class="container">
   <!-- <div class="row">
     <div class="col">
@@ -48,6 +18,7 @@
     <div class="col">
       <lukso-validator-status
         [metrics]="validatorMetrics$ | async"
+        [network]="network$ | async"
       ></lukso-validator-status>
     </div>
   </div>

@@ -13,9 +13,7 @@
     <div class="status d-flex flex-row">
       <div>
         <div class="label">LAST BLOCK</div>
-        <span class="latest-block">
-          {{ metrics['chain/head/block'] | currency: '#':'symbol':'1.0' }}</span
-        >
+        <span class="latest-block"> {{ metrics['chain/head/block'] }}</span>
       </div>
       <div class="ms-auto">
         <div class="label">STATUS</div>

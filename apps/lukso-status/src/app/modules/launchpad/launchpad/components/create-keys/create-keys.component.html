@@ -10,19 +10,6 @@
 <div class="key-form">
   <form [formGroup]="form" (submit)="onSubmit()" novalidate>
     <div class="mb-4">
-      <label class="form-label" for="network-select">Network</label>
-      <select
-        class="form-select form-select-lg"
-        id="network-select"
-        formControlName="network"
-      >
-        <option [value]="NETWORKS.L15_DEV">L15 Development</option>
-        <option [value]="NETWORKS.L15_STAGING">L15 Staging</option>
-        <option [value]="NETWORKS.L15_PROD">L15 Production</option>
-      </select>
-    </div>
-
-    <div class="mb-4">
       <label class="form-label" for="amountOfValidators">Validators</label>
       <input
         class="form-control form-control-lg"

@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 
 const addressTo = '0x000000000000000000000000000000000000cafE';
 import depositABI from './deposit_contract_abi.json';
+import { DataService } from '../../../../../services/data.service';
 
 declare let window: any;
 
@@ -18,6 +19,10 @@ let signer: ethers.Signer;
 })
 export class SendTransactionsComponent {
   @Input() depositData: DepositData[] | null = null;
+
+  constructor(dataService: DataService) {
+    console.log(dataService);
+  }
 
   async sendTransactions() {
     if (window.ethereum) {

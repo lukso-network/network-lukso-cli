@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   AbstractControlOptions,
   FormBuilder,
@@ -13,7 +13,7 @@ import { CustomValidators } from '../../helpers/custom-validators';
   templateUrl: './create-keys.component.html',
   styleUrls: ['./create-keys.component.scss'],
 })
-export class CreateKeysComponent {
+export class CreateKeysComponent implements OnInit {
   @Output() createKeys = new EventEmitter<any>();
   @Output() switchNetwork = new EventEmitter<NETWORKS>();
   @Input() currentTask = {
@@ -27,9 +27,9 @@ export class CreateKeysComponent {
 
   constructor(private fb: FormBuilder) {
     this.form = this.setupForm();
-    this.form.controls.network.valueChanges.subscribe((network: NETWORKS) => {
-      this.switchNetwork.emit(network);
-    });
+  }
+  ngOnInit(): void {
+    this.form.controls.network.setValue(localStorage.getItem('network'));
   }
 
   get f() {
@@ -49,7 +49,7 @@ export class CreateKeysComponent {
   private setupForm() {
     return this.fb.group(
       {
-        network: [NETWORKS.L15_DEV, [Validators.required]],
+        network: [localStorage.getItem('network'), [Validators.required]],
         amountOfValidators: ['', [Validators.required]],
         password: [
           '',

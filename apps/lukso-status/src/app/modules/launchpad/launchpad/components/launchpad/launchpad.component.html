@@ -1,7 +1,8 @@
+{{ network$ | async }}
+
 <lukso-create-keys
   class="shadow-sm p-5 mb-5 bg-body rounded"
   (createKeys)="createKeys($event)"
-  (switchNetwork)="switchNetwork($event)"
   [currentTask]="currentTask"
 ></lukso-create-keys>
 
