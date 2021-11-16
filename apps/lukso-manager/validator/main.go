@@ -90,7 +90,6 @@ func GenerateValidatorKeys(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(args)
 	command := exec.Command("bash", "-c", shared.BinaryDir+"lukso-deposit-cli/v1.2.6-LUKSO/lukso-deposit-cli "+strings.Join(args, " "))
 
 	if startError := command.Start(); startError != nil {
