@@ -402,6 +402,7 @@ start_orchestrator() {
     --ws \
     --ws.addr=$ORC_WS_ADDR \
     --ws.port=$ORC_WS_PORT \
+    --ipcpath=$DATADIR/orchestrator \
     --pandora-rpc-endpoint=$ORCHESTRATOR_PANDORA_RPC_ENDPOINT \
     --verbosity=$ORC_VERBOSITY >|$LOGSDIR/orchestrator/orchestrator_"$RUN_DATE".log 2>&1 &
   disown
