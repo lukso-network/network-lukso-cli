@@ -331,7 +331,8 @@ Function import_accounts() {
     $Arguments.Add("--keys-dir=$(${keys-dir})")
     $Arguments.Add("--wallet-dir=$(${wallet-dir})")
 
-    powershell.exe -command $("$InstallDir\binaries\lukso-validator\$validator\lukso-validator-Windows-x86_64.exe $Arguments")
+    $validatorPath = $(Get-Item "$InstallDir\globalPath\lukso-validator").Target
+    powershell.exe -command "$validatorPath $Arguments"
 }
 
 Function setup_config()
@@ -349,8 +350,8 @@ Function check_validator_requirements()
 
   if ( ($argument -eq "validator") -and (!($coinbase)) ) {
 
-
-    if (!($(powershell.exe -command $("$InstallDir\binaries\pandora\v0.2.0-rc.1\pandora-Windows-x86_64.exe attach ipc:\\.\pipe\geth.ipc --exec 'eth.coinbase'")) -match '^\"0x[a-fA-F0-9]{40}\"$')) {
+    $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target
+    if (!($(powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec 'eth.coinbase'") -match '^\"0x[a-fA-F0-9]{40}\"$')) {
         Write-Output "ERROR: Coinbase is not set on already running pandora. Please provide it using:"
         Write-Output "--coinbase 0x<ETH1_ADDRESS>"
         $CanValidate = $false
@@ -381,7 +382,8 @@ Function check_validator_requirements()
         $value = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
         $global:TempPassFile = "$Env:APPDATA\LUKSO\temp_pass.txt"
         [IO.File]::WriteAllLines($global:TempPassFile, $value)
-        powershell.exe -command $("$InstallDir\binaries\lukso-validator\v0.2.0-rc.1\lukso-validator-Windows-x86_64.exe accounts list --wallet-dir ${wallet-dir} --wallet-password-file $global:TempPassFile")
+        $validatorPath = $(Get-Item "$InstallDir\globalPath\lukso-validator").Target
+        powershell.exe -command "$validatorPath accounts list --wallet-dir ${wallet-dir} --wallet-password-file $global:TempPassFile"
         $PasswordCheck = $?
         if (!($PasswordCheck)) {
             Write-Output "Wrong password for wallet in ${wallet-dir}"
@@ -591,8 +593,9 @@ function start_vanguard() {
 function start_validator() {
 
     if (($argument -eq "validator") -and ($coinbase)) {
-        powershell.exe -command $("$InstallDir\binaries\pandora\v0.2.0-rc.1\pandora-Windows-x86_64.exe attach ipc:\\.\pipe\geth.ipc --exec miner.setEtherbase(`"$COINBASE`")")
-        powershell.exe -command $("$InstallDir\binaries\pandora\v0.2.0-rc.1\pandora-Windows-x86_64.exe attach ipc:\\.\pipe\geth.ipc --exec miner.start()")
+        $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target
+        powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec miner.setEtherbase(`"$COINBASE`")"
+        powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec miner.start()"
     }
 
     if (!(Test-Path $logsdir\validator))
@@ -1030,7 +1033,8 @@ switch ($command)
     }
 
     "attach" {
-        powershell.exe -command $((Get-Item "$InstallDir\globalPath\pandora").Target) "attach ipc:\\.\pipe\geth.ipc"
+        $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target
+        powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc"
     }
 
     "bind-binaries" {
