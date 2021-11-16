@@ -3,7 +3,7 @@
    */
 :host {
   display: block;
-  margin: 0;
+  margin: 0 auto;
 }
 
 .lukso-logo {
@@ -24,4 +24,10 @@ main {
 .navbar-light .navbar-nav .nav-link {
   padding-right: 30px;
   padding-left: 30px;
+}
+
+.status-box {
+  box-shadow: 1in #000;
+  background: white;
+  border-color: 1px solid red;
 }

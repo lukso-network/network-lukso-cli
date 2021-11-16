@@ -64,8 +64,6 @@ func GenerateValidatorKeys(w http.ResponseWriter, r *http.Request) {
 		os.Mkdir(folder+"/passwords", 0775)
 	}
 
-	fmt.Println(folder + "/passwords/mnemonic")
-
 	mnemonicData := []byte(mnemonic)
 	errWrite := os.WriteFile(folder+"/passwords/mnemonic", mnemonicData, 0644)
 	if errWrite != nil {
@@ -166,8 +164,6 @@ func GetDepositData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	network := keys[0]
-
-	fmt.Println(ReadDepositData(network))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

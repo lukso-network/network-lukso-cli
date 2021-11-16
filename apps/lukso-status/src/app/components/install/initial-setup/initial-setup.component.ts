@@ -89,7 +89,7 @@ export class InitialSetupComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.softwareService.getConfig('l15-dev').subscribe((result) => {
+    this.softwareService.getConfig('l15-staging').subscribe((result) => {
       this.setupForm.patchValue(result);
     });
   }
@@ -98,7 +98,7 @@ export class InitialSetupComponent implements OnInit {
     console.log(this.setupForm.valid);
     if (this.setupForm.valid) {
       this.softwareService
-        .setConfig('l15-dev', this.setupForm.value)
+        .setConfig('l15-staging', this.setupForm.value)
         .subscribe(() => {
           this.router.navigate(['/status']);
         });

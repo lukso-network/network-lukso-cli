@@ -13,8 +13,8 @@ import (
 
 func startPandora(version string, network string, settings settings.Settings) (err error) {
 	client := "pandora"
-	datadir := shared.NetworkDir + network + "/datadirs/" + client
-
+	dataDir := shared.GetDataDir(network, client)
+	networkDir := shared.GetNetworkDir(network)
 	if settings.HostName == "" {
 		settings.HostName, _ = os.Hostname()
 	}
@@ -32,7 +32,7 @@ func startPandora(version string, network string, settings settings.Settings) (e
 	}
 
 	args := []string{
-		"--datadir=" + datadir,
+		"--datadir=" + dataDir,
 		"--networkid=" + fmt.Sprint(config.NETWORKID),
 		"--port=30405",
 		"--http",
@@ -56,7 +56,7 @@ func startPandora(version string, network string, settings settings.Settings) (e
 		"--ethstats=" + hostname + ":6Tcpc53R5V763Aur9LgD@" + statsPrefix + "stats.pandora.l15.lukso.network",
 	}
 
-	command := exec.Command("bash", "-c", shared.BinaryDir+client+"/"+version+"/"+client+" --datadir "+datadir+" init "+shared.NetworkDir+network+"/config/pandora-genesis.json &>/dev/null")
+	command := exec.Command("bash", "-c", shared.BinaryDir+client+"/"+version+"/"+client+" --datadir "+dataDir+" init "+networkDir+"/config/pandora-genesis.json &>/dev/null")
 	if startError := command.Start(); startError != nil {
 		log.Fatal(startError)
 		return
@@ -64,14 +64,14 @@ func startPandora(version string, network string, settings settings.Settings) (e
 
 	command.Wait()
 
-	in, err := os.Open(shared.NetworkDir + network + "/config/pandora-nodes.json")
+	in, err := os.Open(networkDir + "/config/pandora-nodes.json")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer in.Close()
 
-	out, err := os.Create(datadir + "/geth/static-nodes.json")
+	out, err := os.Create(dataDir + "/geth/static-nodes.json")
 	if err != nil {
 		fmt.Println(err)
 		return

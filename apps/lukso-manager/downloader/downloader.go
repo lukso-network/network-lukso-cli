@@ -232,15 +232,7 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	fmt.Println("confMap")
-	fmt.Println(confMap)
-	fmt.Println("confMap")
-
 	jsonString, err := json.Marshal(confMap)
-
-	fmt.Println("jsonString")
-	fmt.Println(string(jsonString))
-	fmt.Println("jsonString")
 
 	if err != nil {
 		log.Fatalln(err)

@@ -1,18 +1,11 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   AbstractControlOptions,
   FormBuilder,
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { CURRENT_KEY_ACTION } from '../../helpers/create-keys';
+import { CURRENT_KEY_ACTION, NETWORKS } from '../../helpers/create-keys';
 import { CustomValidators } from '../../helpers/custom-validators';
 
 @Component({
@@ -22,16 +15,21 @@ import { CustomValidators } from '../../helpers/custom-validators';
 })
 export class CreateKeysComponent {
   @Output() createKeys = new EventEmitter<any>();
+  @Output() switchNetwork = new EventEmitter<NETWORKS>();
   @Input() currentTask = {
     status: CURRENT_KEY_ACTION.IDLE,
   };
 
+  NETWORKS = NETWORKS;
   form: FormGroup = new FormGroup({});
   submitted = false;
   isGeneratingKeys = false;
 
   constructor(private fb: FormBuilder) {
     this.form = this.setupForm();
+    this.form.controls.network.valueChanges.subscribe((network: NETWORKS) => {
+      this.switchNetwork.emit(network);
+    });
   }
 
   get f() {
@@ -51,7 +49,7 @@ export class CreateKeysComponent {
   private setupForm() {
     return this.fb.group(
       {
-        network: ['l15-dev', [Validators.required]],
+        network: [NETWORKS.L15_DEV, [Validators.required]],
         amountOfValidators: ['', [Validators.required]],
         password: [
           '',

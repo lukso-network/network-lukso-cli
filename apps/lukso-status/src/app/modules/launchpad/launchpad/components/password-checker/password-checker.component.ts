@@ -15,7 +15,6 @@ export class PasswordCheckerComponent implements OnChanges {
   hasSpecialCharacters = false;
   ngOnChanges(changes: SimpleChanges) {
     if (changes.password) {
-      console.log(changes.password.currentValue);
       this.minlength = new RegExp(/\d/).test(this.password);
       this.hasCapitalCase = new RegExp(/[A-Z]/).test(this.password);
       this.hasNumber = new RegExp(/[0-9]/).test(this.password);

@@ -1,26 +1,51 @@
-<div class="card" *ngIf="metrics">
-  <h4 class="card-header">Validator</h4>
-  <div class="card-body">
-    <table
-      *ngIf="
-        !(metrics['process_cpu_seconds_total'] === undefined);
-        else notRunning
-      "
-      class="table is-hoverable"
-    >
-      <tbody>
-        <tr>
-          <td class="property-name">process_cpu_seconds_total</td>
-          <td class="property-value">
-            {{ metrics['process_cpu_seconds_total'] }}
+<div class="status-box" *ngIf="metrics">
+  <div
+    class="card-body d-flex flex-column"
+    *ngIf="
+      !(metrics['process_cpu_seconds_total'] === undefined);
+      else notRunning
+    "
+  >
+    <h1 class="title">Validator</h1>
+
+    <div class="flex-fill">
+      <span class="peers">{{ validatorData.length }} </span>
+      <span class="label">Validators</span>
+    </div>
+
+    <div class="flex-fill">
+      <table>
+        <tr *ngFor="let validator of validatorData">
+          <td class="property-name">
+            <a
+              href="https://staging.explorer.vanguard.l15.lukso.network/validator/{{
+                validator.key
+              }}"
+              target="_blank"
+              >{{ truncate(validator.key, 6, 6, 50) }}</a
+            >
+          </td>
+          <td>
+            {{ getValidatorStatus(validator.key) }}
           </td>
         </tr>
-      </tbody>
-    </table>
-    <ng-template #notRunning>
-      <button type="button" class="btn btn-primary" routerLink="/launchpad">
-        Become a validator
-      </button></ng-template
-    >
+      </table>
+    </div>
+
+    <div class="status d-flex flex-row align-items-end">
+      <div class="flex-fill">
+        <div class="label">STATUS</div>
+        <span class="badge bg-success">Excellent</span>
+      </div>
+      <div class="flex-fill text-end">
+        <div class="label">HMMM</div>
+        <span class="latest-block">Some Metric</span>
+      </div>
+    </div>
   </div>
+  <ng-template #notRunning>
+    <button type="button" class="btn btn-primary" routerLink="/launchpad">
+      Become a validator
+    </button></ng-template
+  >
 </div>

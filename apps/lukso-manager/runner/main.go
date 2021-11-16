@@ -7,6 +7,7 @@ import (
 	"lukso/settings"
 	"lukso/shared"
 	"net/http"
+	"os"
 	"os/exec"
 )
 
@@ -28,7 +29,16 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 
 	network := body.Network
 
+	oldConfig, _ := ReadConfig(network)
 	downloader.DownloadConfigFiles(network)
+	newConfig, _ := ReadConfig(network)
+
+	if oldConfig.GENESISTIME != newConfig.GENESISTIME {
+		err := os.RemoveAll(shared.NetworkDir + network + "/" + shared.DataDir)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	errVanguard := startVanguard(body.Settings.Versions[settings.Vanguard], network)
 	if errVanguard != nil {

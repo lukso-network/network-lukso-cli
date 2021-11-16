@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
-import { CURRENT_KEY_ACTION } from '../../helpers/create-keys';
+import { CURRENT_KEY_ACTION, NETWORKS } from '../../helpers/create-keys';
 import { KeygenService } from '../../services/keygen.service';
 import { saveAs } from 'file-saver';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+
 interface KeyGenerationValues {
   network: string;
   amountOfValidators: number;
@@ -20,6 +21,7 @@ export class LaunchpadComponent {
   keygenService: KeygenService;
   router: Router;
   showPasswordError = false;
+  network$ = new BehaviorSubject<NETWORKS>(NETWORKS.L15_DEV);
   depositData$: Observable<any>;
   currentTask = {
     status: CURRENT_KEY_ACTION.IDLE,
@@ -28,7 +30,16 @@ export class LaunchpadComponent {
   constructor(keygenService: KeygenService, router: Router) {
     this.router = router;
     this.keygenService = keygenService;
-    this.depositData$ = this.keygenService.getDepositData('l15-dev');
+    this.depositData$ = this.network$.pipe(
+      switchMap((network: NETWORKS) => {
+        return this.keygenService.getDepositData(network);
+      })
+    );
+  }
+
+  switchNetwork(event: any) {
+    console.log(event);
+    this.network$.next(event);
   }
 
   createKeys(values: KeyGenerationValues) {

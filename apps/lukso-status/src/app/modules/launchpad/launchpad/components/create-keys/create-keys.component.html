@@ -16,9 +16,9 @@
         id="network-select"
         formControlName="network"
       >
-        <option value="l15-dev">L15 Development</option>
-        <option value="l15-staging">L15 Staging</option>
-        <option value="l15-prod">L15 Production</option>
+        <option [value]="NETWORKS.L15_DEV">L15 Development</option>
+        <option [value]="NETWORKS.L15_STAGING">L15 Staging</option>
+        <option [value]="NETWORKS.L15_PROD">L15 Production</option>
       </select>
     </div>
 

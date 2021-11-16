@@ -3,6 +3,7 @@ package runner
 import (
 	"fmt"
 	"io/ioutil"
+	"lukso/shared"
 
 	"github.com/go-yaml/yaml"
 )
@@ -17,7 +18,7 @@ type NetworkConfig struct {
 }
 
 func ReadConfig(network string) (*NetworkConfig, error) {
-	fileName := "/opt/lukso/networks/" + network + "/config/network-config.yaml"
+	fileName := shared.NetworkDir + network + "/config/network-config.yaml"
 	buf, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return nil, err

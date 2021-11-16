@@ -21,7 +21,7 @@ func startVanguard(version string, network string) (err error) {
 		"--accept-terms-of-use",
 		"--chain-id=" + fmt.Sprint(config.CHAINID),
 		"--network-id=" + fmt.Sprint(config.NETWORKID),
-		"--datadir=" + shared.NetworkDir + network + "/datadirs/vanguard",
+		"--datadir=" + shared.GetDataDir(network, client),
 		"--genesis-state=" + shared.NetworkDir + network + "/config/vanguard-genesis.ssz",
 		"--chain-config-file=" + shared.NetworkDir + network + "/config/vanguard-config.yaml",
 		"--bootstrap-node=" + bootnodes[0],

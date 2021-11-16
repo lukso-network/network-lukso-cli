@@ -1,29 +1,33 @@
-<div class="card" *ngIf="metrics">
-  <h4 class="card-header">
-    Vanguard
-    <ng-container *ngIf="metrics[peersSelector] as peers">
-      <span *ngIf="peers >= 20" class="badge bg-success">Excellent</span>
-      <span *ngIf="peers < 20 && peers > 1" class="badge bg-warning">Ok</span>
-      <span *ngIf="peers <= 1" class="badge bg-danger">Not syncing</span>
-    </ng-container>
-  </h4>
+<div class="status-box" *ngIf="metrics">
+  <div
+    class="card-body d-flex flex-column"
+    *ngIf="!(metrics[peersSelector] === undefined); else notRunning"
+  >
+    <h1 class="title">Vanguard</h1>
 
-  <div class="card-body">
-    <table
-      *ngIf="!(metrics[peersSelector] === undefined); else notRunning"
-      class="table is-hoverable"
-    >
-      <tbody>
-        <tr class="property property--peers">
-          <td class="property-name">Peers</td>
-          <td class="property-value">{{ metrics[peersSelector] }}</td>
-        </tr>
-        <tr>
-          <td class="property-name">Latest Block</td>
-          <td class="property-value">{{ metrics['beacon_head_slot'] }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <ng-template #notRunning> Not Running </ng-template>
+    <div class="flex-fill">
+      <span class="peers">{{ metrics[peersSelector] }}</span>
+      <span class="label">Peers </span>
+    </div>
+
+    <div class="status d-flex flex-row">
+      <div>
+        <div class="label">LAST BLOCK</div>
+        <span class="latest-block">
+          {{ metrics['beacon_head_slot'] | currency: '#':'symbol':'1.0' }}</span
+        >
+      </div>
+      <div class="ms-auto">
+        <div class="label">STATUS</div>
+        <ng-container *ngIf="metrics[peersSelector] as peers">
+          <span *ngIf="peers >= 20" class="badge bg-success">Excellent</span>
+          <span *ngIf="peers < 20 && peers > 0" class="badge bg-warning"
+            >Ok</span
+          >
+          <span *ngIf="peers <= 0" class="badge bg-danger">Not syncing</span>
+        </ng-container>
+      </div>
+    </div>
   </div>
+  <ng-template #notRunning> Not Running </ng-template>
 </div>

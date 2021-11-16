@@ -17,3 +17,9 @@ export interface DepositData {
   eth2_network_name:      string;
   deposit_cli_version:    string;
 }
+
+export enum NETWORKS {
+  'L15_DEV' = 'l15-dev',
+  'L15_STAGING' = 'l15-staging',
+  'L15_PROD' = 'l15-prod',
+}
