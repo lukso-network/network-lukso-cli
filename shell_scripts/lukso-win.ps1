@@ -8,6 +8,8 @@ param (
     [Parameter(Position = 1)][String]$argument,
     [String]$deposit,
     [String]$eth2stats,
+    [String]${lukso-status},
+    [Switch]${status-page},
     [String]${eth2stats-beacon-addr},
     [String]$network,
     [String]${lukso-home},
@@ -147,6 +149,8 @@ ${pandora-rpc} = "http://${pan-http-addr}:${pan-http-port}"
 
 $deposit = If ($deposit) {$deposit} ElseIf ($ConfigFile.DEPOSIT) {$ConfigFile.DEPOSIT} Else {""}
 $eth2stats = If ($eth2stats) {$eth2stats} ElseIf ($ConfigFile.ETH2STATS) {$ConfigFile.ETH2STATS} Else {""}
+${lukso-status} = If (${lukso-status}) {${lukso-status}} ElseIf ($ConfigFile.LUKSO_STATUS) {$ConfigFile.LUKSO_STATUS} Else {""}
+${status-page} = If (${status-page}) {${status-page}} ElseIf ($ConfigFile.STATUS_PAGE) {$ConfigFile.STATUS_PAGE} Else {$false}
 ${eth2stats-beacon-addr} = If (${eth2stats-beacon-addr}) {${eth2stats-beacon-addr}} ElseIf ($ConfigFile.ETH2STATS_BEACON_ADDR) {$ConfigFile.ETH2STATS_BEACON_ADDR} Else {${vanguard-rpc}}
 ${lukso-home} = If (${lukso-home}) {${lukso-home}} ElseIf ($ConfigFile.LUKSO_HOME) {$ConfigFile.LUKSO_HOME} Else {"$HOME\.lukso"}
 $datadir = If ($datadir) {$datadir} ElseIf ($ConfigFile.DATADIR) {$ConfigFile.DATADIR} Else {"${lukso-home}\$network\datadir"}
@@ -511,7 +515,7 @@ function start_pandora()
         $Arguments.Add("--nat=extip:${pandora-external-ip}")
     }
 
-    if (${pandora-metrics}) {
+    if (${pandora-metrics} -or ${status-page}) {
         $Arguments.Add("--metrics")
         $Arguments.Add("--metrics.expensive")
         $Arguments.Add("--pprof")
@@ -660,6 +664,22 @@ function start_eth2stats_client() {
 
 }
 
+function start_lukso_status() {
+    if (!(Test-Path $logsdir\lukso-status))
+    {
+        New-Item -ItemType Directory -Force -Path $logsdir\lukso-status
+    }
+
+    Write-Output $runDate | Out-File -FilePath "$logsdir\lukso-status\current.tmp"
+
+    $Arguments = New-Object System.Collections.Generic.List[System.Object]
+
+    Start-Process -FilePath "lukso-status" `
+    -NoNewWindow `
+    -RedirectStandardOutput "$logsdir\lukso-status\lukso-status_$runDate.out" `
+    -RedirectStandardError "$logsdir\lukso-status\lukso-status_$runDate.err"
+}
+
 function start_all() {
     if ($validate) {
         check_validator_requirements
@@ -669,6 +689,9 @@ function start_all() {
     start_pandora
     start_vanguard
     start_eth2stats_client
+    if (${status-page}) {
+        start_lukso_status
+    }
 }
 
 # "start" is a reserved keyword in PowerShell
@@ -691,6 +714,14 @@ function _start($client)
         validator {
             check_validator_requirements
             start_validator
+        }
+
+        eth2stats {
+            start_eth2stats_client
+        }
+
+        lukso-status {
+            start_lukso_status
         }
 
         all {
@@ -721,6 +752,10 @@ function stop_validator() {
 
 function stop_eth2stats() {
     Stop-Process -ProcessName "eth2stats-Windows-x86_64"
+}
+
+function stop_lukso_status() {
+    Stop-Process -ProcessName "lukso-status"
 }
 
 function stop_all() {
@@ -987,6 +1022,18 @@ if ($eth2stats)
 if ($deposit)
 {
     bind_binary lukso-deposit-cli $deposit
+}
+
+if (${lukso-status})
+{
+    download "https://github.com/rryter/node-status/releases/download/${lukso-status}/lukso-status-${lukso-status}-windows-amd64.zip" $InstallDir\lukso-status-${lukso-status}-windows-amd64.zip
+    New-Item -ItemType Directory -Force -Path $InstallDir\binaries\lukso-status\${lukso-status}
+    Expand-Archive -Path "$InstallDir\lukso-status-${lukso-status}-windows-amd64.zip" -DestinationPath "$InstallDir\binaries\lukso-status\${lukso-status}" -Force
+    if (Test-Path "$InstallDir\globalPath\lukso-status") {
+        rm "$InstallDir\globalPath\lukso-status"
+    }
+    echo "$InstallDir\binaries\lukso-status\${lukso-status}\lukso-status.exe"
+    cmd /c mklink "$InstallDir\globalPath\lukso-status" "$InstallDir\binaries\lukso-status\${lukso-status}\lukso-status.exe"
 }
 
 

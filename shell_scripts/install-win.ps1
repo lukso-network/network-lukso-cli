@@ -42,4 +42,5 @@ lukso bind-binaries `
 -vanguard v0.2.0-rc.1 `
 -validator v0.2.0-rc.1 `
 -eth2stats v0.1.0-develop `
--deposit v1.2.6-LUKSO
+-deposit v1.2.6-LUKSO `
+-lukso-status v0.0.1-alpha.9
