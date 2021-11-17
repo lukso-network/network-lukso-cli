@@ -44,8 +44,8 @@ export class ValidatorStatusComponent implements OnChanges {
         });
     }
 
-    if (changes.env?.currentValue !== null) {
-      this.env = this.getEnv(changes.network.currentValue);
+    if (changes?.env?.currentValue !== null) {
+      this.env = this.getEnv(changes.network?.currentValue);
     }
   }
 
@@ -54,6 +54,13 @@ export class ValidatorStatusComponent implements OnChanges {
       this.metrics['validator_statuses{pubkey="' + pubkey + '"}'];
 
     return VALIDATOR_STATUSES[statusNumber];
+  }
+
+  getValidatorMetric(key: string, pubkey: string) {
+    const statusNumber: string =
+      this.metrics[key + '{pubkey="' + pubkey + '"}'];
+
+    return statusNumber;
   }
 
   truncate(
@@ -71,7 +78,7 @@ export class ValidatorStatusComponent implements OnChanges {
   }
 
   private getEnv(network: string) {
-    const namespace = network.split('-')[1];
+    const namespace = network?.split('-')[1];
 
     if (namespace === 'dev') {
       return 'dev.';

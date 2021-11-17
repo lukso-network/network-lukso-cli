@@ -16,6 +16,7 @@ export class StatusComponent {
   softwareService: SoftwareService;
   vanguardMetrics$: Observable<any>;
   pandoraMetrics$: Observable<any>;
+  peersOverTime$: Observable<any>;
   validatorMetrics$: Observable<any>;
   network$: Observable<any>;
 
@@ -28,6 +29,8 @@ export class StatusComponent {
   ) {
     this.softwareService = softwareService;
     this.pandoraMetrics$ = pandoraService.getMetrics$();
+    this.pandoraMetrics$ = pandoraService.getMetrics$();
+    this.peersOverTime$ = pandoraService.getPeersOverTime$();
     this.vanguardMetrics$ = vanguardService.getMetrics$();
     this.validatorMetrics$ = validatorService.getMetrics$();
     this.network$ = dataService.getNetwork$();

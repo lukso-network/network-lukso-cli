@@ -7,8 +7,7 @@ import { NETWORKS } from '../modules/launchpad/launchpad/helpers/create-keys';
   providedIn: 'root',
 })
 export class DataService {
-  data: any;
-  network$: any;
+  network$: BehaviorSubject<NETWORKS>;
   constructor() {
     this.network$ = new BehaviorSubject<NETWORKS>(NETWORKS.L15_DEV);
   }
@@ -18,8 +17,6 @@ export class DataService {
   }
 
   setNetwork(network: NETWORKS) {
-    console.log('UPDATED NETWORK');
-    console.log(network);
     localStorage.setItem('network', network);
     this.network$.next(network);
   }

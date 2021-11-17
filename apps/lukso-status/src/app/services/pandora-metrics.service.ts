@@ -8,10 +8,21 @@ import { catchError, switchMap } from 'rxjs/operators';
 })
 export class PandoraMetricsService {
   metrics$: Observable<any>;
+  peersOverTime$: Observable<any>;
   constructor(private httpClient: HttpClient) {
-    this.metrics$ = timer(0, 3000).pipe(
+    const timer$ = timer(0, 3000);
+    this.metrics$ = timer$.pipe(
       switchMap(() => {
-        return httpClient.get('/pandora/debug/metrics').pipe(
+        return httpClient.get('/api/pandora/debug/metrics').pipe(
+          catchError(() => {
+            return of({});
+          })
+        );
+      })
+    );
+    this.peersOverTime$ = timer$.pipe(
+      switchMap(() => {
+        return httpClient.get('/api/pandora/peers-over-time').pipe(
           catchError(() => {
             return of({});
           })
@@ -22,5 +33,9 @@ export class PandoraMetricsService {
 
   getMetrics$() {
     return this.metrics$;
+  }
+
+  getPeersOverTime$() {
+    return this.peersOverTime$;
   }
 }

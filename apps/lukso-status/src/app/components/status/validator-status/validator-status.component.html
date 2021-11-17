@@ -14,35 +14,48 @@
     </div>
 
     <div class="flex-fill">
-      <table>
-        <tr *ngFor="let validator of validatorData">
-          <td class="property-name">
-            <a
-              href="https://{{
-                env
-              }}explorer.vanguard.l15.lukso.network/validator/{{
-                validator.key
-              }}"
-              target="_blank"
-              >{{ truncate(validator.key, 6, 6, 50) }}</a
-            >
-          </td>
-          <td>
-            <span class="badge bg-dark">{{
-              getValidatorStatus(validator.key)
-            }}</span>
-          </td>
-        </tr>
+      <table class="table table-borderless table-sm">
+        <tbody>
+          <tr *ngFor="let validator of validatorData | slice: 0:2">
+            <td class="property-name">
+              <a
+                class="explorer-link"
+                href="https://{{
+                  env
+                }}explorer.vanguard.l15.lukso.network/validator/{{
+                  validator.key
+                }}"
+                target="_blank"
+                >{{ truncate(validator.key, 6, 6, 50) }}</a
+              >
+            </td>
+            <td>
+              <span class="d-flex">
+                {{
+                  getValidatorMetric('validator_balance', validator.key)
+                    | number: '1.2-2'
+                }}&nbsp;LYXt
+              </span>
+            </td>
+            <td>
+              <span class="badge bg-dark">{{
+                VALIDATOR_STATUSES[
+                  getValidatorMetric('validator_statuses', validator.key)
+                ]
+              }}</span>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
 
     <div class="status d-flex flex-row align-items-end">
       <div class="flex-fill">
         <div class="label">STATUS</div>
-        <span class="badge bg-success">Excellent</span>
+        <span class="badge bg-danger">TBD</span>
       </div>
       <div class="flex-fill text-end">
-        <div class="label">HMMM</div>
+        <div class="label">SUCCESSFUL PROPOSALS</div>
         <span class="latest-block">Some Metric</span>
       </div>
     </div>

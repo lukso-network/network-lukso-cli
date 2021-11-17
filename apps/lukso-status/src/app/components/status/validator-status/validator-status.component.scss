@@ -41,6 +41,10 @@
   font-weight: 700;
 }
 
+.explorer-link {
+  color: #020a06;
+}
+
 .bg-success {
   background: #ebf8f1 !important;
   color: #2db679;
@@ -56,10 +60,7 @@ span.badge {
 
 td {
   vertical-align: top;
-}
-
-.property-name {
-  width: 200px;
+  padding: 2px 10px;
 }
 
 .property-value {

@@ -14,6 +14,8 @@ import { ValidatorStatusComponent } from './components/status/validator-status/v
 import { SettingsComponent } from './components/settings/settings.component';
 import { InitialSetupComponent } from './components/install/initial-setup/initial-setup.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -33,6 +35,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     BrowserModule,
     HttpClientModule,
     ReactiveFormsModule,
+    NgxChartsModule,
+    BrowserAnimationsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
