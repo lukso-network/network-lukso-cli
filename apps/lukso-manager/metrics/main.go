@@ -21,11 +21,16 @@ func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
 
 func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 	body, err := getMetrics("http://127.0.0.1:6060/debug/metrics", w)
+	if err != nil {
+		handleError(err, w)
+		return
+	}
+
 	var myStoredVariable map[string]int64
 
 	json.Unmarshal(body, &myStoredVariable)
 
-	err2 := shared.SettingsDB.Update(func(tx *bolt.Tx) error {
+	errDbUpdate := shared.SettingsDB.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("peers"))
 		if err != nil {
 			fmt.Println(err)
@@ -47,15 +52,19 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 		return b.Put([]byte("pandoraPeers"), a)
 	})
 
-	handleError(err, w)
-	handleError(err2, w)
+	if errDbUpdate != nil {
+		handleError(errDbUpdate, w)
+	}
 
 	returnBody(body, w)
 }
 
 func ValidatorMetrics(w http.ResponseWriter, r *http.Request) {
 	body, err := getMetrics("http://127.0.0.1:8081/metrics", w)
-	handleError(err, w)
+	if err != nil {
+		handleError(err, w)
+		return
+	}
 	returnBody(body, w)
 }
 
@@ -68,11 +77,13 @@ func Health(w http.ResponseWriter, r *http.Request) {
 func getMetrics(url string, w http.ResponseWriter) (body []byte, err error) {
 	resp, err := http.Get(url)
 	if err != nil {
+		handleError(err, w)
 		return
 	}
 
 	body, err2 := ioutil.ReadAll(resp.Body)
 	if err2 != nil {
+		handleError(err, w)
 		return
 	}
 
