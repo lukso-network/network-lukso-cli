@@ -341,7 +341,22 @@ Function import_accounts() {
 
 Function setup_config()
 {
-    ConvertTo-Yaml
+    $input_coinbase = Read-Host -Prompt "Enter your coinbase (0x<ETH1_ADDRESS>)"
+    $input_walletDir = Read-Host -Prompt "Enter wallet directory location"
+    $input_dataDir = Read-Host -Prompt "Enter data directory (chain will be stored there) location"
+    $input_logsDir = Read-Host -Prompt "Enter logs directory location"
+    $input_nodeName = Read-Host -Prompt "Enter node name"
+
+    $configData = @{
+        "COINBASE"=$input_coinbase
+        "WALLET_DIR"=$input_walletDir
+        "DATADIR"=$input_dataDir
+        "LOGSDIR"=$input_logsDir
+        "NODE_NAME"=$input_nodeName
+    }
+
+    $yaml = ConvertTo-Yaml $configData
+    Write-Output $yaml >
 }
 
 Function check_validator_requirements()
@@ -1054,7 +1069,7 @@ switch ($command)
     }
 
     "config" {
-        Write-Output "Not available yet"
+         setup_config
     }
 
     "help" {
