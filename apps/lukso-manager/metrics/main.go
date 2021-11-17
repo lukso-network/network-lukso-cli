@@ -26,9 +26,9 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var myStoredVariable map[string]int64
+	var pandoraMetrics map[string]int64
 
-	json.Unmarshal(body, &myStoredVariable)
+	json.Unmarshal(body, &pandoraMetrics)
 
 	errDbUpdate := shared.SettingsDB.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("peers"))
@@ -45,7 +45,7 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 		now := time.Now()
 		sec := now.Unix()
 
-		peersOverTime[sec] = myStoredVariable["p2p/peers"]
+		peersOverTime[sec] = pandoraMetrics["p2p/peers"]
 
 		a, _ := json.Marshal(peersOverTime)
 
