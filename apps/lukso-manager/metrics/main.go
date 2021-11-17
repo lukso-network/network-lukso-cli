@@ -37,13 +37,11 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 			dbMetrics = make(map[int64]int64)
 		}
 
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-		now := time.Now() // current local time
+		now := time.Now()
 		sec := now.Unix()
+
 		dbMetrics[sec] = myStoredVariable["p2p/peers"]
+
 		a, _ := json.Marshal(dbMetrics)
 
 		return b.Put([]byte("pandoraPeers"), a)
