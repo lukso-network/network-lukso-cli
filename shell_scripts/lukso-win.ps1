@@ -341,11 +341,33 @@ Function import_accounts() {
 
 Function setup_config()
 {
-    $input_coinbase = Read-Host -Prompt "Enter your coinbase (0x<ETH1_ADDRESS>)"
-    $input_walletDir = Read-Host -Prompt "Enter wallet directory location"
-    $input_dataDir = Read-Host -Prompt "Enter data directory (chain will be stored there) location"
-    $input_logsDir = Read-Host -Prompt "Enter logs directory location"
-    $input_nodeName = Read-Host -Prompt "Enter node name"
+    $input_configLocation = Read-Host -Prompt "Where to store config file? "
+    while (!($input_coinbase -match '^0x[a-fA-F0-9]{40}$'))
+    {
+        $input_coinbase = Read-Host -Prompt "Enter your coinbase (0x<ETH1_ADDRESS>)"
+        if (!($input_coinbase -match '^0x[a-fA-F0-9]{40}$')) {
+            Write-Host "Enter proper coinbase ex. 0x74cbB1D4F9F79Eabd601405Db6A5950E608F5885"
+        }
+    }
+
+    while (!($input_walletDir)) {
+        $input_walletDir = Read-Host -Prompt "Enter wallet directory location"
+    }
+    $input_walletDir = $(Resolve-Path $input_walletDir).Path
+
+    while (!($input_dataDir)) {
+        $input_dataDir = Read-Host -Prompt "Enter data directory (chain will be stored there) location"
+    }
+    $input_dataDir = $(Resolve-Path $input_dataDir).Path
+
+    while (!($input_logsDir)) {
+        $input_logsDir = Read-Host -Prompt "Enter logs directory location"
+    }
+    $input_logsDir = $(Resolve-Path $input_logsDir).Path
+
+    while (!($input_nodeName)) {
+        $input_nodeName = Read-Host -Prompt "Enter node name"
+    }
 
     $configData = @{
         "COINBASE"=$input_coinbase
@@ -356,7 +378,7 @@ Function setup_config()
     }
 
     $yaml = ConvertTo-Yaml $configData
-    Write-Output $yaml >
+    Write-Output $yaml > config.yaml
 }
 
 Function check_validator_requirements()
