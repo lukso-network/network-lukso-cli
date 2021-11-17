@@ -35,13 +35,7 @@ export class LaunchpadComponent {
   ) {
     this.router = router;
     this.keygenService = keygenService;
-    this.network$ = dataService.getNetwork$().pipe(
-      tap((val: any) => {
-        console.log('wooooot');
-        console.log(val);
-        console.log('wooooot');
-      })
-    );
+    this.network$ = dataService.getNetwork$();
     this.depositData$ = this.network$.pipe(
       switchMap((network: NETWORKS) => {
         return this.keygenService.getDepositData(network);

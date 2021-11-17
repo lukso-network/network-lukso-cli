@@ -32,7 +32,7 @@ export class ValidatorStatusComponent implements OnChanges {
   VALIDATOR_STATUSES = VALIDATOR_STATUSES;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.metrics.currentValue) {
+    if (changes.metrics?.currentValue) {
       this.validatorData = Object.entries(this.metrics)
         .filter(([key]) => {
           return key.includes('validator_statuses');

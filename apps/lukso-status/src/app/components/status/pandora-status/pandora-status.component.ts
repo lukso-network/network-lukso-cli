@@ -1,4 +1,10 @@
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  Input,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import * as shape from 'd3-shape';
 
 @Component({
@@ -7,8 +13,9 @@ import * as shape from 'd3-shape';
   styleUrls: ['./pandora-status.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PandoraStatusComponent {
+export class PandoraStatusComponent implements OnChanges {
   @Input() metrics: any = {};
+  @Input() peersOverTime: any = {};
 
   legend = false;
   showLabels = false;
@@ -18,7 +25,6 @@ export class PandoraStatusComponent {
   showYAxisLabel = false;
   showXAxisLabel = false;
   timeline = false;
-  curve = shape.curveBasis;
   multi = [
     {
       name: 'Peers',
@@ -58,4 +64,23 @@ export class PandoraStatusComponent {
       ],
     },
   ];
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.peersOverTime?.currentValue) {
+      const series = Object.entries<number>(
+        changes.peersOverTime?.currentValue
+      ).map(([key, value]) => {
+        return {
+          name: key,
+          value,
+        };
+      });
+      this.multi = [
+        {
+          name: 'Peers',
+          series,
+        },
+      ];
+    }
+  }
 }

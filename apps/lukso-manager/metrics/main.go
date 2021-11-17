@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"lukso/shared"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -22,13 +23,18 @@ func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
 func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 	body, err := getMetrics("http://127.0.0.1:6060/debug/metrics", w)
 	if err != nil {
-		handleError(err, w)
 		return
 	}
 
 	var pandoraMetrics map[string]int64
 
 	json.Unmarshal(body, &pandoraMetrics)
+
+	if nil != err {
+		fmt.Println(err)
+		handleError(err, w)
+		return
+	}
 
 	errDbUpdate := shared.SettingsDB.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("peers"))
@@ -42,12 +48,30 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 			peersOverTime = make(map[int64]int64)
 		}
 
+		sortingInts := make([]float64, 0)
+
+		for key := range peersOverTime {
+			sortingInts = append(sortingInts, float64(key))
+		}
+
+		sort.Float64s(sortingInts)
+
+		if len(sortingInts) > 100 {
+			sortingInts = sortingInts[len(sortingInts)-100:]
+		}
+
+		reducedMap := make(map[int64]int64)
+
+		for _, timestamp := range sortingInts {
+			reducedMap[int64(timestamp)] = peersOverTime[int64(timestamp)]
+		}
+
 		now := time.Now()
 		sec := now.Unix()
 
-		peersOverTime[sec] = pandoraMetrics["p2p/peers"]
+		reducedMap[sec] = pandoraMetrics["p2p/peers"]
 
-		a, _ := json.Marshal(peersOverTime)
+		a, _ := json.Marshal(reducedMap)
 
 		return b.Put([]byte("pandoraPeers"), a)
 	})

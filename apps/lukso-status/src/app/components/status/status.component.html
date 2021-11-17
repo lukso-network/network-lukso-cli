@@ -8,6 +8,7 @@
     <div class="col">
       <lukso-pandora-status
         [metrics]="pandoraMetrics$ | async"
+        [peersOverTime]="peersOverTime$ | async"
       ></lukso-pandora-status>
     </div>
     <div class="col">
@@ -23,7 +24,6 @@
     </div>
   </div>
 
-  {{ peersOverTime$ | async | json }}
   <!-- <div class="row">
     <div class="col">
       <div class="status-box"></div>
