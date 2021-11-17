@@ -46,7 +46,7 @@ NODE_NAME="$(LC_CTYPE=C LANG=C tr -dc A-F0-9 </dev/urandom | head -c 8)"
 EXTERNAL_IP=$(curl -s ident.me)
 
 ###### General variables
-HTTP_CONNECTIONS=false
+HTTP_CONNECTIVITY=false
 VANGUARD_RPC="127.0.0.1:4000"
 ORC_PANDORA_RPC="ws://127.0.0.1:8546"
 ######
@@ -407,7 +407,7 @@ start_orchestrator() {
     "--verbosity=$ORC_VERBOSITY"
   )
 
-   if [[ $HTTP_CONNECTIONS == "false" ]]; then
+   if [[ $HTTP_CONNECTIVITY == "false" ]]; then
     IPC_FLAGS=(
       "--vanguard-grpc-endpoint=$DATADIR/vanguard/vanguard.ipc"
       "--pandora-rpc-endpoint=$DATADIR/pandora/geth.ipc"
@@ -416,7 +416,7 @@ start_orchestrator() {
     ARGUMENTS=("${ARGUMENTS[@]}" ${IPC_FLAGS[@]})
   fi
 
-  if [[ "$HTTP_CONNECTIONS" == "true" ]]; then
+  if [[ "$HTTP_CONNECTIVITY" == "true" ]]; then
     HTTP_FLAGS=(
       "--vanguard-grpc-endpoint=$ORCHESTRATOR_VANGUARD_RPC_ENDPOINT"
       "--pandora-rpc-endpoint=$ORCHESTRATOR_PANDORA_RPC_ENDPOINT"
@@ -478,11 +478,11 @@ start_pandora() {
     "--verbosity=$PANDORA_VERBOSITY"
   )
 
-  if [[ "$HTTP_CONNECTIONS" == "true" ]]; then
+  if [[ "$HTTP_CONNECTIVITY" == "true" ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--miner.notify=$PAN_WS_MINER_NOTIFY,$PAN_HTTP_MINER_NOTIFY")
   fi
 
-  if [[ "$HTTP_CONNECTIONS" == "false" ]]; then
+  if [[ "$HTTP_CONNECTIVITY" == "false" ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--miner.notify=$DATADIR/orchestrator/orchestrator.ipc")
   fi
 
@@ -591,7 +591,7 @@ start_vanguard() {
     "--lukso-network"
   )
 
-  if [[ $HTTP_CONNECTIONS == "false" ]]; then
+  if [[ $HTTP_CONNECTIVITY == "false" ]]; then
     RPC_ARGUMENTS=(
       "--rpc-host=$DATADIR/vanguard/vanguard.ipc"
       "--orc-rpc-provider=$DATADIR/orchestrator/orchestrator.ipc"
@@ -600,7 +600,7 @@ start_vanguard() {
     ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
   fi
 
-  if [[ $HTTP_CONNECTIONS == "true" ]]; then
+  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
     RPC_ARGUMENTS=(
       "--rpc-host=$VANGUARD_RPC_HOST"
       "--rpc-port=$VANGUARD_RPC_PORT"
@@ -649,7 +649,7 @@ start_validator() {
     "--lukso-network"
   )
 
-  if [[ $HTTP_CONNECTIONS == "false" ]]; then
+  if [[ $HTTP_CONNECTIVITY == "false" ]]; then
     IPC_FLAGS=(
       "--beacon-rpc-provider=$DATADIR/vanguard/vanguard.ipc"
       "--pandora-http-provider=$DATADIR/pandora/geth.ipc"
@@ -657,7 +657,7 @@ start_validator() {
     ARGUMENTS=("${ARGUMENTS[@]}" "${IPC_FLAGS[@]}")
   fi
 
-  if [[ $HTTP_CONNECTIONS == "true" ]]; then
+  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
     HTTP_FLAGS=(
       "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
       "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
@@ -672,7 +672,7 @@ start_validator() {
   if [[ -n $TEMPPASSFILE ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$TEMPPASSFILE")
   fi
-  echo $HTTP_CONNECTIONS
+  echo $HTTP_CONNECTIVITY
   echo "${ARGUMENTS[@]}"
   nohup lukso-validator \
     "${ARGUMENTS[@]}" \
@@ -1147,11 +1147,14 @@ help() {
   echo
   echo "--force                Enables force mode for stopping"
   echo
+  echo "--http-connectivity                   Switches connectivity between clients from IPC to local HTTP (less secure)"
+  echo
+  echo
   echo "--vanguard-http-web3provider          An eth1 web3 provider string http endpoint or IPC socket path. (default: http://127.0.0.1:8545)"
   echo
-  echo "--vanguard-rpc-host                   Host on which the RPC server should listen. (default: 127.0.0.1)"
+  echo "--vanguard-rpc-host                   [Requires --http-connectivity] Host on which the RPC server should listen. (default: 127.0.0.1)"
   echo
-  echo "--van-rpc-port                        Port on which the RPC server should listen. (default: 4000)"
+  echo "--van-rpc-port                        [Requires --http-connectivity] Port on which the RPC server should listen. (default: 4000)"
   echo
   echo "--van-udp-port                        Vanguard beacon chain client UDP port. The port used by discv5. (default: 12000)"
   echo
@@ -1159,15 +1162,15 @@ help() {
   echo
   echo "--van-grpc-gateway-port               Vanguard gRPC gateway port. The port on which the gateway server runs on (default: 3500)"
   echo
-  echo "--vanguard-orc-rpc-provider           A orchestrator string rpc endpoint. This is our orchestrator client http endpoint or socket path. (default: http://127.0.0.1:7877)"
+  echo "--vanguard-orc-rpc-provider           [Requires --http-connectivity] A orchestrator string rpc endpoint. This is our orchestrator client http endpoint or socket path. (default: http://127.0.0.1:7877)"
   echo
-  echo "--validator-beacon-rpc-provider       Beacon node (vanguard) RPC provider endpoint. (default: $VANGUARD_RPC)"
+  echo "--validator-beacon-rpc-provider       [Requires --http-connectivity] Beacon node (vanguard) RPC provider endpoint. (default: $VANGUARD_RPC)"
   echo
-  echo "--validator-pandora-http-provider     A pandora string rpc endpoint. This is our pandora client http endpoint. (default: http://127.0.0.1:8545)"
+  echo "--validator-pandora-http-provider     [Requires --http-connectivity] A pandora string rpc endpoint. This is our pandora client http endpoint. (default: http://127.0.0.1:8545)"
   echo
-  echo "--orchestrator-vanguard-rpc-endpoint  Enables Vanguard node RPC provider endpoint. (default: $VANGUARD_RPC)"
+  echo "--orchestrator-vanguard-rpc-endpoint  [Requires --http-connectivity] Enables Vanguard node RPC provider endpoint. (default: $VANGUARD_RPC)"
   echo
-  echo "--orchestrator-pandora-rpc-endpoint   Pandora node RP provider endpoint. (default: $ORC_PANDORA_RPC)"
+  echo "--orchestrator-pandora-rpc-endpoint   [Requires --http-connectivity] Pandora node RP provider endpoint. (default: $ORC_PANDORA_RPC)"
   echo
   echo "--eth2stats-beacon-addr               Beacon node endpoint address for eth2stats-client. (default: $VANGUARD_RPC)"
   echo
@@ -1189,9 +1192,9 @@ help() {
   echo
   echo "--pan-ws-port                         Pandora client websocket port exposed. (default:  8546)"
   echo
-  echo "--pan-http-miner-addr                 Pandora HTTP URL to notify of new work packages. (default:  http://127.0.0.1:7877)"
+  echo "--pan-http-miner-addr                 [Requires --http-connectivity] Pandora HTTP URL to notify of new work packages. (default:  http://127.0.0.1:7877)"
   echo
-  echo "--pan-ws-miner-addr                   Pandora Websocket URL to notify of new work packages. (default:  ws://127.0.0.1:7878)"
+  echo "--pan-ws-miner-addr                   [Requires --http-connectivity] Pandora Websocket URL to notify of new work packages. (default:  ws://127.0.0.1:7878)"
   echo
   echo "--pan-ethstats                        Pandora flag to activate ethstats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. Example: --pan-ethstats token123@stats.example.com. (default:  enabled for l15 testnet)"
   echo
@@ -1204,7 +1207,6 @@ help() {
   echo "--van-ethstats-metrics                The metrics address for Vanguard eth2stats-client service (default: http://127.0.0.1:8080/metrics)"
   echo
   echo "--status-page                         This flag is for lukso-status activation. With this service you can check your node status over web browser (default: disabled). Default web address is: http://127.0.0.1:8111"
-
   exit
 }
 
@@ -1698,8 +1700,8 @@ while getopts "$optspec" optchar; do
       OVERRIDE_RUN_LUKSO_STATUS=true
       ;;
 
-    http-connections)
-      OVERRIDE_HTTP_CONNECTIONS=true
+    http-connectivity)
+      OVERRIDE_HTTP_CONNECTIVITY=true
       ;;
 
     force)
@@ -1979,8 +1981,8 @@ if [[ -n $OVERRIDE_RUN_LUKSO_STATUS ]]; then
   RUN_LUKSO_STATUS=$OVERRIDE_RUN_LUKSO_STATUS
 fi
 
-if [[ -n $OVERRIDE_HTTP_CONNECTIONS ]]; then
-  HTTP_CONNECTIONS=$OVERRIDE_HTTP_CONNECTIONS
+if [[ -n $OVERRIDE_HTTP_CONNECTIVITY ]]; then
+  HTTP_CONNECTIVITY=$OVERRIDE_HTTP_CONNECTIVITY
 fi
 
 if [[ ! -d $DATADIR ]]; then
