@@ -46,6 +46,7 @@ NODE_NAME="$(LC_CTYPE=C LANG=C tr -dc A-F0-9 </dev/urandom | head -c 8)"
 EXTERNAL_IP=$(curl -s ident.me)
 
 ###### General variables
+HTTP_CONNECTIONS=false
 VANGUARD_RPC="127.0.0.1:4000"
 ORC_PANDORA_RPC="ws://127.0.0.1:8546"
 ######
@@ -394,17 +395,38 @@ start_orchestrator() {
   if [[ ! -d "$DATADIR/orchestrator" ]]; then
     mkdir -p $DATADIR/orchestrator
   fi
-  nohup lukso-orchestrator --datadir=$DATADIR/orchestrator \
-    --vanguard-grpc-endpoint=$ORCHESTRATOR_VANGUARD_RPC_ENDPOINT \
-    --http \
-    --http.addr=$ORC_HTTP_ADDR \
-    --http.port=$ORC_HTTP_PORT \
-    --ws \
-    --ws.addr=$ORC_WS_ADDR \
-    --ws.port=$ORC_WS_PORT \
-    --ipcpath=$DATADIR/orchestrator \
-    --pandora-rpc-endpoint=$ORCHESTRATOR_PANDORA_RPC_ENDPOINT \
-    --verbosity=$ORC_VERBOSITY >|$LOGSDIR/orchestrator/orchestrator_"$RUN_DATE".log 2>&1 &
+
+  ARGUMENTS=(
+    "--datadir=$DATADIR/orchestrator"
+    "--http"
+    "--http.addr=$ORC_HTTP_ADDR"
+    "--http.port=$ORC_HTTP_PORT"
+    "--ws"
+    "--ws.addr=$ORC_WS_ADDR"
+    "--ws.port=$ORC_WS_PORT"
+    "--verbosity=$ORC_VERBOSITY"
+  )
+
+   if [[ $HTTP_CONNECTIONS == "false" ]]; then
+    IPC_FLAGS=(
+      "--vanguard-grpc-endpoint=$DATADIR/vanguard/vanguard.ipc"
+      "--pandora-rpc-endpoint=$DATADIR/pandora/geth.ipc"
+      "--ipcpath=$DATADIR/orchestrator"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" ${IPC_FLAGS[@]})
+  fi
+
+  if [[ "$HTTP_CONNECTIONS" == "true" ]]; then
+    HTTP_FLAGS=(
+      "--vanguard-grpc-endpoint=$ORCHESTRATOR_VANGUARD_RPC_ENDPOINT"
+      "--pandora-rpc-endpoint=$ORCHESTRATOR_PANDORA_RPC_ENDPOINT"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
+  fi
+  echo "${ARGUMENTS[@]}"
+  nohup lukso-orchestrator \
+  "${ARGUMENTS[@]}" \
+  >|$LOGSDIR/orchestrator/orchestrator_"$RUN_DATE".log 2>&1 &
   disown
 }
 
@@ -451,11 +473,19 @@ start_pandora() {
     "--ws"
     "--ws.addr=$PANDORA_WS_ADDR"
     "--ws.port=$PANDORA_WS_PORT"
-    "--miner.notify=$PAN_WS_MINER_NOTIFY,$PAN_HTTP_MINER_NOTIFY"
     "--miner.gaslimit=80000000"
     "--syncmode=full"
     "--verbosity=$PANDORA_VERBOSITY"
   )
+
+  if [[ "$HTTP_CONNECTIONS" == "true" ]]; then
+    ARGUMENTS=("${ARGUMENTS[@]}" "--miner.notify=$PAN_WS_MINER_NOTIFY,$PAN_HTTP_MINER_NOTIFY")
+  fi
+
+  if [[ "$HTTP_CONNECTIONS" == "false" ]]; then
+    ARGUMENTS=("${ARGUMENTS[@]}" "--miner.notify=$DATADIR/orchestrator/orchestrator.ipc")
+  fi
+
 
   if [[ $COINBASE ]]; then
     MINER_ARGUMENTS=(
@@ -548,22 +578,37 @@ start_vanguard() {
     "--datadir=$DATADIR/vanguard/"
     "--chain-config-file=/opt/lukso/networks/$NETWORK/config/vanguard-config.yaml"
     "${BOOTNODES_ARGS[@]}"
-    "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
     "--deposit-contract=0x000000000000000000000000000000000000cafe"
     "--contract-deployment-block=0"
-    "--rpc-host=$VANGUARD_RPC_HOST"
     "--monitoring-host=$VANGUARD_MONITORING_HOST"
     "--verbosity=$VANGUARD_VERBOSITY"
     "--min-sync-peers=$VAN_MIN_SYNC_PEERS"
     "--p2p-max-peers=$VAN_MAX_P2P_PEERS"
-    "--orc-http-provider=$VANGUARD_ORC_RPC_PROVIDER"
-    "--rpc-port=$VANGUARD_RPC_PORT"
     "--p2p-udp-port=$VANGUARD_UDP_PORT"
     "--p2p-tcp-port=$VANGUARD_TCP_PORT"
     "--grpc-gateway-port=$VANGUARD_GRPC_GATEWAY_PORT"
     "--update-head-timely"
     "--lukso-network"
   )
+
+  if [[ $HTTP_CONNECTIONS == "false" ]]; then
+    RPC_ARGUMENTS=(
+      "--rpc-host=$DATADIR/vanguard/vanguard.ipc"
+      "--orc-rpc-provider=$DATADIR/orchestrator/orchestrator.ipc"
+      "--http-web3provider=$DATADIR/pandora/geth.ipc"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
+  fi
+
+  if [[ $HTTP_CONNECTIONS == "true" ]]; then
+    RPC_ARGUMENTS=(
+      "--rpc-host=$VANGUARD_RPC_HOST"
+      "--rpc-port=$VANGUARD_RPC_PORT"
+      "--orc-rpc-provider=$VANGUARD_ORC_RPC_PROVIDER"
+      "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
+  fi
 
   if [[ -n $VANGUARD_P2P_PRIV_KEY ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--p2p-priv-key=$VANGUARD_P2P_PRIV_KEY")
@@ -576,7 +621,7 @@ start_vanguard() {
   else
     ARGUMENTS=("${ARGUMENTS[@]}" "--p2p-host-ip=$EXTERNAL_IP")
   fi
-
+  echo "${ARGUMENTS[@]}"
   nohup vanguard \
     "${ARGUMENTS[@]}" \
     >|$LOGSDIR/vanguard/vanguard_"$RUN_DATE".log 2>&1 &
@@ -596,15 +641,29 @@ start_validator() {
   ARGUMENTS=(
     "--datadir=$DATADIR/validator/"
     "--accept-terms-of-use"
-    "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
     "--chain-config-file=/opt/lukso/networks/$NETWORK/config/vanguard-config.yaml"
     "--verbosity=$VALIDATOR_VERBOSITY"
-    "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
     "--wallet-dir=$WALLET_DIR"
     "--rpc"
     "--log-file=$LOGSDIR/validator/validator_$RUN_DATE.log"
     "--lukso-network"
   )
+
+  if [[ $HTTP_CONNECTIONS == "false" ]]; then
+    IPC_FLAGS=(
+      "--beacon-rpc-provider=$DATADIR/vanguard/vanguard.ipc"
+      "--pandora-http-provider=$DATADIR/pandora/geth.ipc"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${IPC_FLAGS[@]}")
+  fi
+
+  if [[ $HTTP_CONNECTIONS == "true" ]]; then
+    HTTP_FLAGS=(
+      "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
+      "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
+  fi
 
   if [[ -n $VALIDATOR_PASSWORD_FILE ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$VALIDATOR_PASSWORD_FILE")
@@ -613,7 +672,8 @@ start_validator() {
   if [[ -n $TEMPPASSFILE ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$TEMPPASSFILE")
   fi
-
+  echo $HTTP_CONNECTIONS
+  echo "${ARGUMENTS[@]}"
   nohup lukso-validator \
     "${ARGUMENTS[@]}" \
     >|$LOGSDIR/validator/validator_"$RUN_DATE".log 2>&1 &
@@ -688,7 +748,7 @@ start_all() {
     sleep 2
   fi
 
-  if [[ "$RUN_LUKSO_STATUS" = true ]]; then
+  if [[ "$RUN_LUKSO_STATUS" == true ]]; then
     echo "################# Starting lukso status #######################"
     sleep 10
     start_lukso_status
@@ -1638,6 +1698,10 @@ while getopts "$optspec" optchar; do
       OVERRIDE_RUN_LUKSO_STATUS=true
       ;;
 
+    http-connections)
+      OVERRIDE_HTTP_CONNECTIONS=true
+      ;;
+
     force)
       FORCE=true
       ;;
@@ -1913,6 +1977,10 @@ fi
 
 if [[ -n $OVERRIDE_RUN_LUKSO_STATUS ]]; then
   RUN_LUKSO_STATUS=$OVERRIDE_RUN_LUKSO_STATUS
+fi
+
+if [[ -n $OVERRIDE_HTTP_CONNECTIONS ]]; then
+  HTTP_CONNECTIONS=$OVERRIDE_HTTP_CONNECTIONS
 fi
 
 if [[ ! -d $DATADIR ]]; then
