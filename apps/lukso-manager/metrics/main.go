@@ -32,17 +32,17 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 			return err
 		}
 
-		dbMetrics, _ := getMetricsFromDB()
-		if dbMetrics == nil {
-			dbMetrics = make(map[int64]int64)
+		peersOverTime, _ := getPeersOverTime()
+		if peersOverTime == nil {
+			peersOverTime = make(map[int64]int64)
 		}
 
 		now := time.Now()
 		sec := now.Unix()
 
-		dbMetrics[sec] = myStoredVariable["p2p/peers"]
+		peersOverTime[sec] = myStoredVariable["p2p/peers"]
 
-		a, _ := json.Marshal(dbMetrics)
+		a, _ := json.Marshal(peersOverTime)
 
 		return b.Put([]byte("pandoraPeers"), a)
 	})
@@ -80,7 +80,7 @@ func getMetrics(url string, w http.ResponseWriter) (body []byte, err error) {
 }
 
 func GetPandoraPeersOverTime(w http.ResponseWriter, r *http.Request) {
-	metrics, err := getMetricsFromDB()
+	metrics, err := getPeersOverTime()
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -114,7 +114,7 @@ func decodeSettings(data []byte) (metrics map[int64]int64, err error) {
 	return
 }
 
-func getMetricsFromDB() (map[int64]int64, error) {
+func getPeersOverTime() (map[int64]int64, error) {
 	// Store the user model in the user bucket using the username as the key.
 	var settings map[int64]int64
 	err := shared.SettingsDB.View(func(tx *bolt.Tx) error {
