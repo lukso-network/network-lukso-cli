@@ -423,7 +423,7 @@ start_orchestrator() {
     )
     ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
   fi
-  echo "${ARGUMENTS[@]}"
+
   nohup lukso-orchestrator \
   "${ARGUMENTS[@]}" \
   >|$LOGSDIR/orchestrator/orchestrator_"$RUN_DATE".log 2>&1 &
@@ -621,7 +621,7 @@ start_vanguard() {
   else
     ARGUMENTS=("${ARGUMENTS[@]}" "--p2p-host-ip=$EXTERNAL_IP")
   fi
-  echo "${ARGUMENTS[@]}"
+
   nohup vanguard \
     "${ARGUMENTS[@]}" \
     >|$LOGSDIR/vanguard/vanguard_"$RUN_DATE".log 2>&1 &
@@ -672,8 +672,7 @@ start_validator() {
   if [[ -n $TEMPPASSFILE ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$TEMPPASSFILE")
   fi
-  echo $HTTP_CONNECTIVITY
-  echo "${ARGUMENTS[@]}"
+
   nohup lukso-validator \
     "${ARGUMENTS[@]}" \
     >|$LOGSDIR/validator/validator_"$RUN_DATE".log 2>&1 &
