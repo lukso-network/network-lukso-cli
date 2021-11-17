@@ -82,8 +82,7 @@ func getMetrics(url string, w http.ResponseWriter) (body []byte, err error) {
 func GetPandoraPeersOverTime(w http.ResponseWriter, r *http.Request) {
 	metrics, err := getPeersOverTime()
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
+		handleError(err, w)
 	}
 
 	jsonString, _ := json.Marshal(metrics)
