@@ -2,17 +2,11 @@
   display: block;
   width: 100%;
 }
+
 .container > .row {
   margin-top: 25px;
 }
+
 .container .row + .row {
   margin-top: 25px;
-}
-
-.status-box {
-  display: block;
-  border-radius: 10px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  background: white;
 }

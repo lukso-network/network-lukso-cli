@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import {
   AvailableSoftwareBackendResponse,
   DownloadInfo,
@@ -13,7 +13,7 @@ import { Settings } from '../../interfaces/settings';
   providedIn: 'root',
 })
 export class SoftwareService {
-  availableSoftware$: Observable<Releases[]>;
+  availableSoftware$: Observable<Releases[] | null>;
   downloadedSoftware$: Observable<any>;
 
   constructor(private httpClient: HttpClient) {
@@ -24,9 +24,7 @@ export class SoftwareService {
       .get<AvailableSoftwareBackendResponse>('/api/available-versions')
       .pipe(
         map((availableSoftware) => {
-          console.log(availableSoftware);
           return Object.entries(availableSoftware).map(([name, release]) => {
-            console.log(release);
             return {
               name,
               humanReadableName: release.humanReadableName,
@@ -39,8 +37,8 @@ export class SoftwareService {
             } as Releases;
           });
         }),
-        tap((res) => {
-          console.log(res);
+        catchError((error: any) => {
+          return of(null);
         })
       );
   }

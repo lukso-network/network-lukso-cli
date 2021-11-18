@@ -11,7 +11,7 @@ import { SoftwareService } from '../../services/available-versions/available-ver
 export class AvailableVersionsComponent {
   softwareService: SoftwareService;
   downloadedSoftware$: Observable<any>;
-  availableSoftware$: Observable<Releases[]>;
+  availableSoftware$: Observable<Releases[] | null>;
 
   isDownloading = false;
 

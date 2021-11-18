@@ -19,6 +19,7 @@ export class StatusComponent {
   peersOverTime$: Observable<any>;
   validatorMetrics$: Observable<any>;
   network$: Observable<any>;
+  lastBlock$: Observable<any>;
 
   constructor(
     softwareService: SoftwareService,
@@ -29,8 +30,8 @@ export class StatusComponent {
   ) {
     this.softwareService = softwareService;
     this.pandoraMetrics$ = pandoraService.getMetrics$();
-    this.pandoraMetrics$ = pandoraService.getMetrics$();
     this.peersOverTime$ = pandoraService.getPeersOverTime$();
+    this.lastBlock$ = pandoraService.myWSData$;
     this.vanguardMetrics$ = vanguardService.getMetrics$();
     this.validatorMetrics$ = validatorService.getMetrics$();
     this.network$ = dataService.getNetwork$();

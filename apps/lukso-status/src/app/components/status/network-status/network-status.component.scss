@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+
+.status-box {
+  display: flex;
+  border-radius: 10px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  height: 100px;
+  background: white;
+
+  div {
+    flex: auto;
+    padding-left: 30px;
+  }
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.3;
+}
+
+.value {
+  font-weight: 700;
+  font-size: 20px;
+}

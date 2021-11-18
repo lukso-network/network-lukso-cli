@@ -25,6 +25,8 @@ export class PandoraStatusComponent implements OnChanges {
   showYAxisLabel = false;
   showXAxisLabel = false;
   timeline = false;
+  rangeFillOpacity = 1;
+  customColors = [{ name: 'Peers', value: 'rgb(0, 115, 192)' }];
   multi = [
     {
       name: 'Peers',

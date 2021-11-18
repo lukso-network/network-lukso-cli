@@ -1,6 +1,12 @@
 <div class="container">
   <h4 class="title">Available Clients</h4>
-  <table class="table">
+  <table
+    class="table"
+    *ngIf="
+      availableSoftware$ | async as availableSoftware;
+      else apiLimitExceeded
+    "
+  >
     <thead>
       <tr>
         <th>Software</th>
@@ -43,4 +49,5 @@
       </tr>
     </tbody>
   </table>
+  <ng-template #apiLimitExceeded> Github API rate-limit exceeded. </ng-template>
 </div>

@@ -1,9 +1,11 @@
 <div class="container">
-  <!-- <div class="row">
+  <div class="row network-infos">
     <div class="col">
-      <div class="status-box"></div>
+      <lukso-network-status
+        [blockInfo]="lastBlock$ | async"
+      ></lukso-network-status>
     </div>
-  </div> -->
+  </div>
   <div class="row">
     <div class="col">
       <lukso-pandora-status
