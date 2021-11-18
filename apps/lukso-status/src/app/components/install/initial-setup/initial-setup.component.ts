@@ -9,7 +9,7 @@ import { coinbaseValidator } from '../../../shared/eth-address-validator';
 interface DownloadedSoftware {
   vanguard: string[];
   pandora: string[];
-  orchestrator: string[];
+  'lukso-orchestrator': string[];
   'lukso-validator': string[];
 }
 
@@ -31,6 +31,7 @@ export class InitialSetupComponent implements OnInit {
   setupForm = new FormGroup({
     hostName: new FormControl('', [Validators.required]),
     externalIp: new FormControl(''),
+    isValidatorEnabled: new FormControl(0, [Validators.required]),
     versions: new FormGroup({
       vanguard: new FormControl(''),
       pandora: new FormControl(''),
@@ -58,7 +59,7 @@ export class InitialSetupComponent implements OnInit {
       map((result) => result['pandora'])
     );
     this.orchestratorVersions$ = this.downloadedSoftware$.pipe(
-      map((result) => result['orchestrator'])
+      map((result) => result['lukso-orchestrator'])
     );
     this.validatorVersions$ = this.downloadedSoftware$.pipe(
       map((result) => result['lukso-validator'])
@@ -70,6 +71,9 @@ export class InitialSetupComponent implements OnInit {
   }
   get coinbase() {
     return this.setupForm.get('coinbase') as FormControl;
+  }
+  get isValidatorEnabled() {
+    return this.setupForm.get('isValidatorEnabled') as FormControl;
   }
   get vanguard() {
     const versions = this.setupForm.get('versions') as FormGroup;

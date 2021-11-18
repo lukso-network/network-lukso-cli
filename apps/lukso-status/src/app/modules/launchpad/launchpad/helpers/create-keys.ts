@@ -1,3 +1,5 @@
+import { ContractTransaction } from '@ethersproject/contracts';
+
 export const enum CURRENT_KEY_ACTION {
   'IDLE' = 'Generate',
   'GENERATING' = 'Generating',
@@ -16,6 +18,8 @@ export interface DepositData {
   fork_version:           string;
   eth2_network_name:      string;
   deposit_cli_version:    string;
+  transaction?:           ContractTransaction;
+  transaction_confirmed: boolean;
 }
 
 export enum NETWORKS {

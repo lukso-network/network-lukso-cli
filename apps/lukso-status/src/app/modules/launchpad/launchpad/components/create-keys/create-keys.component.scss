@@ -1,16 +1,7 @@
 :host {
-  display: flex;
+  display: block;
   background: white;
-  padding: 30px;
-}
-
-.key-infos {
-  flex: 0 0 400px;
-  padding-right: 30px;
-}
-
-.key-form {
-  flex: 0 0 500px;
+  padding: 40px 100px;
 }
 
 form {
@@ -18,16 +9,20 @@ form {
   flex-direction: column;
 }
 
+.form-label {
+  font-weight: 700;
+}
+
 .password-container {
   position: relative;
 }
 
-lukso-password-checker {
-  position: absolute;
-  top: 33px;
-  left: calc(100% + 40px);
-  width: 400px;
-}
+// lukso-password-checker {
+//   position: absolute;
+//   top: 33px;
+//   left: calc(100% + 40px);
+//   width: 400px;
+// }
 
 .bi-key-fill {
   color: white;
@@ -36,4 +31,13 @@ lukso-password-checker {
   &::before {
     transform: scale(1.4);
   }
+}
+
+.btn--generate-keys {
+  width: 100%;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: 15px;
+  padding: 15px 0px;
 }

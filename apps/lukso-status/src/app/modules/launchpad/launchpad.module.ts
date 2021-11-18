@@ -10,6 +10,7 @@ import { CreateKeysComponent } from './launchpad/components/create-keys/create-k
 import { ReactiveFormsModule } from '@angular/forms';
 import { PasswordCheckerComponent } from './launchpad/components/password-checker/password-checker.component';
 import { SendTransactionsComponent } from './launchpad/components/send-transactions/send-transactions.component';
+import { DepositTransactionComponent } from './launchpad/components/send-transactions/deposit-transaction/deposit-transaction.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { SendTransactionsComponent } from './launchpad/components/send-transacti
     CreateKeysComponent,
     PasswordCheckerComponent,
     SendTransactionsComponent,
+    DepositTransactionComponent,
   ],
   providers: [KeygenService],
   imports: [

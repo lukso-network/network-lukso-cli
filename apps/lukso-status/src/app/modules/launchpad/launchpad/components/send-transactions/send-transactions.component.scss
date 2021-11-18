@@ -1,14 +1,33 @@
 :host {
-  display: flex;
+  display: block;
   background: white;
-  padding: 30px;
+  padding: 40px 100px 70px;
+  margin-bottom: 40px;
 }
 
-.key-infos {
-  flex: 0 0 400px;
-  padding-right: 30px;
+.title {
+  padding: 20px 20px 40px;
 }
 
-.key-form {
-  flex: 0 0 800px;
+.validator {
+  border-radius: 10px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  padding: 5px 10px 10px;
+  background: white;
+  margin-bottom: 20px;
+  padding: 20px;
+}
+
+.btn,
+.btn--send-all-transactions {
+  text-transform: uppercase;
+}
+
+.btn--send-all-transactions {
+  width: 100%;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: 15px;
+  padding: 15px 0px;
 }

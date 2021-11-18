@@ -1,4 +1,4 @@
-<div class="container px-5 my-5">
+<div class="setup px-5 my-5">
   <form
     [formGroup]="setupForm"
     (ngSubmit)="onSubmit()"
@@ -72,6 +72,13 @@
           </div>
         </div>
       </div>
+      <div class="form-floating mb-3">
+        <select class="form-select" [formControl]="isValidatorEnabled">
+          <option value="1">Enabled</option>
+          <option value="0">Disabled</option>
+        </select>
+        <label for="newField">Validator</label>
+      </div>
     </fieldset>
 
     <fieldset>
@@ -143,4 +150,19 @@
       </button>
     </div>
   </form>
+
+  <div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Danger Zone</h4>
+
+    <ul class="list-group">
+      <li class="list-group-item">
+        <h5 class="alert-heading">Validator Reset</h5>
+        <p>
+          This deletes both your Keys and your Wallet. This action is
+          irreversible.
+        </p>
+        <button class="btn btn-danger btn-lg">RESET VALIDATOR KEYS</button>
+      </li>
+    </ul>
+  </div>
 </div>

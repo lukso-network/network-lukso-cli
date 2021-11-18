@@ -169,7 +169,6 @@ func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 			}
 			if !info.IsDir() {
 				pathParts := strings.Split(path, "binaries")
-				fmt.Println(pathParts)
 				fileNameParts := strings.Split(pathParts[1], "/")
 				DownloadedVerions[fileNameParts[1]] = append(DownloadedVerions[fileNameParts[1]], fileNameParts[2])
 			}
@@ -178,6 +177,9 @@ func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 		})
 	if err != nil {
 		log.Println(err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	jsonString, err := json.Marshal(DownloadedVerions)
@@ -209,12 +211,24 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 			DownloadInfo:      make(map[string]downloadInfo),
 		}
 
+		if r.StatusCode == 403 {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Githup API Rate Limit Exceeded"))
+			return
+		}
+
+		if r.StatusCode != 200 {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
 		decoder := json.NewDecoder(r.Body)
 		var releases GithubReleases
 
 		err2 := decoder.Decode(&releases)
 		if err2 != nil {
-			log.Fatalln(err)
+			log.Fatalln(err2)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("Can not decode releases"))
 			return

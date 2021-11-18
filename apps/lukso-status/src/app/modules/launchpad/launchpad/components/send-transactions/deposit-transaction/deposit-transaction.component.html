@@ -1,0 +1,28 @@
+<div class="public-key">
+  <div class="label">Validator</div>
+  <div>0x{{ truncate(deposit.pubkey, 8, 8, 20) }}</div>
+</div>
+<div class="amount">
+  <div class="label">Amount</div>
+  <div>32 LYXt</div>
+</div>
+<div class="transaction-button">
+  <button
+    class="btn btn-outline-secondary"
+    type="button"
+    [disabled]="deposit.transaction"
+  >
+    <ng-container *ngIf="!deposit.transaction">Deposit</ng-container>
+    <ng-container *ngIf="deposit.transaction && !deposit.transaction_confirmed">
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      <span>Pending...</span>
+    </ng-container>
+    <ng-container *ngIf="deposit.transaction && deposit.transaction_confirmed">
+      Confirmed
+    </ng-container>
+  </button>
+</div>

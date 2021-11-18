@@ -11,7 +11,6 @@ import { StatusComponent } from './components/status/status.component';
 import { InstallComponent } from './components/install/install.component';
 import { OrchestratorStatusComponent } from './components/status/orchestrator-status/orchestrator-status.component';
 import { ValidatorStatusComponent } from './components/status/validator-status/validator-status.component';
-import { SettingsComponent } from './components/settings/settings.component';
 import { InitialSetupComponent } from './components/install/initial-setup/initial-setup.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
@@ -27,7 +26,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     InstallComponent,
     OrchestratorStatusComponent,
     ValidatorStatusComponent,
-    SettingsComponent,
     InitialSetupComponent,
   ],
   imports: [

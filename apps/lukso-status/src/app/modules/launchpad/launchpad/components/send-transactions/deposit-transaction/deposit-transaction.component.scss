@@ -1,0 +1,20 @@
+:host {
+  display: block;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.3;
+  padding-bottom: 5px;
+}
+
+.public-key,
+.amount {
+  padding-right: 50px;
+}
+
+.btn {
+  text-transform: uppercase;
+}

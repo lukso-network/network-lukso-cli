@@ -60,10 +60,29 @@ export class CreateKeysComponent implements OnInit {
               hasCapitalCase: true,
             }),
             CustomValidators.patternValidator(/[a-z]/, { hasSmallCase: true }),
+            CustomValidators.patternValidator(
+              /[ !@#$%^&*()_+\-=\\[\]{};':"\\|,.<>\\/?]/,
+              { hasSpecialCharacters: true }
+            ),
             Validators.minLength(8),
           ],
         ],
-        confirmPassword: ['', [Validators.required]],
+        confirmPassword: [
+          '',
+          [
+            Validators.required,
+            CustomValidators.patternValidator(/\d/, { hasNumber: true }),
+            CustomValidators.patternValidator(/[A-Z]/, {
+              hasCapitalCase: true,
+            }),
+            CustomValidators.patternValidator(/[a-z]/, { hasSmallCase: true }),
+            CustomValidators.patternValidator(
+              /[ !@#$%^&*()_+\-=\\[\]{};':"\\|,.<>\\/?]/,
+              { hasSpecialCharacters: true }
+            ),
+            Validators.minLength(8),
+          ],
+        ],
       },
       {
         validator: CustomValidators.passwordMatchValidator,

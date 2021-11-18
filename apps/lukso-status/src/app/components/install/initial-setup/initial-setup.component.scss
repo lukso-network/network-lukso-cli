@@ -1,9 +1,19 @@
 :host {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 600px;
+  display: block;
+  padding: 0px 40px 40px;
   margin: 0 auto;
+  max-width: 800px;
+}
+
+form {
+  margin-bottom: 40px;
+}
+
+.setup {
+  margin: 0 auto;
+  display: block;
+  background: white;
+  padding: 40px 100px;
 }
 
 .form-text {

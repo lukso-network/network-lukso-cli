@@ -1,9 +1,15 @@
 :host {
   display: block;
-  background: rgb(241, 241, 241);
   padding: 40px;
+  margin: 0 auto;
+  max-width: 800px;
 }
 
 .btn-generate-keys {
   width: 300px;
+}
+
+.text-center {
+  max-width: 80%;
+  margin: 0 auto;
 }

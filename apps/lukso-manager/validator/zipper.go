@@ -12,13 +12,13 @@ import (
 	"time"
 )
 
-func zipKeys(network string) (filePath string) {
-	folder := shared.NetworkDir + network
+func zipFolder(network string, folder string) (filePath string) {
+	baseFolder := shared.NetworkDir + network
 
 	now := time.Now()
 	sec := now.Unix()
 
-	pathToFile := folder + "/keys-" + fmt.Sprint(sec) + ".zip"
+	pathToFile := baseFolder + "/" + folder + "-" + fmt.Sprint(sec) + ".zip"
 	file, err := os.Create(pathToFile)
 	if err != nil {
 		panic(err)
@@ -45,7 +45,7 @@ func zipKeys(network string) (filePath string) {
 		// This snippet happens to work because I don't use
 		// absolute paths, but ensure your real-world code
 		// transforms path into a zip-root relative path.
-		s := strings.Split(path, "/validator_keys/")
+		s := strings.Split(path, "/"+folder+"/")
 
 		f, err := w.Create(s[1])
 		if err != nil {
@@ -65,7 +65,7 @@ func zipKeys(network string) (filePath string) {
 		log.Println(err)
 	}
 
-	targpath := folder + "/validator_keys"
+	targpath := baseFolder + "/" + folder
 	basepath := path
 	relpath, _ := filepath.Rel(basepath, targpath)
 

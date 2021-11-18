@@ -27,8 +27,42 @@ type importValidatorKeysRequestBody struct {
 	WalletPassword string
 }
 
-type getDepositDataRequestBody struct {
-	Network string
+func ResetValidator(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	decoder := json.NewDecoder(r.Body)
+	var body generateValidatorKeysRequestBody
+	errJson := decoder.Decode(&body)
+	if errJson != nil {
+		panic(errJson)
+	}
+
+	folder := shared.NetworkDir + body.Network
+
+	zipFolder(body.Network, "validator_keys")
+	errDeleteValidatoKeys := os.Remove(folder + "/validator_keys")
+	if errDeleteValidatoKeys != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		if err := json.NewEncoder(w).Encode("Could not delete validator keys"); err != nil {
+			panic(err)
+		}
+		return
+	}
+
+	zipFolder(body.Network, "vanguard_wallet")
+	errDeleteVanguardWallet := os.Remove(folder + "/vanguard_wallet")
+	if errDeleteVanguardWallet != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		if err := json.NewEncoder(w).Encode("Could not delete validator wallet"); err != nil {
+			panic(err)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode("Successfully created keys"); err != nil {
+		panic(err)
+	}
 }
 
 func GenerateValidatorKeys(w http.ResponseWriter, r *http.Request) {
@@ -44,18 +78,13 @@ func GenerateValidatorKeys(w http.ResponseWriter, r *http.Request) {
 
 	folder := shared.NetworkDir + body.Network
 
-	// errDeleteValidatoKeys := os.Remove(folder + "/validator_keys")
-	// if errDeleteValidatoKeys != nil {
-	// 	log.Fatal(errDeleteValidatoKeys)
-	// }
-
-	// errDeleteVanguardWallet := os.Remove(folder + "/vanguard_wallet")
-	// if errDeleteVanguardWallet != nil {
-	// 	log.Fatal(errDeleteVanguardWallet)
-	// }
-
-	err := os.Chmod(folder, 0775)
+	_, err := os.Stat(folder)
 	if err != nil {
+		os.Mkdir(folder, 0775)
+	}
+
+	_, err1 := os.Stat(folder + "/validator_keys")
+	if err1 != nil {
 		os.Mkdir(folder, 0775)
 	}
 
@@ -138,7 +167,7 @@ func ImportValidatorKeys(w http.ResponseWriter, r *http.Request) {
 	in := bufio.NewScanner(stdout)
 
 	for in.Scan() {
-		log.Printf(in.Text()) // write each line to your log, or anything you need
+		log.Println(in.Text())
 	}
 
 	if err := in.Err(); err != nil {
@@ -147,11 +176,11 @@ func ImportValidatorKeys(w http.ResponseWriter, r *http.Request) {
 
 	command.Wait()
 
-	zipFile := zipKeys(body.Network)
+	compressedValidatorKeys := zipFolder(body.Network, "validator_keys")
 
 	w.Header().Set("Content-Disposition", "attachment; filename="+strconv.Quote("validator_keys.zip"))
 	w.Header().Set("Content-Type", "application/octet-stream")
-	http.ServeFile(w, r, zipFile)
+	http.ServeFile(w, r, compressedValidatorKeys)
 }
 
 func GetDepositData(w http.ResponseWriter, r *http.Request) {

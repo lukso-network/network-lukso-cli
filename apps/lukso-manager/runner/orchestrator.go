@@ -3,7 +3,7 @@ package runner
 import "lukso/shared"
 
 func startOrchestrator(version string, network string) (err error) {
-	client := "orchestrator"
+	client := "lukso-orchestrator"
 	args := []string{
 		"--datadir=" + shared.NetworkDir + network + "/" + shared.DataDir + "/orchestrator",
 		"--vanguard-grpc-endpoint=127.0.0.1:4000",

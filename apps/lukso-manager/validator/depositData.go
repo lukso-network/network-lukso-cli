@@ -41,7 +41,6 @@ func ReadDepositData(network string) DepositData {
 						log.Fatal(err)
 					}
 				}
-				fmt.Println(path)
 			}
 
 			return nil
