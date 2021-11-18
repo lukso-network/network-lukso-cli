@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { merge, Observable, of, timer } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { DEFAULT_UPDATE_INTERVAL } from '../shared/config';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { DEFAULT_UPDATE_INTERVAL, getNamespacePrefix } from '../shared/config';
 
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
@@ -20,20 +20,23 @@ export class PandoraMetricsService {
 
     this.metrics$ = this.setMetrics$(timer$);
     this.peersOverTime$ = this.setPeersOverTime$(timer$);
-    this.myWebSocket = webSocket('ws://localhost:8546');
-    const a = this.myWebSocket.pipe(
+    this.myWebSocket = webSocket(
+      `ws://${getNamespacePrefix()}rpc.l15.lukso.network:8546`
+    );
+
+    const newHeads$ = this.myWebSocket.pipe(
       map((data) => {
         return {
           blockNumber: data?.params?.result.number
             ? parseInt(data?.params?.result.number, 16)
             : undefined,
           timeStamp: data?.params?.result.timestamp
-            ? parseInt(data?.params?.result.timestamp, 16) * 1000 + 6000
+            ? parseInt(data?.params?.result.timestamp, 16) * 1000
             : undefined,
         };
       })
     );
-    this.myWSData$ = merge(this.setLastBlock$(), a);
+    this.myWSData$ = merge(this.getLastBlock$(), newHeads$);
     this.myWebSocket.next({
       jsonrpc: '2.0',
       id: 1,
@@ -50,9 +53,9 @@ export class PandoraMetricsService {
     return this.peersOverTime$;
   }
 
-  private setLastBlock$() {
+  private getLastBlock$() {
     return this.httpClient
-      .post('https://staging.rpc.l15.lukso.network', {
+      .post(`https://${getNamespacePrefix()}rpc.l15.lukso.network`, {
         jsonrpc: '2.0',
         method: 'eth_blockNumber',
         params: [],
@@ -61,7 +64,7 @@ export class PandoraMetricsService {
       .pipe(
         switchMap((blockNumberResponse: any) => {
           return this.httpClient
-            .post('https://staging.rpc.l15.lukso.network', {
+            .post(`https://${getNamespacePrefix()}rpc.l15.lukso.network`, {
               jsonrpc: '2.0',
               method: 'eth_getBlockByNumber',
               params: [blockNumberResponse.result, true],
@@ -69,8 +72,6 @@ export class PandoraMetricsService {
             })
             .pipe(
               map((result: any) => {
-                console.log(Date.now());
-                console.log(parseInt(result.result.timestamp, 16) * 1000);
                 return {
                   blockNumber: blockNumberResponse.result,
                   timeStamp:

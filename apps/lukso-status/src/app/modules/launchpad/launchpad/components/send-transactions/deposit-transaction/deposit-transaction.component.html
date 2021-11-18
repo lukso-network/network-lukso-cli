@@ -1,6 +1,10 @@
 <div class="public-key">
   <div class="label">Validator</div>
-  <div>0x{{ truncate(deposit.pubkey, 8, 8, 20) }}</div>
+  <div>
+    <a [href]="explorerLink" target="_blank" rel="noopener noreferrer"
+      >0x{{ truncate(deposit.pubkey, 8, 8, 20) }}</a
+    >
+  </div>
 </div>
 <div class="amount">
   <div class="label">Amount</div>

@@ -1,15 +1,22 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { getNamespacePrefix } from '../../../../../../shared/config';
 
 @Component({
   selector: 'lukso-deposit-transaction',
   templateUrl: './deposit-transaction.component.html',
   styleUrls: ['./deposit-transaction.component.scss'],
 })
-export class DepositTransactionComponent implements OnInit {
+export class DepositTransactionComponent implements OnChanges {
   @Input() deposit: any;
-  constructor() {}
+  explorerLink: string | null = null;
 
-  ngOnInit(): void {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.deposit?.currentValue) {
+      this.explorerLink = `http://${getNamespacePrefix()}explorer.vanguard.l15.lukso.network/validator/${
+        changes.deposit?.currentValue.pubkey
+      }`;
+    }
+  }
 
   truncate(
     text: string,

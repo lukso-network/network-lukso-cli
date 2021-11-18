@@ -1,19 +1,18 @@
 <div class="status-box d-flex flex-row">
-  <div>
+  <div *ngIf="blockInfo?.blockNumber">
     <div class="label">BEST BLOCK</div>
     <div class="value">#{{ blockInfo?.blockNumber | number: '1.0-0' }}</div>
   </div>
-  <div>
+  <div *ngIf="blockInfo?.blockNumber">
     <div class="label">LAST BLOCK</div>
-    {{ blockInfo?.blockTime | json }}
     <div class="value">{{ blockInfo?.timeStamp | timeago: true }}</div>
   </div>
   <div>
     <div class="label">AVERAGE BLOCK TIME</div>
-    <div class="value">6 seconds</div>
+    <div class="value">...</div>
   </div>
   <div>
     <div class="label">VALIDATORS</div>
-    <div class="value">423</div>
+    <div class="value">...</div>
   </div>
 </div>

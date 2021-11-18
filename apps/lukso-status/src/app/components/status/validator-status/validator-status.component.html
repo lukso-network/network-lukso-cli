@@ -6,7 +6,7 @@
       else notRunning
     "
   >
-    <h1 class="title">Validator</h1>
+    <h1 class="title">Validator <span>v0.1.0-develop</span></h1>
 
     <div class="flex-fill">
       <span class="peers">{{ validatorData.length }} </span>
@@ -61,8 +61,9 @@
     </div>
   </div>
   <ng-template #notRunning>
+    <h5>Become a Validator</h5>
     <button type="button" class="btn btn-primary" routerLink="/launchpad">
-      Become a validator
-    </button></ng-template
-  >
+      Get Started
+    </button>
+  </ng-template>
 </div>

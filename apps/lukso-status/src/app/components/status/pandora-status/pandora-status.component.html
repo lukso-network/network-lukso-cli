@@ -3,7 +3,7 @@
     class="card-body d-flex flex-column"
     *ngIf="!(metrics['p2p/peers'] === undefined); else notRunning"
   >
-    <h1 class="title">Pandora</h1>
+    <h1 class="title">Pandora <span>v0.1.0-develop</span></h1>
 
     <div class="flex-fill">
       <span class="peers">{{ metrics['p2p/peers'] }}</span>
@@ -11,17 +11,17 @@
     </div>
 
     <div class="graph">
-      <ngx-charts-area-chart
+      <ngx-charts-line-chart
         [legend]="false"
         [animations]="false"
         [showXAxisLabel]="false"
         [showYAxisLabel]="false"
         [showGridLines]="true"
+        [autoScale]="true"
         [results]="multi"
         [customColors]="customColors"
-        [autoScale]="true"
       >
-      </ngx-charts-area-chart>
+      </ngx-charts-line-chart>
     </div>
 
     <div class="status d-flex flex-row">
@@ -51,5 +51,7 @@
       </div>
     </div>
   </div>
-  <ng-template #notRunning> Not Running </ng-template>
+  <ng-template #notRunning>
+    <button type="button" class="btn btn-primary">Start Pandora</button>
+  </ng-template>
 </div>
