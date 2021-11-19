@@ -2,6 +2,7 @@ package runner
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"lukso/downloader"
 	"lukso/settings"
@@ -44,18 +45,23 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	if errVanguard != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errVanguard.Error()))
+		return
 	}
+
+	fmt.Println(body.Settings.Versions)
 
 	errOrchestrator := startOrchestrator(body.Settings.Versions[settings.Orchestrator], network)
 	if errOrchestrator != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errOrchestrator.Error()))
+		return
 	}
 
 	errPandora := startPandora(body.Settings.Versions[settings.Pandora], network, body.Settings)
 	if errPandora != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errPandora.Error()))
+		return
 	}
 
 	// if body.Settings.ValidatorEnabled {
@@ -63,6 +69,7 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	if errValidator != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errValidator.Error()))
+		return
 	}
 	// }
 
@@ -80,13 +87,16 @@ func StopClients(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func StartBinary(client string, version string, args []string) {
+func StartBinary(client string, version string, args []string) (err error) {
 
 	command := exec.Command(shared.BinaryDir+client+"/"+version+"/"+client, args...)
 
 	if startError := command.Start(); startError != nil {
 		log.Println("ERROR STARTING " + client + "@" + version)
 		log.Fatal(startError)
+		return
 	}
+
+	return
 
 }

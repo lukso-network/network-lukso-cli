@@ -58,6 +58,7 @@ export class AppComponent implements OnInit {
       .getConfig(network)
       .pipe(
         switchMap((settings: Settings) => {
+          console.log(settings, network);
           return this.softwareService.startClients(network, settings);
         })
       )

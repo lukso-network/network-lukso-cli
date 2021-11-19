@@ -27,45 +27,7 @@ export class PandoraStatusComponent implements OnChanges {
   timeline = false;
   rangeFillOpacity = 1;
   customColors = [{ name: 'Peers', value: 'rgb(0, 115, 192)' }];
-  multi = [
-    {
-      name: 'Peers',
-      series: [
-        {
-          name: '1',
-          value: 3,
-        },
-        {
-          name: '2',
-          value: 4,
-        },
-        {
-          name: '3',
-          value: 3,
-        },
-        {
-          name: '4',
-          value: 3,
-        },
-        {
-          name: '5',
-          value: 4,
-        },
-        {
-          name: '6',
-          value: 3,
-        },
-        {
-          name: '7',
-          value: 3,
-        },
-        {
-          name: '8',
-          value: 4,
-        },
-      ],
-    },
-  ];
+  multi: any = null;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.peersOverTime?.currentValue) {

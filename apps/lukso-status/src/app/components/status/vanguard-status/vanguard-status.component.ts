@@ -1,4 +1,9 @@
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  Input,
+  SimpleChanges,
+} from '@angular/core';
 
 @Component({
   selector: 'lukso-vanguard-status',
@@ -7,7 +12,38 @@ import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VanguardStatusComponent {
-  @Input() metrics: any = {};
+  @Input() metrics: { peers?: number; headSlot?: number } = {};
 
-  peersSelector = 'p2p_peer_count{state="Connected"}';
+  @Input() peersOverTime: any = {};
+
+  legend = false;
+  showLabels = false;
+  animations = true;
+  xAxis = false;
+  yAxis = true;
+  showYAxisLabel = false;
+  showXAxisLabel = false;
+  timeline = false;
+  rangeFillOpacity = 1;
+  customColors = [{ name: 'Peers', value: '#b62daf' }];
+  multi: any = null;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.peersOverTime?.currentValue) {
+      const series = Object.entries<number>(
+        changes.peersOverTime?.currentValue
+      ).map(([key, value]) => {
+        return {
+          name: key,
+          value,
+        };
+      });
+      this.multi = [
+        {
+          name: 'Peers',
+          series,
+        },
+      ];
+    }
+  }
 }

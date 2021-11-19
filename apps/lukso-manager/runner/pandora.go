@@ -81,7 +81,10 @@ func startPandora(version string, network string, settings settings.Settings) (e
 	io.Copy(in, out)
 	out.Close()
 
-	StartBinary(client, version, args)
+	errBinary := StartBinary(client, version, args)
+	if errBinary != nil {
+		return
+	}
 
 	return
 }

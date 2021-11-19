@@ -1,23 +1,61 @@
 package metrics
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"lukso/shared"
 	"net/http"
-	"sort"
-	"time"
 
-	"github.com/boltdb/bolt"
+	dto "github.com/prometheus/client_model/go"
+	"github.com/prometheus/common/expfmt"
 )
 
-func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
-	body, err := getMetrics("http://127.0.0.1:8080/metrics", w)
-	fmt.Println("body")
+type VanguardMetricss struct {
+	Peers    int64 `json:"peers"`
+	HeadSlot int64 `json:"headSlot"`
+}
 
-	handleError(err, w)
-	returnBody(body, w)
+func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
+	body, err1 := getMetrics("http://127.0.0.1:8080/metrics", w)
+	if err1 != nil {
+		handleError(err1, w)
+		return
+	}
+
+	mf, err2 := parseMetricFamily(body)
+
+	if err2 != nil {
+		handleError(err2, w)
+		return
+	}
+
+	peers := mf["p2p_peer_count"].GetMetric()
+	headSlot := mf["beacon_head_slot"].GetMetric()
+
+	if peers == nil || headSlot == nil {
+		return
+	}
+
+	// TODO: proper error handling in case the structure of the metrics changes
+	var response VanguardMetricss = VanguardMetricss{
+		Peers:    int64(*peers[1].Gauge.Value),
+		HeadSlot: int64(*headSlot[0].Gauge.Value),
+	}
+
+	err := setPeersOverTime(*peers[1].Gauge.Value, "vanguard")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	jsonString, err := json.Marshal(response)
+	if err != nil {
+		fmt.Println(err)
+		handleError(err, w)
+		return
+	}
+
+	returnBody(jsonString, w)
 }
 
 func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
@@ -26,58 +64,19 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var pandoraMetrics map[string]int64
+	var pandoraMetrics map[string]float64
 
 	json.Unmarshal(body, &pandoraMetrics)
+
+	err2 := setPeersOverTime(pandoraMetrics["p2p/peers"], "pandora")
+	if err2 != nil {
+		fmt.Println(err2)
+	}
 
 	if nil != err {
 		fmt.Println(err)
 		handleError(err, w)
 		return
-	}
-
-	errDbUpdate := shared.SettingsDB.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte("peers"))
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-
-		peersOverTime, _ := getPeersOverTime()
-		if peersOverTime == nil {
-			peersOverTime = make(map[int64]int64)
-		}
-
-		sortingInts := make([]float64, 0)
-
-		for key := range peersOverTime {
-			sortingInts = append(sortingInts, float64(key))
-		}
-
-		sort.Float64s(sortingInts)
-
-		if len(sortingInts) > 100 {
-			sortingInts = sortingInts[len(sortingInts)-100:]
-		}
-
-		reducedMap := make(map[int64]int64)
-
-		for _, timestamp := range sortingInts {
-			reducedMap[int64(timestamp)] = peersOverTime[int64(timestamp)]
-		}
-
-		now := time.Now()
-		sec := now.Unix()
-
-		reducedMap[sec] = pandoraMetrics["p2p/peers"]
-
-		a, _ := json.Marshal(reducedMap)
-
-		return b.Put([]byte("pandoraPeers"), a)
-	})
-
-	if errDbUpdate != nil {
-		handleError(errDbUpdate, w)
 	}
 
 	returnBody(body, w)
@@ -115,9 +114,23 @@ func getMetrics(url string, w http.ResponseWriter) (body []byte, err error) {
 }
 
 func GetPandoraPeersOverTime(w http.ResponseWriter, r *http.Request) {
-	metrics, err := getPeersOverTime()
+	metrics, err := getPeersOverTime("pandora")
 	if err != nil {
 		handleError(err, w)
+		return
+	}
+
+	jsonString, _ := json.Marshal(metrics)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(jsonString))
+}
+
+func GetVanguardPeersOverTime(w http.ResponseWriter, r *http.Request) {
+	metrics, err := getPeersOverTime("vanguard")
+	if err != nil {
+		handleError(err, w)
+		return
 	}
 
 	jsonString, _ := json.Marshal(metrics)
@@ -129,7 +142,7 @@ func GetPandoraPeersOverTime(w http.ResponseWriter, r *http.Request) {
 func handleError(err error, w http.ResponseWriter) {
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 }
@@ -140,7 +153,7 @@ func returnBody(body []byte, w http.ResponseWriter) {
 	w.Write(body)
 }
 
-func decodeSettings(data []byte) (metrics map[int64]int64, err error) {
+func decodeSettings(data []byte) (metrics map[int64]float64, err error) {
 	err = json.Unmarshal(data, &metrics)
 	if err != nil {
 		return
@@ -148,24 +161,11 @@ func decodeSettings(data []byte) (metrics map[int64]int64, err error) {
 	return
 }
 
-func getPeersOverTime() (map[int64]int64, error) {
-	// Store the user model in the user bucket using the username as the key.
-	var settings map[int64]int64
-	err := shared.SettingsDB.View(func(tx *bolt.Tx) error {
-		var err error
-		b := tx.Bucket([]byte("peers"))
-		k := []byte("pandoraPeers")
-		settings, err = decodeSettings(b.Get(k))
-
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+func parseMetricFamily(text []byte) (map[string]*dto.MetricFamily, error) {
+	var parser expfmt.TextParser
+	mf, err := parser.TextToMetricFamilies(bytes.NewReader(text))
 	if err != nil {
-		fmt.Printf("Could not get settings")
 		return nil, err
 	}
-	return settings, nil
-
+	return mf, nil
 }

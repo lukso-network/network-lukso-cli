@@ -44,7 +44,10 @@ func startVanguard(version string, network string) (err error) {
 		"--p2p-host-ip=46.127.26.82",
 	}
 
-	StartBinary(client, version, args)
+	errBinary := StartBinary(client, version, args)
+	if errBinary != nil {
+		return
+	}
 
 	return
 }

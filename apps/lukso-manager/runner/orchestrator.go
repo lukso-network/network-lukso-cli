@@ -17,6 +17,10 @@ func startOrchestrator(version string, network string) (err error) {
 		"--verbosity=debug",
 	}
 
-	StartBinary(client, version, args)
+	errBinary := StartBinary(client, version, args)
+	if errBinary != nil {
+		return
+	}
+
 	return
 }

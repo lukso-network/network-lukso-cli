@@ -20,6 +20,10 @@ func startValidator(version string, network string) (err error) {
 		"--lukso-network",
 	}
 
-	StartBinary(client, version, args)
+	errBinary := StartBinary(client, version, args)
+	if errBinary != nil {
+		return
+	}
+
 	return
 }

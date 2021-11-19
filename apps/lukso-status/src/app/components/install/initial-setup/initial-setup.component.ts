@@ -93,16 +93,17 @@ export class InitialSetupComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.softwareService.getConfig('l15-staging').subscribe((result) => {
+    const network = localStorage.getItem('network') as string;
+    this.softwareService.getConfig(network).subscribe((result) => {
       this.setupForm.patchValue(result);
     });
   }
 
   onSubmit() {
-    console.log(this.setupForm.valid);
+    const network = localStorage.getItem('network') as string;
     if (this.setupForm.valid) {
       this.softwareService
-        .setConfig('l15-staging', this.setupForm.value)
+        .setConfig(network, this.setupForm.value)
         .subscribe(() => {
           this.router.navigate(['/status']);
         });

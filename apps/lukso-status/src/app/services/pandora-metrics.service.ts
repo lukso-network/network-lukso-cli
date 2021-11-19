@@ -21,7 +21,7 @@ export class PandoraMetricsService {
     this.metrics$ = this.setMetrics$(timer$);
     this.peersOverTime$ = this.setPeersOverTime$(timer$);
     this.myWebSocket = webSocket(
-      `ws://${getNamespacePrefix()}rpc.l15.lukso.network:8546`
+      `wss://${getNamespacePrefix()}rpc.l15.lukso.network:8546`
     );
 
     const newHeads$ = this.myWebSocket.pipe(

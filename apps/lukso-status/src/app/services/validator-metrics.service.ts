@@ -11,30 +11,26 @@ export class ValidatorMetricsService {
   constructor(private httpClient: HttpClient) {
     this.metrics$ = timer(0, 3000).pipe(
       switchMap(() => {
-        return httpClient
-          .get('/validator/metrics', {
-            responseType: 'text',
+        return httpClient.get('/validator/metrics').pipe(
+          map((result: any) => {
+            return result.split('\n');
+          }),
+          map((lines) => {
+            return lines.filter((line: string) => {
+              return line !== '' && !line.startsWith('#');
+            });
+          }),
+          map((lines) => {
+            return lines.reduce((acc: any, curr: any) => {
+              const [key, value] = curr.split(' ');
+              acc[key] = value;
+              return acc;
+            }, {});
+          }),
+          catchError(() => {
+            return of({});
           })
-          .pipe(
-            map((result: any) => {
-              return result.split('\n');
-            }),
-            map((lines) => {
-              return lines.filter((line: string) => {
-                return line !== '' && !line.startsWith('#');
-              });
-            }),
-            map((lines) => {
-              return lines.reduce((acc: any, curr: any) => {
-                const [key, value] = curr.split(' ');
-                acc[key] = value;
-                return acc;
-              }, {});
-            }),
-            catchError(() => {
-              return of({});
-            })
-          );
+        );
       })
     );
   }

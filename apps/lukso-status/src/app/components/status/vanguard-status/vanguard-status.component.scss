@@ -46,6 +46,7 @@
   font-size: 36px;
   font-weight: 700;
   padding-right: 10px;
+  color: #b62daf;
 }
 .latest-block {
   font-size: 16px;
@@ -94,4 +95,8 @@ td {
 .bg-danger {
   background: #fde9ee !important;
   color: #eb476f;
+}
+
+.graph {
+  height: 100px;
 }

@@ -5,6 +5,7 @@ import { VanguardService } from '../../services/vanguard-metrics.service';
 import { PandoraMetricsService } from '../../services/pandora-metrics.service';
 import { ValidatorMetricsService } from '../../services/validator-metrics.service';
 import { DataService } from '../../services/data.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'lukso-status',
@@ -16,7 +17,8 @@ export class StatusComponent {
   softwareService: SoftwareService;
   vanguardMetrics$: Observable<any>;
   pandoraMetrics$: Observable<any>;
-  peersOverTime$: Observable<any>;
+  peersOverTimePandora$: Observable<any>;
+  peersOverTimeVanguard$: Observable<any>;
   validatorMetrics$: Observable<any>;
   network$: Observable<any>;
   lastBlock$: Observable<any>;
@@ -30,7 +32,8 @@ export class StatusComponent {
   ) {
     this.softwareService = softwareService;
     this.pandoraMetrics$ = pandoraService.getMetrics$();
-    this.peersOverTime$ = pandoraService.getPeersOverTime$();
+    this.peersOverTimePandora$ = pandoraService.getPeersOverTime$();
+    this.peersOverTimeVanguard$ = vanguardService.getPeersOverTime$();
     this.lastBlock$ = pandoraService.myWSData$;
     this.vanguardMetrics$ = vanguardService.getMetrics$();
     this.validatorMetrics$ = validatorService.getMetrics$();
