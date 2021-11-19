@@ -11,12 +11,14 @@
       <lukso-pandora-status
         [metrics]="pandoraMetrics$ | async"
         [peersOverTime]="peersOverTimePandora$ | async"
+        [version]="(settings$ | async)?.versions"
       ></lukso-pandora-status>
     </div>
     <div class="col">
       <lukso-vanguard-status
         [metrics]="vanguardMetrics$ | async"
         [peersOverTime]="peersOverTimeVanguard$ | async"
+        [version]="(settings$ | async)?.versions"
       ></lukso-vanguard-status>
     </div>
     <div class="col">

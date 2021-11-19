@@ -3,7 +3,10 @@ import {
   ChangeDetectionStrategy,
   Input,
   SimpleChanges,
+  OnChanges,
 } from '@angular/core';
+import { ClientVersion } from '../../../interfaces/client-versions';
+import { GraphData } from '../../../interfaces/graph-data';
 
 @Component({
   selector: 'lukso-vanguard-status',
@@ -11,39 +14,31 @@ import {
   styleUrls: ['./vanguard-status.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VanguardStatusComponent {
+export class VanguardStatusComponent implements OnChanges {
   @Input() metrics: { peers?: number; headSlot?: number } = {};
-
   @Input() peersOverTime: any = {};
+  @Input() version: ClientVersion = {};
 
-  legend = false;
-  showLabels = false;
-  animations = true;
-  xAxis = false;
-  yAxis = true;
-  showYAxisLabel = false;
-  showXAxisLabel = false;
-  timeline = false;
-  rangeFillOpacity = 1;
   customColors = [{ name: 'Peers', value: '#b62daf' }];
-  multi: any = null;
+  graphData: GraphData[] = [];
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.peersOverTime?.currentValue) {
-      const series = Object.entries<number>(
-        changes.peersOverTime?.currentValue
-      ).map(([key, value]) => {
-        return {
-          name: key,
-          value,
-        };
-      });
-      this.multi = [
-        {
-          name: 'Peers',
-          series,
-        },
-      ];
+      this.graphData = this.setGraphData(changes.peersOverTime?.currentValue);
     }
+  }
+
+  private setGraphData(peersOverTime: any) {
+    return [
+      {
+        name: 'Peers',
+        series: Object.entries<number>(peersOverTime).map(([key, value]) => {
+          return {
+            name: key,
+            value,
+          };
+        }),
+      },
+    ];
   }
 }

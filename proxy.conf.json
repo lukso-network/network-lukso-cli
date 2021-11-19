@@ -24,6 +24,7 @@
     "target": "http://localhost:8111",
     "secure": false,
     "logLevel": "debug",
-    "changeOrigin": true
+    "changeOrigin": true,
+    "pathRewrite": { "^/api": "" }
   }
 }

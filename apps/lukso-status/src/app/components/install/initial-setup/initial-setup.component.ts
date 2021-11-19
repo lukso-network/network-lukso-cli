@@ -94,7 +94,7 @@ export class InitialSetupComponent implements OnInit {
 
   ngOnInit(): void {
     const network = localStorage.getItem('network') as string;
-    this.softwareService.getConfig(network).subscribe((result) => {
+    this.softwareService.getSettings(network).subscribe((result) => {
       this.setupForm.patchValue(result);
     });
   }

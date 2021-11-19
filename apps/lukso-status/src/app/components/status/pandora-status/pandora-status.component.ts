@@ -5,7 +5,7 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import * as shape from 'd3-shape';
+import { ClientVersion } from '../../../interfaces/client-versions';
 
 @Component({
   selector: 'lukso-pandora-status',
@@ -16,7 +16,7 @@ import * as shape from 'd3-shape';
 export class PandoraStatusComponent implements OnChanges {
   @Input() metrics: any = {};
   @Input() peersOverTime: any = {};
-
+  @Input() version: ClientVersion = {};
   legend = false;
   showLabels = false;
   animations = true;

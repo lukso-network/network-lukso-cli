@@ -3,7 +3,9 @@
     class="card-body d-flex flex-column"
     *ngIf="!(metrics['p2p/peers'] === undefined); else notRunning"
   >
-    <h1 class="title">Pandora <span>v0.1.0-develop</span></h1>
+    <h1 class="title">
+      Pandora <span>{{ version.pandora }}</span>
+    </h1>
 
     <div class="flex-fill">
       <span class="peers">{{ metrics['p2p/peers'] }}</span>
@@ -18,6 +20,7 @@
         [showYAxisLabel]="false"
         [showGridLines]="true"
         [autoScale]="true"
+        [activeEntries]="multi"
         [results]="multi"
         [customColors]="customColors"
       >

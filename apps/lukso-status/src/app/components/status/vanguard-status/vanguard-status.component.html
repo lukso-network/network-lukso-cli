@@ -3,7 +3,9 @@
     class="card-body d-flex flex-column"
     *ngIf="!(metrics.peers === undefined); else notRunning"
   >
-    <h1 class="title">Vanguard <span>v0.1.0-develop</span></h1>
+    <h1 class="title">
+      Vanguard <span>{{ version.vanguard }}</span>
+    </h1>
 
     <div class="flex-fill">
       <span class="peers">{{ metrics.peers }}</span>
@@ -12,13 +14,15 @@
 
     <div class="graph">
       <ngx-charts-line-chart
+        [showGridLines]="true"
+        [activeEntries]="graphData"
         [legend]="false"
         [animations]="false"
-        [showXAxisLabel]="false"
-        [showYAxisLabel]="false"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
         [showGridLines]="true"
         [autoScale]="true"
-        [results]="multi"
+        [results]="graphData"
         [customColors]="customColors"
       >
       </ngx-charts-line-chart>
@@ -34,11 +38,11 @@
       <div class="ms-auto">
         <div class="label">STATUS</div>
         <ng-container *ngIf="metrics">
-          <span *ngIf="metrics.peers >= 20" class="badge bg-success"
+          <span *ngIf="metrics.peers >= 10" class="badge bg-success"
             >Excellent</span
           >
           <span
-            *ngIf="metrics.peers < 20 && metrics.peers > 0"
+            *ngIf="metrics.peers < 10 && metrics.peers > 0"
             class="badge bg-warning"
             >Ok</span
           >

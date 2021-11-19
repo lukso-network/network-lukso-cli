@@ -5,7 +5,7 @@ import { VanguardService } from '../../services/vanguard-metrics.service';
 import { PandoraMetricsService } from '../../services/pandora-metrics.service';
 import { ValidatorMetricsService } from '../../services/validator-metrics.service';
 import { DataService } from '../../services/data.service';
-import { tap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'lukso-status',
@@ -22,6 +22,7 @@ export class StatusComponent {
   validatorMetrics$: Observable<any>;
   network$: Observable<any>;
   lastBlock$: Observable<any>;
+  settings$: Observable<any>;
 
   constructor(
     softwareService: SoftwareService,
@@ -38,6 +39,11 @@ export class StatusComponent {
     this.vanguardMetrics$ = vanguardService.getMetrics$();
     this.validatorMetrics$ = validatorService.getMetrics$();
     this.network$ = dataService.getNetwork$();
+    this.settings$ = this.network$.pipe(
+      switchMap((network) => {
+        return softwareService.getSettings(network);
+      })
+    );
   }
 
   stopClients() {

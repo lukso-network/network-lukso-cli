@@ -62,7 +62,7 @@ export class SoftwareService {
     return this.httpClient.post('/api/stop-clients', {});
   }
 
-  getConfig(network: string) {
+  getSettings(network: string) {
     return this.httpClient.get('/api/settings', {
       params: {
         network,
