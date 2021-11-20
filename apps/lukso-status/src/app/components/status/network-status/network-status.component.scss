@@ -1,30 +1,58 @@
 :host {
   display: block;
+  background: white;
 }
 
 .status-box {
   display: flex;
   border-radius: 10px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.13);
   padding: 20px;
-  margin-top: 40px;
+  margin-top: 34px;
   margin-bottom: 40px;
-  height: 100px;
-  background: white;
+  height: 80px;
 
   div {
-    flex: auto;
-    padding-left: 30px;
+    position: relative;
+    flex: 1;
+    padding-left: 25px;
+  }
+
+  > div {
+    &::after {
+      content: '';
+      position: absolute;
+      right: 21px;
+      bottom: 0px;
+      display: block;
+      margin-top: 5px;
+      height: 40px;
+      width: 1px;
+      background-color: #f2f2f6;
+    }
+  }
+
+  > div:last-of-type {
+    &:after {
+      display: none;
+    }
   }
 }
 
+.icon {
+  position: absolute;
+  top: 7px;
+  left: 15px;
+}
+
 .label {
-  font-size: 12px;
-  font-weight: 700;
-  opacity: 0.3;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1;
+  color: #919cb4;
 }
 
 .value {
-  font-weight: 700;
+  font-weight: 400;
   font-size: 20px;
 }

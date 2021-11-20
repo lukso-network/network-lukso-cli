@@ -11,6 +11,7 @@
           type="text"
           formControlName="amountOfValidators"
           placeholder="0"
+          autocomplete="off"
           [ngClass]="{
             'is-valid':
               form.controls.amountOfValidators.dirty &&
@@ -79,6 +80,9 @@
 
       <div class="mb-4">
         <lukso-password-checker
+          *ngIf="
+            form.controls.password?.dirty && form.controls.password?.errors
+          "
           [password]="form.controls.password.value"
         ></lukso-password-checker>
       </div>

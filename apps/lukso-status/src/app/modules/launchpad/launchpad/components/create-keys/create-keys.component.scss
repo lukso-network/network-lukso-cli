@@ -1,7 +1,13 @@
 :host {
   display: block;
   background: white;
-  padding: 40px 100px;
+  padding: 60px 150px 80px;
+}
+
+h5 {
+  font-family: 'Sofia W05 Semi Bold';
+  font-size: 25px;
+  margin-bottom: 40px;
 }
 
 form {
@@ -17,12 +23,16 @@ form {
   position: relative;
 }
 
-// lukso-password-checker {
-//   position: absolute;
-//   top: 33px;
-//   left: calc(100% + 40px);
-//   width: 400px;
-// }
+lukso-password-checker {
+  position: absolute;
+  top: 33px;
+  left: calc(100% + 40px);
+  padding: 20px 30px;
+  width: 400px;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.13);
+  border-radius: 10px;
+}
 
 .bi-key-fill {
   color: white;

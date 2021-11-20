@@ -1,13 +1,13 @@
 <div class="status-box" *ngIf="metrics">
   <div
-    class="card-body d-flex flex-column"
+    class="d-flex flex-column"
     *ngIf="!(metrics['p2p/peers'] === undefined); else notRunning"
   >
     <h1 class="title">
       Pandora <span>{{ version.pandora }}</span>
     </h1>
 
-    <div class="flex-fill">
+    <div class="peers-container">
       <span class="peers">{{ metrics['p2p/peers'] }}</span>
       <span class="label">Peers </span>
     </div>
@@ -27,7 +27,7 @@
       </ngx-charts-line-chart>
     </div>
 
-    <div class="status d-flex flex-row">
+    <div class="status d-flex flex-row flex-fill">
       <div>
         <div class="label">LAST BLOCK</div>
         <span class="latest-block">

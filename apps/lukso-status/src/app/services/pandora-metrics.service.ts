@@ -26,13 +26,13 @@ export class PandoraMetricsService {
 
     const newHeads$ = this.myWebSocket.pipe(
       map((data) => {
+        const lastBlock = new Date();
+        lastBlock.setSeconds(lastBlock.getSeconds() - 1);
         return {
           blockNumber: data?.params?.result.number
             ? parseInt(data?.params?.result.number, 16)
             : undefined,
-          timeStamp: data?.params?.result.timestamp
-            ? parseInt(data?.params?.result.timestamp, 16) * 1000
-            : undefined,
+          timeStamp: lastBlock,
         };
       })
     );

@@ -26,7 +26,7 @@ export class PandoraStatusComponent implements OnChanges {
   showXAxisLabel = false;
   timeline = false;
   rangeFillOpacity = 1;
-  customColors = [{ name: 'Peers', value: 'rgb(0, 115, 192)' }];
+  customColors = [{ name: 'Peers', value: '#1CABE1' }];
   multi: any = null;
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -1,21 +1,35 @@
 :host {
   display: block;
   background: white;
-  padding: 40px 100px 70px;
+  padding: 40px 50px 70px;
   margin-bottom: 40px;
+}
+
+.transactions {
+  margin-bottom: 100px;
+}
+
+.label,
+.value {
+  font-size: 10px;
+  display: block;
+  text-align: center;
+}
+
+.label {
+  color: #919cb4;
+}
+
+.value {
+  font-size: 30px;
+}
+
+.total-amount {
+  padding-bottom: 20px;
 }
 
 .title {
   padding: 20px 20px 40px;
-}
-
-.validator {
-  border-radius: 10px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
-  padding: 5px 10px 10px;
-  background: white;
-  margin-bottom: 20px;
-  padding: 20px;
 }
 
 .btn,
@@ -24,10 +38,12 @@
 }
 
 .btn--send-all-transactions {
-  width: 100%;
+  display: block;
+  width: 70%;
+  margin: 0 auto;
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 1px;
-  font-size: 15px;
-  padding: 15px 0px;
+  font-size: 18px;
+  height: 62px;
 }

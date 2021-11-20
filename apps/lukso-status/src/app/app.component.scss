@@ -8,7 +8,7 @@
 
 .lukso-logo {
   display: block;
-  max-height: 20px;
+  max-height: 24px;
   margin: 0 20px;
 }
 
@@ -21,13 +21,37 @@ main {
 }
 
 .navbar {
-  text-transform: uppercase;
-  font-weight: 700;
+  height: 80px;
+  font-size: 16px;
+  background-color: white;
+}
+
+.navbar-brand {
+  padding-right: 40px;
+}
+
+a.nav-link.active {
+  position: relative;
+  color: #151c2c !important;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 21px;
+    right: 21px;
+    bottom: 0px;
+    display: block;
+    margin-top: 5px;
+    height: 2px;
+    background-color: #1cabe1;
+  }
+}
+a.nav-link {
+  color: #919cb4 !important;
 }
 
 .navbar-light .navbar-nav .nav-link {
-  padding-right: 30px;
-  padding-left: 30px;
+  padding-right: 21px;
+  padding-left: 21px;
 }
 
 .status-box {

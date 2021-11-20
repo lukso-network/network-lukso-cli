@@ -1,16 +1,18 @@
 :host {
   display: block;
-  height: 300px;
+  height: 340px;
+  width: 370px;
   border-radius: 10px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
-  padding: 5px 10px 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.13);
+  padding: 0;
   background: white;
 }
 
 .title {
   font-size: 20px;
-  font-weight: 700;
-
+  font-weight: 500;
+  padding-top: 19px;
+  padding-left: 30px;
   span {
     font-size: 14px;
     font-weight: 400;
@@ -25,78 +27,45 @@
 
 .status-box {
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .status {
-  padding: 20px 0 0;
+  padding: 0 22px 0 30px;
+  align-items: center;
+}
+
+.peers-container {
+  padding-left: 30px;
 }
 
 .label {
-  font-weight: 700;
-  color: rgba(0, 0, 0, 0.2);
+  font-weight: 400;
+  color: #919cb4;
   font-size: 10px;
-  margin-bottom: 5px;
   text-transform: uppercase;
 }
 
 .peers {
   display: inline-block;
-  font-size: 36px;
-  font-weight: 700;
-  padding-right: 10px;
-  color: #b62daf;
-}
-.latest-block {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 25px;
+  font-weight: 400;
+  padding-right: 5px;
+  padding-bottom: 10px;
+  padding-top: 15px;
+  color: rgb(0, 115, 192);
 }
 
-.bg-success {
-  background: #ccfbe1 !important;
-  color: #2db679;
+.latest-block {
+  font-size: 20px;
+  font-weight: 400;
 }
 
 span.badge {
-  display: block;
-  width: 100px;
-  padding: 5px 10px;
-  border-radius: 4px;
-  text-transform: uppercase;
-}
-
-td {
-  vertical-align: top;
-}
-
-.property-name {
-  width: 200px;
-}
-
-.property-value {
-  text-align: right;
-}
-
-.property--peers {
-  font-size: 30px;
-}
-
-.bg-success {
-  background: #ccfbe1 !important;
-  color: #2db679;
-}
-
-.bg-warning {
-  background: #fcf8e9 !important;
-  color: #e3bd18;
-}
-
-.bg-danger {
-  background: #fde9ee !important;
-  color: #eb476f;
+  margin-top: 3px;
 }
 
 .graph {
+  border-top: 1px solid #f2f2f6;
+  border-bottom: 1px solid #f2f2f6;
   height: 100px;
 }

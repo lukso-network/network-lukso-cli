@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { switchMap, tap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { CURRENT_KEY_ACTION, NETWORKS } from '../../helpers/create-keys';
 import { KeygenService } from '../../services/keygen.service';
 import { saveAs } from 'file-saver';
@@ -22,7 +22,7 @@ export class LaunchpadComponent {
   keygenService: KeygenService;
   router: Router;
   showPasswordError = false;
-  network$: Observable<any>;
+  network$: Observable<NETWORKS>;
   depositData$: Observable<any>;
   currentTask = {
     status: CURRENT_KEY_ACTION.IDLE,
@@ -59,14 +59,14 @@ export class LaunchpadComponent {
       )
       .subscribe({
         next: (response: any) => {
-          console.log(response);
           this.currentTask.status = CURRENT_KEY_ACTION.COMPLETE;
           const blob: any = new Blob([response], {
             type: 'text/json; charset=utf-8',
           });
           saveAs(blob, 'validator_keys.zip');
         },
-        error: (error: any) => console.log('Error downloading the file'),
+        error: (error: Error) =>
+          console.log('Error downloading the file', error),
       });
   }
 }

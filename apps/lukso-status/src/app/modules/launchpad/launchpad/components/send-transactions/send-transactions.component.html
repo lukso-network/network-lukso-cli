@@ -1,10 +1,17 @@
 <div class="key-form">
   <h5 class="title text-center">Transactions</h5>
-  <lukso-deposit-transaction
-    class="d-flex validator"
-    *ngFor="let deposit of depositData"
-    [deposit]="deposit"
-  ></lukso-deposit-transaction>
+  <div class="transactions">
+    <lukso-deposit-transaction
+      class="d-flex validator"
+      *ngFor="let deposit of depositData"
+      [deposit]="deposit"
+    ></lukso-deposit-transaction>
+  </div>
+
+  <div class="total-amount">
+    <span class="label">TOTAL AMOUNT</span>
+    <span class="value">{{ depositData!.length * 32 }} LYXt</span>
+  </div>
   <button
     class="btn btn-primary btn-lg btn--send-all-transactions"
     (click)="sendTransactions()"

@@ -19,7 +19,7 @@ export class VanguardStatusComponent implements OnChanges {
   @Input() peersOverTime: any = {};
   @Input() version: ClientVersion = {};
 
-  customColors = [{ name: 'Peers', value: '#b62daf' }];
+  customColors = [{ name: 'Peers', value: '#1CABE1' }];
   graphData: GraphData[] = [];
 
   ngOnChanges(changes: SimpleChanges): void {
