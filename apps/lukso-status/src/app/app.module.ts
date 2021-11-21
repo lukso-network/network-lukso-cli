@@ -3,8 +3,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import { PandoraStatusComponent } from './components/status/pandora-status/pandora-status.component';
-import { VanguardStatusComponent } from './components/status/vanguard-status/vanguard-status.component';
 import { AvailableVersionsComponent } from './components/available-versions/available-versions.component';
 import { AppRoutingModule } from './app-routing.module';
 import { StatusComponent } from './components/status/status.component';
@@ -17,12 +15,11 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NetworkStatusComponent } from './components/status/network-status/network-status.component';
 import { TimeagoModule } from 'ngx-timeago';
+import { StatusBoxComponent } from './components/status/status-box/status-box.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PandoraStatusComponent,
-    VanguardStatusComponent,
     AvailableVersionsComponent,
     StatusComponent,
     InstallComponent,
@@ -30,6 +27,7 @@ import { TimeagoModule } from 'ngx-timeago';
     ValidatorStatusComponent,
     InitialSetupComponent,
     NetworkStatusComponent,
+    StatusBoxComponent,
   ],
   imports: [
     AppRoutingModule,

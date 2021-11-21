@@ -6,6 +6,7 @@ import { PandoraMetricsService } from '../../services/pandora-metrics.service';
 import { ValidatorMetricsService } from '../../services/validator-metrics.service';
 import { DataService } from '../../services/data.service';
 import { switchMap } from 'rxjs/operators';
+import { DEFAULT_NETWORK } from '../../shared/config';
 
 @Component({
   selector: 'lukso-status',
@@ -18,11 +19,13 @@ export class StatusComponent {
   vanguardMetrics$: Observable<any>;
   pandoraMetrics$: Observable<any>;
   peersOverTimePandora$: Observable<any>;
-  peersOverTimeVanguard$: Observable<any>;
+  vanguardPeersOverTime$: Observable<any>;
   validatorMetrics$: Observable<any>;
   network$: Observable<any>;
   lastBlock$: Observable<any>;
   settings$: Observable<any>;
+
+  hasStopped = false;
 
   constructor(
     softwareService: SoftwareService,
@@ -32,10 +35,10 @@ export class StatusComponent {
     dataService: DataService
   ) {
     this.softwareService = softwareService;
+    this.lastBlock$ = pandoraService.myWSData$;
     this.pandoraMetrics$ = pandoraService.getMetrics$();
     this.peersOverTimePandora$ = pandoraService.getPeersOverTime$();
-    this.peersOverTimeVanguard$ = vanguardService.getPeersOverTime$();
-    this.lastBlock$ = pandoraService.myWSData$;
+    this.vanguardPeersOverTime$ = vanguardService.getPeersOverTime$();
     this.vanguardMetrics$ = vanguardService.getMetrics$();
     this.validatorMetrics$ = validatorService.getMetrics$();
     this.network$ = dataService.getNetwork$();
@@ -46,7 +49,17 @@ export class StatusComponent {
     );
   }
 
-  stopClients() {
-    this.softwareService.stopClients().subscribe();
+  stopClients(clients: string[]) {
+    this.softwareService.stopClients(clients).subscribe(() => {});
+  }
+
+  startClients(options: any) {
+    this.softwareService
+      .startClients(
+        localStorage.getItem('network') || DEFAULT_NETWORK,
+        options.settings,
+        options.clients
+      )
+      .subscribe();
   }
 }

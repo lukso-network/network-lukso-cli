@@ -1,14 +1,16 @@
 <div class="status-box" *ngIf="metrics">
   <div
-    class="card-body d-flex flex-column"
+    class="d-flex flex-column flex-fill"
     *ngIf="
       !(metrics['process_cpu_seconds_total'] === undefined);
       else notRunning
     "
   >
-    <h1 class="title">Validator <span>v0.1.0-develop</span></h1>
+    <h1 class="title">
+      Validator <span>{{ version.vanguard }}</span>
+    </h1>
 
-    <div class="flex-fill">
+    <div class="peers-container">
       <span class="peers">{{ validatorData.length }} </span>
       <span class="label">Validators</span>
     </div>
@@ -49,14 +51,14 @@
       </table>
     </div>
 
-    <div class="status d-flex flex-row align-items-end">
-      <div class="flex-fill">
-        <div class="label">STATUS</div>
-        <span class="badge bg-danger">TBD</span>
+    <div class="status d-flex flex-row flex-fill">
+      <div>
+        <div class="label">Balance</div>
+        <span class="latest-block"> 64 LYXt</span>
       </div>
-      <div class="flex-fill text-end">
-        <div class="label">SUCCESSFUL PROPOSALS</div>
-        <span class="latest-block">Some Metric</span>
+      <div class="ms-auto">
+        <div class="label">STATUS</div>
+        <span class="badge bg-success">Excellent</span>
       </div>
     </div>
   </div>

@@ -1,8 +1,11 @@
 package runner
 
-import "lukso/shared"
+import (
+	"lukso-manager/shared"
+	"os/exec"
+)
 
-func startValidator(version string, network string) (err error) {
+func startValidator(version string, network string) (cmd *exec.Cmd, err error) {
 	client := "lukso-validator"
 	networkDir := shared.GetNetworkDir(network)
 
@@ -20,10 +23,10 @@ func startValidator(version string, network string) (err error) {
 		"--lukso-network",
 	}
 
-	errBinary := StartBinary(client, version, args)
+	cmd, errBinary := StartBinary(client, version, args)
 	if errBinary != nil {
 		return
 	}
 
-	return
+	return cmd, nil
 }

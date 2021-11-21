@@ -59,9 +59,16 @@ export class AppComponent implements OnInit {
       .pipe(
         switchMap((settings: Settings) => {
           console.log(settings, network);
-          return this.softwareService.startClients(network, settings);
+          const clients = ['pandora', 'vanguard', 'orchestrator', 'validator'];
+          return this.softwareService.startClients(network, settings, clients);
         })
       )
+      .subscribe();
+  }
+
+  stopClients() {
+    this.softwareService
+      .stopClients(['pandora', 'vanguard', 'orchestrator', 'validator'])
       .subscribe();
   }
 

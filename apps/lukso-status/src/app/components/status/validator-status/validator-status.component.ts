@@ -6,6 +6,7 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
+import { ClientVersion } from '../../../interfaces/client-versions';
 
 const VALIDATOR_STATUSES: { [key: string]: string } = {
   '0': 'UNKNOWN',
@@ -27,6 +28,7 @@ export class ValidatorStatusComponent implements OnChanges {
   validatorData: KeyValue<string, string>[] = [];
   @Input() metrics: any = {};
   @Input() network = '';
+  @Input() version: ClientVersion = {};
 
   env = '';
   VALIDATOR_STATUSES = VALIDATOR_STATUSES;

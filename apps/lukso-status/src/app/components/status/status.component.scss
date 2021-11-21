@@ -1,13 +1,23 @@
 :host {
   display: block;
-  width: 1280px;
 }
 
 .container > .row {
   margin-top: 0px;
-  max-width: 1180px;
 }
 
 .container .row + .row {
   margin-top: 25px;
+}
+
+.status-box {
+  margin-top: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.13);
+  padding: 0;
+  background: white;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

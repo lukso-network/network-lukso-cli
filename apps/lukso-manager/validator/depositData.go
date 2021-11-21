@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"lukso/shared"
+	"lukso-manager/shared"
 	"os"
 	"path/filepath"
 	"strings"

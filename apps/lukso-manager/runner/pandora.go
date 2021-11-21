@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"lukso/settings"
-	"lukso/shared"
+	"lukso-manager/settings"
+	"lukso-manager/shared"
 	"os"
 	"os/exec"
 	"strings"
 )
 
-func startPandora(version string, network string, settings settings.Settings) (err error) {
+func startPandora(version string, network string, settings settings.Settings) (cmd *exec.Cmd, err error) {
 	client := "pandora"
 	dataDir := shared.GetDataDir(network, client)
 	networkDir := shared.GetNetworkDir(network)
@@ -81,10 +81,10 @@ func startPandora(version string, network string, settings settings.Settings) (e
 	io.Copy(in, out)
 	out.Close()
 
-	errBinary := StartBinary(client, version, args)
+	cmd, errBinary := StartBinary(client, version, args)
 	if errBinary != nil {
 		return
 	}
 
-	return
+	return cmd, nil
 }

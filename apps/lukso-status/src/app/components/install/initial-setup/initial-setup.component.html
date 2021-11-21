@@ -83,52 +83,59 @@
 
     <fieldset>
       <legend>Versions</legend>
-      <div class="form-floating mb-3">
-        <select class="form-select" [formControl]="vanguard">
-          <option
-            *ngFor="let version of vanguardVersions$ | async"
-            [value]="version"
-          >
-            {{ version }}
-          </option>
-        </select>
-        <label for="newField">Vanguard</label>
-      </div>
-
-      <div class="form-floating mb-3">
-        <select class="form-select" [formControl]="pandora">
-          <option
-            *ngFor="let version of pandoraVersions$ | async"
-            [value]="version"
-          >
-            {{ version }}
-          </option>
-        </select>
-        <label for="newField">Pandora</label>
-      </div>
-
-      <div class="form-floating mb-3">
-        <select class="form-select" [formControl]="orchestrator">
-          <option
-            *ngFor="let version of orchestratorVersions$ | async"
-            [value]="version"
-          >
-            {{ version }}
-          </option>
-        </select>
-        <label for="newField">Orchestrator</label>
-      </div>
-
-      <div class="form-floating mb-3">
-        <select class="form-select" [formControl]="validator">
-          <option
-            *ngFor="let version of validatorVersions$ | async"
-            [value]="version"
-          >
-            {{ version }}
-          </option>
-        </select>
-        <label for="newField">Validator</label>
+      <div class="row">
+        <div class="col">
+          <div class="form-floating mb-3">
+            <select class="form-select" [formControl]="vanguard">
+              <option
+                *ngFor="let version of vanguardVersions$ | async"
+                [value]="version"
+              >
+                {{ version }}
+              </option>
+            </select>
+            <label for="newField">Vanguard</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-floating mb-3">
+            <select class="form-select" [formControl]="pandora">
+              <option
+                *ngFor="let version of pandoraVersions$ | async"
+                [value]="version"
+              >
+                {{ version }}
+              </option>
+            </select>
+            <label for="newField">Pandora</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-floating mb-3">
+            <select class="form-select" [formControl]="orchestrator">
+              <option
+                *ngFor="let version of orchestratorVersions$ | async"
+                [value]="version"
+              >
+                {{ version }}
+              </option>
+            </select>
+            <label for="newField">Orchestrator</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-floating mb-3">
+            <select class="form-select" [formControl]="validator">
+              <option
+                *ngFor="let version of validatorVersions$ | async"
+                [value]="version"
+              >
+                {{ version }}
+              </option>
+            </select>
+            <label for="newField">Validator</label>
+          </div>
+        </div>
       </div>
     </fieldset>
 
@@ -146,7 +153,7 @@
     </div>
     <div class="d-grid">
       <button class="btn btn-primary" id="submitButton" type="submit">
-        Save Settings
+        Save and Restart Node
       </button>
     </div>
   </form>
@@ -162,6 +169,11 @@
           irreversible.
         </p>
         <button class="btn btn-danger btn-lg">RESET VALIDATOR KEYS</button>
+      </li>
+      <li class="list-group-item">
+        <h5 class="alert-heading">DataDir Reset</h5>
+        <p>This deletes all your datadirs. This action is irreversible.</p>
+        <button class="btn btn-danger btn-lg">DELETE DATADIRS</button>
       </li>
     </ul>
   </div>

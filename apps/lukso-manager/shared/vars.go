@@ -18,3 +18,12 @@ func GetDataDir(network string, client string) string {
 func GetNetworkDir(network string) string {
 	return NetworkDir + network
 }
+
+func Contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}

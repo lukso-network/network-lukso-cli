@@ -1,8 +1,11 @@
 package runner
 
-import "lukso/shared"
+import (
+	"lukso-manager/shared"
+	"os/exec"
+)
 
-func startOrchestrator(version string, network string) (err error) {
+func startOrchestrator(version string, network string) (cmd *exec.Cmd, err error) {
 	client := "lukso-orchestrator"
 	args := []string{
 		"--datadir=" + shared.NetworkDir + network + "/" + shared.DataDir + "/orchestrator",
@@ -17,10 +20,10 @@ func startOrchestrator(version string, network string) (err error) {
 		"--verbosity=debug",
 	}
 
-	errBinary := StartBinary(client, version, args)
+	cmd, errBinary := StartBinary(client, version, args)
 	if errBinary != nil {
 		return
 	}
 
-	return
+	return cmd, nil
 }

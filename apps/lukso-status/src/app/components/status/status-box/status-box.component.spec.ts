@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PandoraStatusComponent } from './pandora-status.component';
+import { StatusBoxComponent } from './status-box.component';
 
-describe('PandoraStatusComponent', () => {
-  let component: PandoraStatusComponent;
-  let fixture: ComponentFixture<PandoraStatusComponent>;
+describe('StatusBoxComponent', () => {
+  let component: StatusBoxComponent;
+  let fixture: ComponentFixture<StatusBoxComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PandoraStatusComponent ]
+      declarations: [ StatusBoxComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PandoraStatusComponent);
+    fixture = TestBed.createComponent(StatusBoxComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

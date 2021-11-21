@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"lukso/shared"
+	"lukso-manager/shared"
 	"net/http"
 
 	"github.com/boltdb/bolt"

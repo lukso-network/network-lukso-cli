@@ -1,3 +1,4 @@
+export const DEFAULT_NETWORK = 'l15-dev';
 export const DEFAULT_UPDATE_INTERVAL = 5000;
 export const VALIDATOR_DEPOSIT_COST = 32;
 export const DEPOSIT_CONTRACT_ADDRESS =

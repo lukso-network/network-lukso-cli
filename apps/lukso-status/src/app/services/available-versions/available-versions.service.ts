@@ -51,15 +51,18 @@ export class SoftwareService {
     });
   }
 
-  startClients(network: string, settings: Settings) {
+  startClients(network: string, settings: Settings, clients: string[]) {
     return this.httpClient.post('/api/start-clients', {
       network,
       settings,
+      clients,
     }) as Observable<string>;
   }
 
-  stopClients() {
-    return this.httpClient.post('/api/stop-clients', {});
+  stopClients(clients: string[]) {
+    return this.httpClient.post('/api/stop-clients', {
+      clients,
+    });
   }
 
   getSettings(network: string) {

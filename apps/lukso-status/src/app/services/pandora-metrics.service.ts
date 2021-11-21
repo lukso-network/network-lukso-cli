@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { merge, Observable, of, timer } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, retry, switchMap } from 'rxjs/operators';
 import { DEFAULT_UPDATE_INTERVAL, getNamespacePrefix } from '../shared/config';
 
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
@@ -25,6 +25,7 @@ export class PandoraMetricsService {
     );
 
     const newHeads$ = this.myWebSocket.pipe(
+      retry(),
       map((data) => {
         const lastBlock = new Date();
         lastBlock.setSeconds(lastBlock.getSeconds() - 1);

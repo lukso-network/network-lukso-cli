@@ -2,13 +2,13 @@ package main
 
 import (
 	"log"
-	"lukso/downloader"
-	"lukso/metrics"
-	"lukso/runner"
-	"lukso/settings"
-	"lukso/shared"
-	"lukso/validator"
-	"lukso/webserver"
+	"lukso-manager/downloader"
+	"lukso-manager/metrics"
+	"lukso-manager/runner"
+	"lukso-manager/settings"
+	"lukso-manager/shared"
+	"lukso-manager/validator"
+	"lukso-manager/webserver"
 	"net"
 	"os"
 

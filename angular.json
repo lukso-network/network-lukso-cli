@@ -71,6 +71,7 @@
               "browserTarget": "lukso-status:build:production"
             },
             "development": {
+              "disableHostCheck": true,
               "browserTarget": "lukso-status:build:development",
               "proxyConfig": "proxy.conf.json"
             }

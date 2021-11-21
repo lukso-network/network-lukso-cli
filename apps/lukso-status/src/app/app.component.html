@@ -3,7 +3,7 @@
     <a class="navbar-brand" href="#">
       <img
         class="lukso-logo"
-        src="https://lukso.network/images/lukso_wordmark_black.png"
+        src="assets/lukso_wordmark_black.png"
         alt="LUKSO Logo"
       />
     </a>
@@ -68,6 +68,7 @@
     <div class="d-flex settings">
       <button class="btn btn-success" (click)="startClients(network.value)">
         Start</button
+      >&nbsp;<button class="btn btn-danger" (click)="stopClients()">Stop</button
       >&nbsp;
       <select
         #network

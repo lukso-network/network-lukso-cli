@@ -11,9 +11,9 @@ import (
 	"github.com/prometheus/common/expfmt"
 )
 
-type VanguardMetricss struct {
-	Peers    int64 `json:"peers"`
-	HeadSlot int64 `json:"headSlot"`
+type MetricsResponseData struct {
+	Peers     int64 `json:"peers"`
+	ChainData int64 `json:"chainData"`
 }
 
 func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
@@ -31,16 +31,16 @@ func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
 	}
 
 	peers := mf["p2p_peer_count"].GetMetric()
-	headSlot := mf["beacon_head_slot"].GetMetric()
+	chainData := mf["beacon_head_slot"].GetMetric()
 
-	if peers == nil || headSlot == nil {
+	if peers == nil || chainData == nil {
 		return
 	}
 
 	// TODO: proper error handling in case the structure of the metrics changes
-	var response VanguardMetricss = VanguardMetricss{
-		Peers:    int64(*peers[1].Gauge.Value),
-		HeadSlot: int64(*headSlot[0].Gauge.Value),
+	var response MetricsResponseData = MetricsResponseData{
+		Peers:     int64(*peers[1].Gauge.Value),
+		ChainData: int64(*chainData[0].Gauge.Value),
 	}
 
 	err := setPeersOverTime(*peers[1].Gauge.Value, "vanguard")
@@ -68,18 +68,25 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(body, &pandoraMetrics)
 
+	// TODO: proper error handling in case the structure of the metrics changes
+	var response MetricsResponseData = MetricsResponseData{
+		Peers:     int64(pandoraMetrics["p2p/peers"]),
+		ChainData: int64(pandoraMetrics["chain/head/block"]),
+	}
+
 	err2 := setPeersOverTime(pandoraMetrics["p2p/peers"], "pandora")
 	if err2 != nil {
 		fmt.Println(err2)
 	}
 
-	if nil != err {
+	jsonString, err := json.Marshal(response)
+	if err != nil {
 		fmt.Println(err)
 		handleError(err, w)
 		return
 	}
 
-	returnBody(body, w)
+	returnBody(jsonString, w)
 }
 
 func ValidatorMetrics(w http.ResponseWriter, r *http.Request) {

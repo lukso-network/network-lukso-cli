@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"lukso/shared"
+	"lukso-manager/shared"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -236,7 +236,8 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 
 		for _, v := range releases {
 			assetURL := getDownloadUrlFromAsset(client, v.Assets)
-			if assetURL != "" {
+			fmt.Println(assetURL)
+			if assetURL != "" && strings.Contains(assetURL, "-rc") {
 				confMap[client].DownloadInfo[v.TagName] = downloadInfo{
 					Tag:         v.TagName,
 					DownloadURL: assetURL,

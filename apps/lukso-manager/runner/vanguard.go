@@ -2,11 +2,12 @@ package runner
 
 import (
 	"fmt"
-	"lukso/shared"
+	"lukso-manager/shared"
+	"os/exec"
 	"strings"
 )
 
-func startVanguard(version string, network string) (err error) {
+func startVanguard(version string, network string) (cmd *exec.Cmd, err error) {
 	client := "vanguard"
 
 	config, err := ReadConfig(network)
@@ -44,10 +45,10 @@ func startVanguard(version string, network string) (err error) {
 		"--p2p-host-ip=46.127.26.82",
 	}
 
-	errBinary := StartBinary(client, version, args)
+	cmd, errBinary := StartBinary(client, version, args)
 	if errBinary != nil {
 		return
 	}
 
-	return
+	return cmd, nil
 }
