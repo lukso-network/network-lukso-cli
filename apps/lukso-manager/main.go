@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"lukso-manager/downloader"
 	"lukso-manager/metrics"
@@ -13,6 +14,7 @@ import (
 	"os"
 
 	"github.com/boltdb/bolt"
+	"github.com/glendc/go-external-ip"
 	"github.com/gorilla/mux"
 )
 
@@ -31,7 +33,17 @@ func init() {
 		log.Fatal(err)
 	}
 	shared.SettingsDB = db
-	shared.OutboundIP = getOutboundIP().String()
+
+	consensus := externalip.DefaultConsensus(nil, nil)
+	consensus.UseIPProtocol(4)
+
+	// Get your IP,
+	// which is never <nil> when err is <nil>.
+	ip, err := consensus.ExternalIP()
+	if err == nil {
+		fmt.Println(ip.String()) // print IPv4/IPv6 in string format
+	}
+	shared.OutboundIP = ip
 
 }
 

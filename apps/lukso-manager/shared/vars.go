@@ -1,11 +1,15 @@
 package shared
 
-import "github.com/boltdb/bolt"
+import (
+	"net"
+
+	"github.com/boltdb/bolt"
+)
 
 var LuksoHomeDir = ""
 var BinaryDir = ""
 var NetworkDir = ""
-var OutboundIP = ""
+var OutboundIP net.IP
 var DataDir = "datadirs"
 var SettingsDB *bolt.DB
 

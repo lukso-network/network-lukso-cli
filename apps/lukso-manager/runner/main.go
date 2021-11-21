@@ -2,7 +2,6 @@ package runner
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"lukso-manager/downloader"
 	"lukso-manager/settings"
@@ -65,8 +64,6 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 		CommandsByClient.vanguard = vanCmd
 	}
 
-	fmt.Println(body.Clients)
-	fmt.Println(body.Settings.Versions)
 	if shared.Contains(body.Clients, "orchestrator") {
 		orchCmd, errOrchestrator := startOrchestrator(body.Settings.Versions[settings.Orchestrator], network)
 		if errOrchestrator != nil {

@@ -48,7 +48,7 @@ func startPandora(version string, network string, settings settings.Settings) (c
 		"--miner.gaslimit=80000000",
 		"--syncmode=full",
 		"--verbosity=4",
-		"--nat=extip:" + shared.OutboundIP,
+		"--nat=extip:" + shared.OutboundIP.String(),
 		"--metrics",
 		"--metrics.expensive",
 		"--pprof",

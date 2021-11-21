@@ -37,7 +37,7 @@ func SaveSettingsEndpoint(w http.ResponseWriter, r *http.Request) {
 	var body saveSettingsRequestBody
 
 	if body.Settings.ExternalIP == "" {
-		body.Settings.ExternalIP = shared.OutboundIP
+		body.Settings.ExternalIP = shared.OutboundIP.String()
 	}
 
 	errJson := decoder.Decode(&body)

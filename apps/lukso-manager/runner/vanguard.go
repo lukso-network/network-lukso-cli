@@ -5,6 +5,7 @@ import (
 	"lukso-manager/shared"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 func startVanguard(version string, network string) (cmd *exec.Cmd, err error) {
@@ -17,6 +18,9 @@ func startVanguard(version string, network string) (cmd *exec.Cmd, err error) {
 	}
 
 	bootnodes := strings.Split(config.VANGUARDBOOTNODES, ",")
+
+	now := time.Now() // current local time
+	sec := now.Unix()
 
 	args := []string{
 		"--accept-terms-of-use",
@@ -42,7 +46,8 @@ func startVanguard(version string, network string) (cmd *exec.Cmd, err error) {
 		"--grpc-gateway-port=3500",
 		"--update-head-timely",
 		"--lukso-network",
-		"--p2p-host-ip=46.127.26.82",
+		"--p2p-host-ip=" + shared.OutboundIP.String(),
+		"--log-file=" + shared.NetworkDir + network + "/logs/vanguard-" + version + "-" + fmt.Sprint(sec) + ".log",
 	}
 
 	cmd, errBinary := StartBinary(client, version, args)

@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/boltdb/bolt v1.3.1
+	github.com/glendc/go-external-ip v0.1.0
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/kr/pretty v0.3.0 // indirect
