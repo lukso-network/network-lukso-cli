@@ -635,8 +635,8 @@ function start_validator() {
 
     if (($argument -eq "validator") -and ($coinbase)) {
         $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target
-        powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec miner.setEtherbase(`"$COINBASE`")"
-        powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec miner.start()"
+        powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec `"miner.setEtherbase(`'$coinbase`')`""
+        powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec 'miner.start()'"
     }
 
     if (!(Test-Path $logsdir\validator))
