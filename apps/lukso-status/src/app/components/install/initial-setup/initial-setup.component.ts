@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { SoftwareService } from '../../../services/available-versions/available-versions.service';
+import { DEFAULT_NETWORK } from '../../../shared/config';
 import { coinbaseValidator } from '../../../shared/eth-address-validator';
 
 interface DownloadedSoftware {
@@ -93,14 +94,14 @@ export class InitialSetupComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const network = localStorage.getItem('network') as string;
+    const network = localStorage.getItem('network') || DEFAULT_NETWORK;
     this.softwareService.getSettings(network).subscribe((result) => {
       this.setupForm.patchValue(result);
     });
   }
 
   onSubmit() {
-    const network = localStorage.getItem('network') as string;
+    const network = localStorage.getItem('network') || DEFAULT_NETWORK;
     if (this.setupForm.valid) {
       this.softwareService
         .setConfig(network, this.setupForm.value)

@@ -20,7 +20,7 @@ func startValidator(version string, network string, config *NetworkConfig, times
 		"--wallet-dir=" + networkDir + "/vanguard_wallet",
 		"--wallet-password-file=" + networkDir + "/passwords/keys",
 		"--rpc",
-		"--log-file=" + shared.NetworkDir + network + "/logs/" + fmt.Sprint(config.GENESISTIME) + "/" + client + "-" + version + "-" + timestamp + ".log",
+		"--log-file=" + shared.NetworkDir + network + "/logs/" + fmt.Sprint(config.GENESISTIME) + "/validator-" + version + "-" + timestamp + ".log",
 		"--lukso-network",
 	}
 
