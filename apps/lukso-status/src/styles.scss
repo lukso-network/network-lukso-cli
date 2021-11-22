@@ -135,13 +135,14 @@ body {
 }
 
 span.badge {
-  display: block;
+  display: inline-block;
   min-width: 100px;
   padding: 0px 10px;
   border-radius: 4px;
   text-transform: uppercase;
   line-height: 26px;
   height: 26px;
+  margin-right: 4px;
 }
 
 // g.line-chart {

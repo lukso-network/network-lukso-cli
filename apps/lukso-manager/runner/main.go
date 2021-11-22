@@ -2,6 +2,7 @@ package runner
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"lukso-manager/downloader"
 	"lukso-manager/settings"
@@ -9,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
+	"time"
 )
 
 type startClientsRequestBody struct {
@@ -45,17 +48,27 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 
 	oldConfig, _ := ReadConfig(network)
 	downloader.DownloadConfigFiles(network)
-	newConfig, _ := ReadConfig(network)
+	config, _ := ReadConfig(network)
 
-	if oldConfig.GENESISTIME != newConfig.GENESISTIME {
+	if oldConfig.GENESISTIME != config.GENESISTIME {
 		err := os.RemoveAll(shared.NetworkDir + network + "/" + shared.DataDir)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
+	folder := shared.NetworkDir + body.Network + "/logs/" + fmt.Sprint(config.GENESISTIME)
+
+	_, folderErr := os.Stat(folder)
+	if folderErr != nil {
+		os.Mkdir(folder, 0775)
+	}
+
+	now := time.Now()
+	timestamp := now.Unix()
+
 	if shared.Contains(body.Clients, "vanguard") {
-		vanCmd, errVanguard := startVanguard(body.Settings.Versions[settings.Vanguard], network)
+		vanCmd, errVanguard := startVanguard(body.Settings.Versions[settings.Vanguard], network, config, fmt.Sprint(timestamp))
 		if errVanguard != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errVanguard.Error()))
@@ -75,7 +88,8 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if shared.Contains(body.Clients, "pandora") {
-		cmdPandora, errPandora := startPandora(body.Settings.Versions[settings.Pandora], network, body.Settings)
+		version := body.Settings.Versions[settings.Pandora]
+		cmdPandora, errPandora := startPandora(version, network, body.Settings, config, fmt.Sprint(timestamp))
 		if errPandora != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errPandora.Error()))
@@ -85,7 +99,8 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if shared.Contains(body.Clients, "validator") {
-		cmdValidator, errValidator := startValidator(body.Settings.Versions[settings.Validator], network)
+		version := body.Settings.Versions[settings.Validator]
+		cmdValidator, errValidator := startValidator(version, network, config, fmt.Sprint(timestamp))
 		if errValidator != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errValidator.Error()))
@@ -152,6 +167,8 @@ func StopClients(w http.ResponseWriter, r *http.Request) {
 
 func StartBinary(client string, version string, args []string) (*exec.Cmd, error) {
 
+	log.Println("STARTING " + client + "@" + version)
+	log.Println("ARGS " + strings.Join(args, " "))
 	command := exec.Command(shared.BinaryDir+client+"/"+version+"/"+client, args...)
 
 	if startError := command.Start(); startError != nil {

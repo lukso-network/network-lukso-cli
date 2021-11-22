@@ -1,11 +1,12 @@
 package runner
 
 import (
+	"fmt"
 	"lukso-manager/shared"
 	"os/exec"
 )
 
-func startValidator(version string, network string) (cmd *exec.Cmd, err error) {
+func startValidator(version string, network string, config *NetworkConfig, timestamp string) (cmd *exec.Cmd, err error) {
 	client := "lukso-validator"
 	networkDir := shared.GetNetworkDir(network)
 
@@ -19,7 +20,7 @@ func startValidator(version string, network string) (cmd *exec.Cmd, err error) {
 		"--wallet-dir=" + networkDir + "/vanguard_wallet",
 		"--wallet-password-file=" + networkDir + "/passwords/keys",
 		"--rpc",
-		"--log-file=" + networkDir + "/logs/validator",
+		"--log-file=" + shared.NetworkDir + network + "/logs/" + fmt.Sprint(config.GENESISTIME) + "/" + client + "-" + version + "-" + timestamp + ".log",
 		"--lukso-network",
 	}
 

@@ -70,7 +70,12 @@
       </g>
     </svg>
 
-    <div class="label">LAST BLOCK</div>
+    <div class="label">
+      <ng-container *ngIf="blockInfo?.timeStamp >= now"
+        >START TIME</ng-container
+      >
+      <ng-container *ngIf="blockInfo?.timeStamp < now">LAST BLOCK</ng-container>
+    </div>
     <div class="value" *ngIf="blockInfo?.blockNumber">
       {{ blockInfo?.timeStamp | timeago: true }}
     </div>

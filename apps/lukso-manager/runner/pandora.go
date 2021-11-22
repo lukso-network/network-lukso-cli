@@ -11,20 +11,22 @@ import (
 	"strings"
 )
 
-func startPandora(version string, network string, settings settings.Settings) (cmd *exec.Cmd, err error) {
+func startPandora(
+	version string,
+	network string,
+	settings settings.Settings,
+	config *NetworkConfig,
+	timestamp string,
+) (cmd *exec.Cmd, err error) {
 	client := "pandora"
 	dataDir := shared.GetDataDir(network, client)
 	networkDir := shared.GetNetworkDir(network)
+
 	if settings.HostName == "" {
 		settings.HostName, _ = os.Hostname()
 	}
 
 	hostname := "l15-" + settings.HostName
-
-	config, err := ReadConfig(network)
-	if err != nil {
-		return
-	}
 
 	statsPrefix := ""
 	if !(network == "l15-prod") {
@@ -54,6 +56,7 @@ func startPandora(version string, network string, settings settings.Settings) (c
 		"--pprof",
 		"--pprof.addr=127.0.0.1",
 		"--ethstats=" + hostname + ":6Tcpc53R5V763Aur9LgD@" + statsPrefix + "stats.pandora.l15.lukso.network",
+		// "2> " + networkDir + "/logs/pandora-" + version + "-" + timestamp + ".log",
 	}
 
 	command := exec.Command("bash", "-c", shared.BinaryDir+client+"/"+version+"/"+client+" --datadir "+dataDir+" init "+networkDir+"/config/pandora-genesis.json &>/dev/null")
