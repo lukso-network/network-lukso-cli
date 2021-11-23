@@ -6,6 +6,7 @@ import {
   map,
   retry,
   switchMap,
+  tap,
   withLatestFrom,
 } from 'rxjs/operators';
 import { DEFAULT_UPDATE_INTERVAL, getNamespacePrefix } from '../shared/config';
@@ -26,49 +27,46 @@ export class PandoraMetricsService extends RxState<MetricsState> {
   readonly network$ = this.select('network');
   metrics$: Observable<any>;
   peersOverTime$: Observable<any>;
-
+  networkData$: Observable<any>;
   constructor(
     @Inject(GLOBAL_RX_STATE) private globalState: RxState<GlobalState>,
     private httpClient: HttpClient
   ) {
     super();
-
+    this.connect('network', globalState.select('network'));
     const timer$ = timer(0, DEFAULT_UPDATE_INTERVAL);
 
     this.metrics$ = this.setMetrics$(timer$);
     this.peersOverTime$ = this.setPeersOverTime$(timer$);
-    // this.myWebSocket = this.network$.pipe(
-    //   switchMap((network: NETWORKS) => {
-    //     return webSocket(
-    //       `wss://${getNamespacePrefix(network)}rpc.l15.lukso.network:8546`
-    //     );
-    //   })
-    // );
 
-    // const newHeads$ = this.myWebSocket.pipe(
-    //   retry(),
-    //   map((data: any) => {
-    //     const lastBlock = new Date();
-    //     lastBlock.setSeconds(lastBlock.getSeconds() - 1);
-    //     return {
-    //       blockNumber: data?.params?.result.number
-    //         ? parseInt(data?.params?.result.number, 16)
-    //         : undefined,
-    //       timeStamp: lastBlock,
-    //     };
-    //   })
-    // );
-    // this.networkData$ = this.network$.pipe(
-    //   switchMap((network: string) => {
-    //     return merge([this.getLastBlock$(network), newHeads$]);
-    //   })
-    // );
-    // this.myWebSocket.next({
-    //   jsonrpc: '2.0',
-    //   id: 1,
-    //   method: 'eth_subscribe',
-    //   params: ['newHeads'],
-    // });
+    const myWebSocket = this.select('network').pipe(
+      switchMap((network: NETWORKS) => {
+        const webSocket$: any = webSocket(
+          `wss://${getNamespacePrefix(network)}rpc.l15.lukso.network:8546`
+        );
+        webSocket$.next({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_subscribe',
+          params: ['newHeads'],
+        });
+        return webSocket$;
+      })
+    );
+
+    this.networkData$ = myWebSocket.pipe(
+      retry(),
+      map((data: any) => {
+        const lastBlock = new Date();
+        lastBlock.setSeconds(lastBlock.getSeconds() - 1);
+        return {
+          blockNumber: data?.params?.result.number
+            ? parseInt(data?.params?.result.number, 16)
+            : undefined,
+          timeStamp: data?.params?.result.number ? lastBlock : undefined,
+        };
+      })
+    );
   }
 
   getMetrics$() {

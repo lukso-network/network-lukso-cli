@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+
 import { AvailableVersionsComponent } from './components/available-versions/available-versions.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { StatusComponent } from './components/status/status.component';

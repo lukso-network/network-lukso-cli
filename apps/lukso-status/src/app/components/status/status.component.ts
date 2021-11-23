@@ -61,6 +61,7 @@ export class StatusComponent extends RxState<StatusState> {
 
     this.connect('pandoraPeersOverTime', pandoraService.getPeersOverTime$());
     this.connect('pandoraMetrics', pandoraService.getMetrics$());
+    this.connect('networkData', pandoraService.networkData$);
 
     this.connect('vanguardPeersOverTime', vanguardService.getPeersOverTime$());
     this.connect('vanguardMetrics', vanguardService.getMetrics$());

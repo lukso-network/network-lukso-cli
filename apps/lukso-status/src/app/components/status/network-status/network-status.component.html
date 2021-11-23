@@ -34,12 +34,14 @@
 
     <div class="label">BEST BLOCK</div>
     <div class="value">
-      <ng-container *ngIf="!networkData">
+      <ng-container
+        *ngIf="!networkData || (networkData && !networkData.blockNumber)"
+      >
         <p class="placeholder-glow">
           <span class="placeholder col-4"></span>
         </p>
       </ng-container>
-      <ng-container *ngIf="networkData">
+      <ng-container *ngIf="networkData && networkData.blockNumber">
         #{{ networkData.blockNumber | number: '1.0-0' }}
       </ng-container>
     </div>
@@ -78,22 +80,26 @@
     </svg>
 
     <div class="label">
-      <ng-container *ngIf="!networkData"> LAST BLOCK </ng-container>
-      <ng-container *ngIf="networkData && networkData.timestamp >= now"
+      <ng-container *ngIf="networkData && !networkData.timeStamp">
+        LAST BLOCK
+      </ng-container>
+      <ng-container *ngIf="networkData && networkData.timeStamp >= now"
         >START TIME</ng-container
       >
-      <ng-container *ngIf="networkData && networkData.timestamp < now"
+      <ng-container *ngIf="networkData && networkData.timeStamp < now"
         >LAST BLOCK</ng-container
       >
     </div>
     <div class="value">
-      <ng-container *ngIf="!networkData">
+      <ng-container
+        *ngIf="!networkData || (networkData && !networkData.timeStamp)"
+      >
         <p class="placeholder-glow">
           <span class="placeholder col-5"></span>
         </p>
       </ng-container>
-      <ng-container *ngIf="networkData">
-        {{ networkData.timestamp | timeago: true }}
+      <ng-container *ngIf="networkData && networkData.timeStamp">
+        {{ networkData.timeStamp | timeago: true }}
       </ng-container>
     </div>
   </div>
@@ -117,7 +123,7 @@
 
     <div class="label">AVERAGE BLOCK TIME</div>
     <div class="value">
-      <ng-container *ngIf="!networkData">
+      <ng-container *ngIf="networkData">
         <p class="placeholder-glow">
           <span class="placeholder col-6"></span>
         </p>
@@ -201,7 +207,7 @@
 
     <div class="label">VALIDATORS</div>
     <div class="value">
-      <ng-container *ngIf="!networkData">
+      <ng-container *ngIf="networkData">
         <p class="placeholder-glow">
           <span class="placeholder col-3"></span>
         </p>
