@@ -50,10 +50,12 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	downloader.DownloadConfigFiles(network)
 	config, _ := ReadConfig(network)
 
-	if oldConfig.GENESISTIME != config.GENESISTIME {
-		err := os.RemoveAll(shared.NetworkDir + network + "/" + shared.DataDir)
-		if err != nil {
-			log.Fatal(err)
+	if oldConfig != nil {
+		if oldConfig.GENESISTIME != config.GENESISTIME {
+			err := os.RemoveAll(shared.NetworkDir + network + "/" + shared.DataDir)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 
