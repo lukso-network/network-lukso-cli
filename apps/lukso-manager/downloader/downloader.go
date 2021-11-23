@@ -237,7 +237,7 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 		for _, v := range releases {
 			assetURL := getDownloadUrlFromAsset(client, v.Assets)
 			fmt.Println(assetURL)
-			if assetURL != "" && strings.Contains(assetURL, "-rc") {
+			if assetURL != "" {
 				confMap[client].DownloadInfo[v.TagName] = downloadInfo{
 					Tag:         v.TagName,
 					DownloadURL: assetURL,
@@ -318,7 +318,7 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 func createDirIfNotExists(folder string) {
 	_, err := os.Stat(folder)
 	if err != nil {
-		os.Mkdir(folder, 0775)
+		os.MkdirAll(folder, 0775)
 	}
 }
 

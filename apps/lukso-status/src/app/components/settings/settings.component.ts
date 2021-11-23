@@ -62,7 +62,7 @@ export class SettingsComponent
     );
 
     this.hold(this.saveSettings$, (values) =>
-      softwareService.setConfig(values.network, values.settings)
+      softwareService.setConfig(values.network, values.settings).subscribe()
     );
   }
 
