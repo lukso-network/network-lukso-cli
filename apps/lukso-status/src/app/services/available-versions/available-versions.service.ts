@@ -72,7 +72,7 @@ export class SoftwareService {
     }) as Observable<Settings>;
   }
 
-  setConfig(network: string, settings: Settings) {
+  setSettings(network: string, settings: Settings) {
     return this.httpClient
       .post('/api/settings', {
         network,
