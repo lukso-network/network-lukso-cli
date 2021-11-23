@@ -4,16 +4,21 @@ import {
   Inject,
   OnInit,
 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { NETWORKS } from '../../modules/launchpad/launchpad/helpers/create-keys';
 import { SoftwareService } from '../../services/available-versions/available-versions.service';
 import { ValidatorService } from '../../services/validator.service';
-import { DEFAULT_NETWORK } from '../../shared/config';
 import { coinbaseValidator } from '../../shared/eth-address-validator';
 import { RxState } from '@rx-angular/state';
 import { GlobalState, GLOBAL_RX_STATE } from '../../shared/rx-state';
 import { Settings } from '../../interfaces/settings';
+import { switchMap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 interface SettingsState {
   network: NETWORKS;
@@ -33,24 +38,32 @@ export class SettingsComponent
   readonly network$ = this.select('network');
   readonly settings$ = this.select('settings');
 
-  softwareService: SoftwareService;
-  validatorService: ValidatorService;
+  resetValidator$ = new Subject<NETWORKS>();
+  saveSettings$ = new Subject<{ network: NETWORKS; settings: Settings }>();
 
   settingsForm: FormGroup;
 
   constructor(
     @Inject(GLOBAL_RX_STATE) private globalState: RxState<GlobalState>,
+    fb: FormBuilder,
     softwareService: SoftwareService,
     validatorService: ValidatorService
   ) {
     super();
 
-    this.settingsForm = this.initForm();
-    this.validatorService = validatorService;
-    this.softwareService = softwareService;
+    this.settingsForm = this.initForm(fb);
 
     this.connect('network', this.globalState.select('network'));
     this.connect('settings', this.globalState.select('settings'));
+
+    // Side Effects
+    this.hold(this.resetValidator$, (network) =>
+      validatorService.resetValidator(network)
+    );
+
+    this.hold(this.saveSettings$, (values) =>
+      softwareService.setConfig(values.network, values.settings)
+    );
   }
 
   ngOnInit(): void {
@@ -59,6 +72,7 @@ export class SettingsComponent
     });
   }
 
+  // TODO: check best practices, this certainly isn't it
   get hostName() {
     return this.settingsForm.get('hostName') as FormControl;
   }
@@ -85,35 +99,21 @@ export class SettingsComponent
     return versions.get('validator') as FormControl;
   }
 
-  onSubmit() {
-    const network = localStorage.getItem('network') || DEFAULT_NETWORK;
-    if (this.settingsForm.valid) {
-      this.softwareService
-        .setConfig(network, this.settingsForm.value)
-        .subscribe();
-    }
-  }
-
-  resetValidator() {
-    const network = localStorage.getItem('network') || DEFAULT_NETWORK;
-    this.validatorService.resetValidator(network).subscribe();
-  }
-
-  initForm() {
-    return new FormGroup({
-      hostName: new FormControl('', [Validators.required]),
-      externalIp: new FormControl(''),
-      isValidatorEnabled: new FormControl(0, [Validators.required]),
-      versions: new FormGroup({
-        vanguard: new FormControl(''),
-        pandora: new FormControl(''),
-        orchestrator: new FormControl(''),
-        validator: new FormControl(''),
+  private initForm(fb: FormBuilder) {
+    return fb.group({
+      hostName: ['', [Validators.required]],
+      externalIp: [''],
+      isValidatorEnabled: [0, [Validators.required]],
+      versions: fb.group({
+        vanguard: [''],
+        pandora: [''],
+        orchestrator: [''],
+        validator: [''],
       }),
-      coinbase: new FormControl('', [
-        Validators.required,
-        coinbaseValidator(/^0x[a-fA-F0-9]{40}$/i),
-      ]),
+      coinbase: [
+        '',
+        [Validators.required, coinbaseValidator(/^0x[a-fA-F0-9]{40}$/i)],
+      ],
     });
   }
 }

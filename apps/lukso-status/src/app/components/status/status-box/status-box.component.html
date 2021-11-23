@@ -23,6 +23,7 @@
 
     <div class="graph">
       <ngx-charts-line-chart
+        *ngIf="customColors"
         [legend]="false"
         [animations]="false"
         [showXAxisLabel]="false"

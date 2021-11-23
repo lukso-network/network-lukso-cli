@@ -11,6 +11,11 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PasswordCheckerComponent } from './launchpad/components/password-checker/password-checker.component';
 import { SendTransactionsComponent } from './launchpad/components/send-transactions/send-transactions.component';
 import { DepositTransactionComponent } from './launchpad/components/send-transactions/deposit-transaction/deposit-transaction.component';
+import {
+  LetModule,
+  PushModule,
+  ViewportPrioModule,
+} from '@rx-angular/template';
 
 @NgModule({
   declarations: [
@@ -27,6 +32,9 @@ import { DepositTransactionComponent } from './launchpad/components/send-transac
     LaunchpadRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
+    LetModule,
+    PushModule,
+    ViewportPrioModule,
   ],
 })
 export class LaunchpadModule {}

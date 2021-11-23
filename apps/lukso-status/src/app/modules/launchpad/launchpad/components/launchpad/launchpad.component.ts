@@ -1,24 +1,26 @@
 import { Component, Inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
-import { CURRENT_KEY_ACTION, NETWORKS } from '../../helpers/create-keys';
+import { map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import {
+  CURRENT_KEY_ACTION,
+  NETWORKS,
+  KeyGenerationValues,
+  DepositData,
+} from '../../helpers/create-keys';
 import { KeygenService } from '../../services/keygen.service';
 import { saveAs } from 'file-saver';
-import { Observable } from 'rxjs';
 import {
   GlobalState,
   GLOBAL_RX_STATE,
 } from '../../../../../../app/shared/rx-state';
 import { RxState } from '@rx-angular/state';
-
-interface KeyGenerationValues {
-  network: string;
-  amountOfValidators: number;
-  password: string;
-}
+import { merge, Subject } from 'rxjs';
 
 interface LaunchpadState {
   network: NETWORKS;
+  depositData: DepositData[];
+  currentTask: {
+    status: CURRENT_KEY_ACTION;
+  };
 }
 
 @Component({
@@ -28,28 +30,37 @@ interface LaunchpadState {
 })
 export class LaunchpadComponent extends RxState<LaunchpadState> {
   readonly network$ = this.select('network');
+  readonly depositData$ = this.select('depositData');
+
+  state$ = this.select();
+  createKeys$ = new Subject<KeyGenerationValues>();
 
   keygenService: KeygenService;
-  router: Router;
-  showPasswordError = false;
-  depositData$: Observable<any>;
   currentTask = {
     status: CURRENT_KEY_ACTION.IDLE,
   };
 
   constructor(
     @Inject(GLOBAL_RX_STATE) private globalState: RxState<GlobalState>,
-    keygenService: KeygenService,
-    router: Router
+    keygenService: KeygenService
   ) {
     super();
-
-    this.router = router;
     this.keygenService = keygenService;
-    this.depositData$ = this.network$.pipe(
-      switchMap((network: NETWORKS) => {
-        return this.keygenService.getDepositData(network);
-      })
+
+    const refreshListSideEffect$ = this.createKeys$.pipe(
+      tap((values) => this.createKeys(values))
+    );
+    this.hold(refreshListSideEffect$);
+
+    this.connect('network', globalState.select('network'));
+    this.connect(
+      'depositData',
+      merge([refreshListSideEffect$, this.network$]).pipe(
+        withLatestFrom(this.network$),
+        switchMap(([, network]) => {
+          return this.keygenService.getDepositData(network);
+        })
+      )
     );
   }
 
@@ -70,7 +81,7 @@ export class LaunchpadComponent extends RxState<LaunchpadState> {
       .subscribe({
         next: (response: any) => {
           this.currentTask.status = CURRENT_KEY_ACTION.COMPLETE;
-          const blob: any = new Blob([response], {
+          const blob = new Blob([response], {
             type: 'text/json; charset=utf-8',
           });
           saveAs(blob, 'validator_keys.zip');

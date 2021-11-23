@@ -18,6 +18,11 @@ import { StatusBoxComponent } from './components/status/status-box/status-box.co
 
 import { GLOBAL_RX_STATE, GlobalState } from './shared/rx-state';
 import { RxState } from '@rx-angular/state';
+import {
+  LetModule,
+  PushModule,
+  ViewportPrioModule,
+} from '@rx-angular/template';
 
 @NgModule({
   declarations: [
@@ -38,6 +43,9 @@ import { RxState } from '@rx-angular/state';
     NgxChartsModule,
     BrowserAnimationsModule,
     TimeagoModule.forRoot(),
+    LetModule,
+    PushModule,
+    ViewportPrioModule,
   ],
   providers: [
     {

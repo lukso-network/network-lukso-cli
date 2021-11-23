@@ -1,11 +1,27 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import {
   AbstractControlOptions,
   FormBuilder,
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { CURRENT_KEY_ACTION, NETWORKS } from '../../helpers/create-keys';
+import { RxState } from '@rx-angular/state';
+import {
+  GLOBAL_RX_STATE,
+  GlobalState,
+} from '../../../../../../app/shared/rx-state';
+import {
+  CURRENT_KEY_ACTION,
+  KeyGenerationValues,
+  NETWORKS,
+} from '../../helpers/create-keys';
 import { CustomValidators } from '../../helpers/custom-validators';
 
 @Component({
@@ -13,22 +29,32 @@ import { CustomValidators } from '../../helpers/custom-validators';
   templateUrl: './create-keys.component.html',
   styleUrls: ['./create-keys.component.scss'],
 })
-export class CreateKeysComponent implements OnInit {
-  @Output() createKeys = new EventEmitter<any>();
+export class CreateKeysComponent extends RxState<any> implements OnInit {
+  @Output() createKeys = new EventEmitter<KeyGenerationValues>();
   @Output() switchNetwork = new EventEmitter<NETWORKS>();
   @Input() currentTask = {
     status: CURRENT_KEY_ACTION.IDLE,
   };
 
+  readonly network$ = this.select('network');
+
   form: FormGroup = new FormGroup({});
   submitted = false;
   isGeneratingKeys = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    @Inject(GLOBAL_RX_STATE) private globalState: RxState<GlobalState>,
+    private fb: FormBuilder
+  ) {
+    super();
+
+    this.connect('network', this.globalState.select('network'));
     this.form = this.setupForm();
   }
   ngOnInit(): void {
-    this.form.controls.network.setValue(localStorage.getItem('network'));
+    this.network$.subscribe((network) => {
+      this.form.controls.network.setValue(network);
+    });
   }
 
   get f() {

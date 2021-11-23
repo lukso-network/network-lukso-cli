@@ -27,7 +27,7 @@ func init() {
 	shared.BinaryDir = shared.LuksoHomeDir + "/binaries/"
 	shared.NetworkDir = shared.LuksoHomeDir + "/networks/"
 
-	db, err := bolt.Open(shared.LuksoHomeDir+"/settings.db", 0640, nil)
+	db, err := bolt.Open(shared.LuksoHomeDir+"/lukso-manager.db", 0640, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -22,6 +22,12 @@ export interface DepositData {
   transaction_confirmed: boolean;
 }
 
+export interface KeyGenerationValues {
+  network: string;
+  amountOfValidators: number;
+  password: string;
+}
+
 export enum NETWORKS {
   'L15_DEV' = 'l15-dev',
   'L15_STAGING' = 'l15-staging',
