@@ -120,15 +120,20 @@
         </div>
       </div>
     </fieldset>
-
     <div class="d-grid">
-      <button
-        class="btn btn-primary"
-        id="submitButton"
-        type="submit"
-        [disabled]="settingsForm.invalid"
-      >
-        Save Settings
+      <button class="btn btn-primary" id="submitSettings" type="submit">
+        <ng-container *rxLet="isSaving$; let isSaving; rxSuspense: suspense">
+          <ng-container *ngIf="isSaving">
+            <span
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Saving...
+          </ng-container>
+          <ng-container *ngIf="!isSaving">Save Settings</ng-container>
+        </ng-container>
+        <ng-template #suspense>Save Settings</ng-template>
       </button>
     </div>
   </form>

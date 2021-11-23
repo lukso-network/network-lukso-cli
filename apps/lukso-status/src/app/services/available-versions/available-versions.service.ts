@@ -73,12 +73,10 @@ export class SoftwareService {
   }
 
   setSettings(network: string, settings: Settings) {
-    return this.httpClient
-      .post('/api/settings', {
-        network,
-        settings,
-      })
-      .subscribe();
+    return this.httpClient.post('/api/settings', {
+      network,
+      settings,
+    });
   }
 
   getAvailableVersions$() {
