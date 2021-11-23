@@ -318,7 +318,7 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 func createDirIfNotExists(folder string) {
 	_, err := os.Stat(folder)
 	if err != nil {
-		os.Mkdir(folder, 0775)
+		os.MkdirAll(folder, 0775)
 	}
 }
 

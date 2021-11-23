@@ -61,7 +61,7 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 
 	_, folderErr := os.Stat(folder)
 	if folderErr != nil {
-		os.Mkdir(folder, 0775)
+		os.MkdirAll(folder, 0775)
 	}
 
 	now := time.Now()

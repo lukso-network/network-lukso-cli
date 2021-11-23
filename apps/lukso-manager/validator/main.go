@@ -76,17 +76,17 @@ func GenerateValidatorKeys(w http.ResponseWriter, r *http.Request) {
 
 	_, err := os.Stat(folder)
 	if err != nil {
-		os.Mkdir(folder, 0775)
+		os.MkdirAll(folder, 0775)
 	}
 
 	_, err1 := os.Stat(folder + "/validator_keys")
 	if err1 != nil {
-		os.Mkdir(folder, 0775)
+		os.MkdirAll(folder, 0775)
 	}
 
 	_, errPw := os.Stat(folder + "/passwords")
 	if errPw != nil {
-		os.Mkdir(folder+"/passwords", 0775)
+		os.MkdirAll(folder+"/passwords", 0775)
 	}
 
 	mnemonicData := []byte(mnemonic)
