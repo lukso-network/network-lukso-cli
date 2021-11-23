@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -263,8 +264,9 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 
 func getDownloadUrlFromAsset(name string, assets []Assets) string {
 	var downloadUrl string
+	os_type := strings.Title(runtime.GOOS)
 	for i := range assets {
-		if assets[i].Name == name+"-Linux-x86_64" {
+		if assets[i].Name == name+"-"+os_type+"-x86_64" {
 			downloadUrl = assets[i].BrowserDownloadURL
 			break
 		}
