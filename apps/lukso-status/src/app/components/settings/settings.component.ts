@@ -24,6 +24,7 @@ interface SettingsState {
   network: NETWORKS;
   settings: Settings;
   isSaving: boolean;
+  isResettingValidator: boolean;
 }
 
 @Component({
@@ -39,6 +40,7 @@ export class SettingsComponent
   readonly network$ = this.select('network');
   readonly settings$ = this.select('settings');
   readonly isSaving$ = this.select('isSaving');
+  readonly isResettingValidator$ = this.select('isResettingValidator');
 
   resetValidator$ = new Subject<NETWORKS>();
   saveSettings$ = new Subject<{ network: NETWORKS; settings: Settings }>();
@@ -58,7 +60,9 @@ export class SettingsComponent
     this.connect('network', this.globalState.select('network'));
     this.connect('settings', this.globalState.select('settings'));
 
+    this.connect(this.resetValidator$, () => ({ isResettingValidator: true }));
     this.connect(this.saveSettings$, () => ({ isSaving: true }));
+
     this.hold(this.saveSettings$, (values) =>
       softwareService
         .setSettings(values.network, values.settings)
@@ -69,7 +73,12 @@ export class SettingsComponent
     );
 
     this.hold(this.resetValidator$, (network) =>
-      validatorService.resetValidator(network)
+      validatorService
+        .resetValidator(network)
+        .pipe(delay(1000))
+        .subscribe(() => {
+          this.set({ isResettingValidator: false });
+        })
     );
   }
 

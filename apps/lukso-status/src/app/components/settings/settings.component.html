@@ -152,7 +152,26 @@
       This deletes both your Keys and your Wallet. This action is irreversible.
     </p>
     <button class="btn btn-danger btn" (click)="resetValidator$.next(network)">
-      RESET VALIDATOR KEYS
+      <ng-container
+        *rxLet="
+          isResettingValidator$;
+          let isResettingValidator;
+          rxSuspense: suspense
+        "
+      >
+        <ng-container *ngIf="isResettingValidator">
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          Resetting...
+        </ng-container>
+        <ng-container *ngIf="!isResettingValidator"
+          >Reset Validator Keys</ng-container
+        >
+      </ng-container>
+      <ng-template #suspense>Reset Validator Keys</ng-template>
     </button>
   </div>
   <br />
