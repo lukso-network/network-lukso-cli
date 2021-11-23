@@ -7,7 +7,7 @@
     "
   >
     <h1 class="title">
-      Validator <span>{{ version.vanguard }}</span>
+      (WIP) Validator <span>{{ version?.vanguard }}</span>
     </h1>
 
     <div class="peers-container">
@@ -28,18 +28,21 @@
                   validator.key
                 }}"
                 target="_blank"
-                >{{ truncate(validator.key, 6, 6, 50) }}</a
-              >
+                >{{ truncate(validator.key, 6, 6, 50) }}
+              </a>
             </td>
-            <td>
-              <span class="d-flex">
+            <td class="property-balance">
+              <span
+                class="d-flex"
+                *ngIf="getValidatorMetric('validator_balance', validator.key)"
+              >
                 {{
                   getValidatorMetric('validator_balance', validator.key)
                     | number: '1.2-2'
                 }}&nbsp;LYXt
               </span>
             </td>
-            <td>
+            <td class="property-status">
               <span class="badge bg-dark">{{
                 VALIDATOR_STATUSES[
                   getValidatorMetric('validator_statuses', validator.key)

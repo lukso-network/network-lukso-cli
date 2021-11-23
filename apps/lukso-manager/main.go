@@ -10,11 +10,10 @@ import (
 	"lukso-manager/shared"
 	"lukso-manager/validator"
 	"lukso-manager/webserver"
-	"net"
 	"os"
 
 	"github.com/boltdb/bolt"
-	"github.com/glendc/go-external-ip"
+	externalip "github.com/glendc/go-external-ip"
 	"github.com/gorilla/mux"
 )
 
@@ -47,18 +46,6 @@ func init() {
 
 }
 
-func getOutboundIP() net.IP {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-
-	return localAddr.IP
-}
-
 func main() {
 	app := webserver.App{
 		Router: mux.NewRouter(),
@@ -80,6 +67,7 @@ func main() {
 	app.Router.Methods("POST").Path("/stop-clients").HandlerFunc(runner.StopClients)
 	app.Router.Methods("POST").Path("/launchpad/generate-keys").HandlerFunc(validator.GenerateValidatorKeys)
 	app.Router.Methods("POST").Path("/launchpad/import-keys").HandlerFunc(validator.ImportValidatorKeys)
+	app.Router.Methods("POST").Path("/launchpad/reset-validator").HandlerFunc(validator.ResetValidator)
 	app.Router.Methods("POST").Path("/settings").HandlerFunc(settings.SaveSettingsEndpoint)
 	app.Router.Methods("GET").Path("/settings").HandlerFunc(settings.GetSettingsEndpoint)
 

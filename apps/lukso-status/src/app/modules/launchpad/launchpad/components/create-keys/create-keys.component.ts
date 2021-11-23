@@ -20,7 +20,6 @@ export class CreateKeysComponent implements OnInit {
     status: CURRENT_KEY_ACTION.IDLE,
   };
 
-  NETWORKS = NETWORKS;
   form: FormGroup = new FormGroup({});
   submitted = false;
   isGeneratingKeys = false;
@@ -46,11 +45,34 @@ export class CreateKeysComponent implements OnInit {
     this.createKeys.emit(this.form.value);
   }
 
+  decrease() {
+    const validators = parseInt(
+      this.form.controls.amountOfValidators.value,
+      10
+    );
+    if (validators > 1) {
+      this.form.controls.amountOfValidators.setValue(validators - 1);
+    }
+  }
+  increase() {
+    const validators = parseInt(
+      this.form.controls.amountOfValidators.value,
+      10
+    );
+    this.form.controls.amountOfValidators.setValue(validators + 1);
+  }
+
+  filterNonNumeric(event: KeyboardEvent) {
+    if (!(parseInt(event.key, 10) >= 0 && parseInt(event.key, 10) <= 9))
+      return false;
+    return true;
+  }
+
   private setupForm() {
     return this.fb.group(
       {
         network: [localStorage.getItem('network'), [Validators.required]],
-        amountOfValidators: ['', [Validators.required]],
+        amountOfValidators: ['1', [Validators.required]],
         password: [
           '',
           [

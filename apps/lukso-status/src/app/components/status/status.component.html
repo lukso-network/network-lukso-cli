@@ -1,7 +1,7 @@
 <div class="row network-infos">
   <div class="col">
     <lukso-network-status
-      [blockInfo]="lastBlock$ | async"
+      [networkData]="networkData$ | async"
     ></lukso-network-status>
   </div>
 </div>
@@ -12,7 +12,7 @@
       [blockMetric]="'chain/head/block'"
       [blockLabel]="'Last Block'"
       [metrics]="pandoraMetrics$ | async"
-      [peersOverTime]="peersOverTimePandora$ | async"
+      [peersOverTime]="pandoraPeersOverTime$ | async"
       [settings]="settings$ | async"
       (stopClient)="stopClients(['pandora'])"
       (startClient)="startClients($event)"

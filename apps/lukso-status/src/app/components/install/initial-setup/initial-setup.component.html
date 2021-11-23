@@ -1,11 +1,13 @@
 <div class="setup px-5 my-5">
   <form
-    [formGroup]="setupForm"
+    [formGroup]="settingsForm"
     (ngSubmit)="onSubmit()"
     class="needs-validation"
   >
     <fieldset>
-      <legend>Settings</legend>
+      <legend>
+        Settings <span>{{ network$ | async | uppercase }}</span>
+      </legend>
       <div class="form-floating mb-3">
         <input
           class="form-control"
@@ -33,7 +35,7 @@
       <div
         class="form-floating mb-3"
         [ngClass]="
-          setupForm.controls.coinbase.errors &&
+          settingsForm.controls.coinbase.errors &&
           (coinbase.dirty || coinbase.touched)
             ? 'danger'
             : 'success'
@@ -81,7 +83,7 @@
       </div>
     </fieldset>
 
-    <fieldset>
+    <!-- <fieldset>
       <legend>Versions</legend>
       <div class="row">
         <div class="col">
@@ -137,44 +139,33 @@
           </div>
         </div>
       </div>
-    </fieldset>
+    </fieldset> -->
 
-    <div class="d-none" id="submitSuccessMessage">
-      <div class="text-center mb-3">
-        <div class="fw-bolder">Form submission successful!</div>
-        <p>To activate this form, sign up at</p>
-        <a href="https://startbootstrap.com/solution/contact-forms"
-          >https://startbootstrap.com/solution/contact-forms</a
-        >
-      </div>
-    </div>
-    <div class="d-none" id="submitErrorMessage">
-      <div class="text-center text-danger mb-3">Error sending message!</div>
-    </div>
     <div class="d-grid">
       <button class="btn btn-primary" id="submitButton" type="submit">
         Save Settings
       </button>
     </div>
   </form>
+</div>
 
-  <div class="alert alert-danger" role="alert">
-    <h4 class="alert-heading">Danger Zone</h4>
-
-    <ul class="list-group">
-      <li class="list-group-item">
-        <h5 class="alert-heading">Validator Reset</h5>
-        <p>
-          This deletes both your Keys and your Wallet. This action is
-          irreversible.
-        </p>
-        <button class="btn btn-danger btn-lg">RESET VALIDATOR KEYS</button>
-      </li>
-      <li class="list-group-item">
-        <h5 class="alert-heading">DataDir Reset</h5>
-        <p>This deletes all your datadirs. This action is irreversible.</p>
-        <button class="btn btn-danger btn-lg">DELETE DATADIRS</button>
-      </li>
-    </ul>
+<div class="setup px-5 my-5 alert alert-danger" role="alert">
+  <h4 class="alert-heading">Danger Zone</h4>
+  <br />
+  <div>
+    <h5 class="alert-heading">Validator Reset</h5>
+    <p>
+      This deletes both your Keys and your Wallet. This action is irreversible.
+    </p>
+    <button class="btn btn-danger btn" (click)="resetValidator()">
+      RESET VALIDATOR KEYS
+    </button>
+  </div>
+  <br />
+  <br />
+  <div>
+    <h5 class="alert-heading">DataDir Reset</h5>
+    <p>This deletes all your datadirs. This action is irreversible.</p>
+    <button class="btn btn-danger btn">DELETE DATADIRS</button>
   </div>
 </div>

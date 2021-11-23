@@ -2253,6 +2253,13 @@
   resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.10.2.tgz"
   integrity sha512-IXf3XA7+XyN7CP9gGh/XB0UxVMlvARGEgGXLubFICsUMGz6Q+DU+i4gGlpOxTjKvXjkJDJC8YdqdKkDj9qZHEQ==
 
+"@rx-angular/state@^1.4.6":
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/@rx-angular/state/-/state-1.4.6.tgz#a32cc064fc50ba6f7fa613b5be1cfba57300f375"
+  integrity sha512-ylXJbk5Q3SMnDSOxiRNin+2XgobKq/8tk33PaitQPeHC8oSqx/yPpySzw9b2DBmJMjaDSFgGov30RwuwfPCY3A==
+  dependencies:
+    tslib "^2.0.0"
+
 "@schematics/angular@12.2.13", "@schematics/angular@~12.2.0":
   version "12.2.13"
   resolved "https://registry.npmjs.org/@schematics/angular/-/angular-12.2.13.tgz"

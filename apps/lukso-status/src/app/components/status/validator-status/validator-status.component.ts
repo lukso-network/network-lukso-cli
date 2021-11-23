@@ -7,6 +7,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { ClientVersion } from '../../../interfaces/client-versions';
+import { NETWORKS } from '../../../modules/launchpad/launchpad/helpers/create-keys';
 
 const VALIDATOR_STATUSES: { [key: string]: string } = {
   '0': 'UNKNOWN',
@@ -27,8 +28,8 @@ const VALIDATOR_STATUSES: { [key: string]: string } = {
 export class ValidatorStatusComponent implements OnChanges {
   validatorData: KeyValue<string, string>[] = [];
   @Input() metrics: any = {};
-  @Input() network = '';
-  @Input() version: ClientVersion = {};
+  @Input() network: NETWORKS | null = NETWORKS.L15_DEV;
+  @Input() version: ClientVersion | undefined = {};
 
   env = '';
   VALIDATOR_STATUSES = VALIDATOR_STATUSES;
@@ -47,7 +48,7 @@ export class ValidatorStatusComponent implements OnChanges {
     }
 
     if (changes?.env?.currentValue !== null) {
-      this.env = this.getEnv(changes.network?.currentValue);
+      this.env = this.getEnv(this.network as NETWORKS);
     }
   }
 

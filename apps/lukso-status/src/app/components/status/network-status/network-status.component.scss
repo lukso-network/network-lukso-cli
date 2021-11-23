@@ -5,14 +5,14 @@
 .status-box {
   display: flex;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.13);
+  box-shadow: 0 4px 6px 0 hsla(0%, 0%, 0%, 0.1);
   background: white;
   padding: 20px;
   margin-top: 34px;
   margin-bottom: 40px;
   height: 80px;
 
-  div {
+  .metric {
     position: relative;
     flex: 1;
     padding-left: 25px;
@@ -50,9 +50,15 @@
   font-weight: 400;
   line-height: 1;
   color: #919cb4;
+  padding-left: 25px;
 }
 
 .value {
   font-weight: 400;
   font-size: 20px;
+  padding-left: 25px;
+}
+
+.placeholder-glow {
+  opacity: 0.1;
 }

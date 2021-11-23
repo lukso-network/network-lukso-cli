@@ -1,56 +1,47 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { switchMap } from 'rxjs/operators';
+import { startWith, switchMap } from 'rxjs/operators';
 import { Settings } from './interfaces/settings';
 import { NETWORKS } from './modules/launchpad/launchpad/helpers/create-keys';
 import { SoftwareService } from './services/available-versions/available-versions.service';
-import { DataService } from './services/data.service';
+import { GlobalState, GLOBAL_RX_STATE } from './shared/rx-state';
+import { RxState } from '@rx-angular/state';
 
 @Component({
   selector: 'lukso-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'lukso-status';
   NETWORKS = NETWORKS;
 
-  dataService: DataService;
   softwareService: SoftwareService;
 
   form: FormGroup = new FormGroup({
-    network: new FormControl('', [Validators.required]),
+    network: new FormControl(NETWORKS.L15_DEV, [Validators.required]),
   });
 
   constructor(
+    @Inject(GLOBAL_RX_STATE) private state: RxState<GlobalState>,
     private http: HttpClient,
-    dataService: DataService,
     softwareService: SoftwareService
   ) {
-    this.dataService = dataService;
     this.softwareService = softwareService;
-  }
 
-  ngOnInit() {
-    const network =
-      (localStorage.getItem('network') as NETWORKS) || NETWORKS.L15_DEV;
-    this.dataService.setNetwork(network);
-    this.form.controls.network.setValue(network);
-    this.form.controls.network.valueChanges.subscribe((network) => {
-      this.dataService.setNetwork(network);
-    });
-  }
-
-  updateClient() {
-    this.http
-      .post('/api/update-client', {
-        client: 'lukso-status',
-        version: 'v0.0.1-alpha.9',
-      })
-      .subscribe(() => {
-        console.log('success');
-      });
+    this.state.connect(
+      'network',
+      this.networkFormCtrl.valueChanges.pipe(
+        startWith(this.networkFormCtrl.value)
+      )
+    );
+    this.state.connect(
+      'settings',
+      this.state
+        .select('network')
+        .pipe(switchMap((network) => this.softwareService.getSettings(network)))
+    );
   }
 
   startClients(network: string) {

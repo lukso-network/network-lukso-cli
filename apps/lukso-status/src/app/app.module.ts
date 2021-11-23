@@ -17,6 +17,9 @@ import { NetworkStatusComponent } from './components/status/network-status/netwo
 import { TimeagoModule } from 'ngx-timeago';
 import { StatusBoxComponent } from './components/status/status-box/status-box.component';
 
+import { GLOBAL_RX_STATE, GlobalState } from './shared/rx-state';
+import { RxState } from '@rx-angular/state';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,7 +41,12 @@ import { StatusBoxComponent } from './components/status/status-box/status-box.co
     BrowserAnimationsModule,
     TimeagoModule.forRoot(),
   ],
-  providers: [],
+  providers: [
+    {
+      provide: GLOBAL_RX_STATE,
+      useFactory: () => new RxState<GlobalState>(),
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

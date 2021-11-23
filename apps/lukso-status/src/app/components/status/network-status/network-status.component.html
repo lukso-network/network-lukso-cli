@@ -1,5 +1,5 @@
 <div class="status-box d-flex flex-row">
-  <div>
+  <div class="metric">
     <svg
       class="icon"
       xmlns="http://www.w3.org/2000/svg"
@@ -33,11 +33,18 @@
     </svg>
 
     <div class="label">BEST BLOCK</div>
-    <div class="value" *ngIf="blockInfo?.blockNumber">
-      #{{ blockInfo?.blockNumber | number: '1.0-0' }}
+    <div class="value">
+      <ng-container *ngIf="!networkData">
+        <p class="placeholder-glow">
+          <span class="placeholder col-4"></span>
+        </p>
+      </ng-container>
+      <ng-container *ngIf="networkData">
+        #{{ networkData.blockNumber | number: '1.0-0' }}
+      </ng-container>
     </div>
   </div>
-  <div>
+  <div class="metric">
     <svg
       class="icon"
       xmlns="http://www.w3.org/2000/svg"
@@ -71,16 +78,26 @@
     </svg>
 
     <div class="label">
-      <ng-container *ngIf="blockInfo?.timeStamp >= now"
+      <ng-container *ngIf="!networkData"> LAST BLOCK </ng-container>
+      <ng-container *ngIf="networkData && networkData.timestamp >= now"
         >START TIME</ng-container
       >
-      <ng-container *ngIf="blockInfo?.timeStamp < now">LAST BLOCK</ng-container>
+      <ng-container *ngIf="networkData && networkData.timestamp < now"
+        >LAST BLOCK</ng-container
+      >
     </div>
-    <div class="value" *ngIf="blockInfo?.blockNumber">
-      {{ blockInfo?.timeStamp | timeago: true }}
+    <div class="value">
+      <ng-container *ngIf="!networkData">
+        <p class="placeholder-glow">
+          <span class="placeholder col-5"></span>
+        </p>
+      </ng-container>
+      <ng-container *ngIf="networkData">
+        {{ networkData.timestamp | timeago: true }}
+      </ng-container>
     </div>
   </div>
-  <div>
+  <div class="metric">
     <svg
       class="icon"
       xmlns="http://www.w3.org/2000/svg"
@@ -99,9 +116,15 @@
     </svg>
 
     <div class="label">AVERAGE BLOCK TIME</div>
-    <div class="value">6 Seconds</div>
+    <div class="value">
+      <ng-container *ngIf="!networkData">
+        <p class="placeholder-glow">
+          <span class="placeholder col-6"></span>
+        </p>
+      </ng-container>
+    </div>
   </div>
-  <div>
+  <div class="metric">
     <svg
       class="icon"
       xmlns="http://www.w3.org/2000/svg"
@@ -177,6 +200,12 @@
     </svg>
 
     <div class="label">VALIDATORS</div>
-    <div class="value">120</div>
+    <div class="value">
+      <ng-container *ngIf="!networkData">
+        <p class="placeholder-glow">
+          <span class="placeholder col-3"></span>
+        </p>
+      </ng-container>
+    </div>
   </div>
 </div>

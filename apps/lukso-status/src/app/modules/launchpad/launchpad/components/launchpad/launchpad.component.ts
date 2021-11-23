@@ -1,11 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { CURRENT_KEY_ACTION, NETWORKS } from '../../helpers/create-keys';
 import { KeygenService } from '../../services/keygen.service';
 import { saveAs } from 'file-saver';
 import { Observable } from 'rxjs';
-import { DataService } from '../../../../../services/data.service';
+import {
+  GlobalState,
+  GLOBAL_RX_STATE,
+} from '../../../../../../app/shared/rx-state';
+import { RxState } from '@rx-angular/state';
 
 interface KeyGenerationValues {
   network: string;
@@ -13,29 +17,35 @@ interface KeyGenerationValues {
   password: string;
 }
 
+interface LaunchpadState {
+  network: NETWORKS;
+}
+
 @Component({
   selector: 'lukso-launchpad',
   templateUrl: './launchpad.component.html',
   styleUrls: ['./launchpad.component.scss'],
 })
-export class LaunchpadComponent {
+export class LaunchpadComponent extends RxState<LaunchpadState> {
+  readonly network$ = this.select('network');
+
   keygenService: KeygenService;
   router: Router;
   showPasswordError = false;
-  network$: Observable<NETWORKS>;
   depositData$: Observable<any>;
   currentTask = {
     status: CURRENT_KEY_ACTION.IDLE,
   };
 
   constructor(
+    @Inject(GLOBAL_RX_STATE) private globalState: RxState<GlobalState>,
     keygenService: KeygenService,
-    router: Router,
-    dataService: DataService
+    router: Router
   ) {
+    super();
+
     this.router = router;
     this.keygenService = keygenService;
-    this.network$ = dataService.getNetwork$();
     this.depositData$ = this.network$.pipe(
       switchMap((network: NETWORKS) => {
         return this.keygenService.getDepositData(network);

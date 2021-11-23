@@ -27,40 +27,36 @@ type importValidatorKeysRequestBody struct {
 	WalletPassword string
 }
 
+type resetValidatorKeysRequestBody struct {
+	Network string
+}
+
 func ResetValidator(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	decoder := json.NewDecoder(r.Body)
-	var body generateValidatorKeysRequestBody
+	var body resetValidatorKeysRequestBody
 	errJson := decoder.Decode(&body)
 	if errJson != nil {
 		panic(errJson)
 	}
 
-	folder := shared.NetworkDir + body.Network
-
-	zipFolder(body.Network, "validator_keys")
-	errDeleteValidatoKeys := os.Remove(folder + "/validator_keys")
-	if errDeleteValidatoKeys != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		if err := json.NewEncoder(w).Encode("Could not delete validator keys"); err != nil {
-			panic(err)
-		}
-		return
+	validator_keys := shared.NetworkDir + body.Network + "/validator_keys"
+	_, errV := os.Stat(validator_keys)
+	if errV == nil {
+		zipFolder(body.Network, "validator_keys")
+		os.RemoveAll(validator_keys)
 	}
 
-	zipFolder(body.Network, "vanguard_wallet")
-	errDeleteVanguardWallet := os.Remove(folder + "/vanguard_wallet")
-	if errDeleteVanguardWallet != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		if err := json.NewEncoder(w).Encode("Could not delete validator wallet"); err != nil {
-			panic(err)
-		}
-		return
+	vanguard_wallet := shared.NetworkDir + body.Network + "/vanguard_wallet"
+	_, errW := os.Stat(vanguard_wallet)
+	if errW == nil {
+		zipFolder(body.Network, "vanguard_wallet")
+		os.RemoveAll(vanguard_wallet)
 	}
 
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode("Successfully created keys"); err != nil {
+	if err := json.NewEncoder(w).Encode("Successfully removed keys and wallet"); err != nil {
 		panic(err)
 	}
 }

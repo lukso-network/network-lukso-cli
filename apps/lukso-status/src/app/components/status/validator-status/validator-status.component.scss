@@ -72,3 +72,17 @@ span.badge {
 h5 {
   font-size: 25px;
 }
+
+.property-name,
+.property-balance,
+.property-status {
+  width: 33.33%;
+}
+.status {
+  padding: 0 30px;
+  align-items: center;
+}
+table {
+  width: calc(100% - 60px);
+  margin: 0 30px;
+}

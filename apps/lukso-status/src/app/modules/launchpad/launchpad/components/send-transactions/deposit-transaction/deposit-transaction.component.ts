@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { getNamespacePrefix } from '../../../../../../shared/config';
+import { NETWORKS } from '../../../helpers/create-keys';
 
 @Component({
   selector: 'lukso-deposit-transaction',
@@ -12,7 +13,9 @@ export class DepositTransactionComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.deposit?.currentValue) {
-      this.explorerLink = `http://${getNamespacePrefix()}explorer.vanguard.l15.lukso.network/validator/${
+      this.explorerLink = `http://${getNamespacePrefix(
+        NETWORKS.L15_DEV
+      )}explorer.vanguard.l15.lukso.network/validator/${
         changes.deposit?.currentValue.pubkey
       }`;
     }

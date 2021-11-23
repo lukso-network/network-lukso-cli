@@ -4,14 +4,22 @@
     <div class="mb-4">
       <label class="form-label" for="amountOfValidators">Validators</label>
       <div class="input-group input-group-lg">
-        <button class="btn btn-outline-secondary" type="button">-</button>
+        <button
+          class="btn btn-outline-secondary"
+          type="button"
+          (click)="decrease()"
+        >
+          -
+        </button>
         <input
+          #validators
           class="form-control form-control-lg text-center"
           id="amountOfValidators"
           type="text"
           formControlName="amountOfValidators"
           placeholder="0"
           autocomplete="off"
+          (keypress)="filterNonNumeric($event)"
           [ngClass]="{
             'is-valid':
               form.controls.amountOfValidators.dirty &&
@@ -23,7 +31,13 @@
           }"
           required
         />
-        <button class="btn btn-outline-secondary" type="button">+</button>
+        <button
+          class="btn btn-outline-secondary"
+          type="button"
+          (click)="increase()"
+        >
+          +
+        </button>
       </div>
 
       <div
