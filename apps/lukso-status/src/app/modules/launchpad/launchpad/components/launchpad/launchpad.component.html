@@ -5,13 +5,11 @@
   interdum. Fusce bibendum non lectus eget efficitur.
 </p>
 
-{{ state$ | push | json }}
-
 <lukso-create-keys
   *ngIf="(depositData$ | async) === null"
   class="shadow-sm bg-body rounded"
   (createKeys)="createKeys$.next($event)"
-  [currentTask]="currentTask"
+  [status]="status$ | push"
 ></lukso-create-keys>
 
 <lukso-send-transactions

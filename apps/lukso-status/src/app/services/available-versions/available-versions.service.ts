@@ -74,11 +74,12 @@ export class SoftwareService {
   }
 
   setConfig(network: string, settings: Settings) {
-    console.log(settings);
-    return this.httpClient.post('/api/settings', {
-      network,
-      settings,
-    }) as Observable<Settings>;
+    return this.httpClient
+      .post('/api/settings', {
+        network,
+        settings,
+      })
+      .subscribe();
   }
 
   getAvailableVersions$() {
