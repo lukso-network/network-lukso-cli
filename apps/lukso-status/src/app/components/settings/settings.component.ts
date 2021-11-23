@@ -6,14 +6,14 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NETWORKS } from '../../../modules/launchpad/launchpad/helpers/create-keys';
-import { SoftwareService } from '../../../services/available-versions/available-versions.service';
-import { ValidatorService } from '../../../services/validator.service';
-import { DEFAULT_NETWORK } from '../../../shared/config';
-import { coinbaseValidator } from '../../../shared/eth-address-validator';
+import { NETWORKS } from '../../modules/launchpad/launchpad/helpers/create-keys';
+import { SoftwareService } from '../../services/available-versions/available-versions.service';
+import { ValidatorService } from '../../services/validator.service';
+import { DEFAULT_NETWORK } from '../../shared/config';
+import { coinbaseValidator } from '../../shared/eth-address-validator';
 import { RxState } from '@rx-angular/state';
-import { GlobalState, GLOBAL_RX_STATE } from '../../../shared/rx-state';
-import { Settings } from '../../../interfaces/settings';
+import { GlobalState, GLOBAL_RX_STATE } from '../../shared/rx-state';
+import { Settings } from '../../interfaces/settings';
 
 interface SettingsState {
   network: NETWORKS;
@@ -21,12 +21,12 @@ interface SettingsState {
 }
 
 @Component({
-  selector: 'lukso-initial-setup',
-  templateUrl: './initial-setup.component.html',
-  styleUrls: ['./initial-setup.component.scss'],
+  selector: 'lukso-settings',
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InitialSetupComponent
+export class SettingsComponent
   extends RxState<SettingsState>
   implements OnInit
 {

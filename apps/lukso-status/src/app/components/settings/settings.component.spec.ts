@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InitialSetupComponent } from './initial-setup.component';
+import { InitialSetupComponent } from './settings.component';
 
 describe('InitialSetupComponent', () => {
   let component: InitialSetupComponent;
@@ -8,9 +8,8 @@ describe('InitialSetupComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ InitialSetupComponent ]
-    })
-    .compileComponents();
+      declarations: [InitialSetupComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -6,10 +6,9 @@ import { AppComponent } from './app.component';
 import { AvailableVersionsComponent } from './components/available-versions/available-versions.component';
 import { AppRoutingModule } from './app-routing.module';
 import { StatusComponent } from './components/status/status.component';
-import { InstallComponent } from './components/install/install.component';
 import { OrchestratorStatusComponent } from './components/status/orchestrator-status/orchestrator-status.component';
 import { ValidatorStatusComponent } from './components/status/validator-status/validator-status.component';
-import { InitialSetupComponent } from './components/install/initial-setup/initial-setup.component';
+import { SettingsComponent } from './components/settings/settings.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -25,10 +24,9 @@ import { RxState } from '@rx-angular/state';
     AppComponent,
     AvailableVersionsComponent,
     StatusComponent,
-    InstallComponent,
     OrchestratorStatusComponent,
     ValidatorStatusComponent,
-    InitialSetupComponent,
+    SettingsComponent,
     NetworkStatusComponent,
     StatusBoxComponent,
   ],
