@@ -153,28 +153,24 @@
         </small>
       </div>
     </div>
-
     <div>
       <button
         type="submit"
         class="btn btn-primary btn-lg btn--generate-keys"
-        [disabled]="!(currentTask.status === 'Generate')"
+        [disabled]="!(status === 'Generate')"
       >
-        <ng-container *ngIf="!(currentTask.status === 'Generate')">
+        <ng-container *ngIf="!(status === 'Generate')">
           <span
             class="spinner-border spinner-border-sm"
             role="status"
             aria-hidden="true"
-            *ngIf="
-              currentTask.status === 'Generating' ||
-              currentTask.status === 'Importing'
-            "
+            *ngIf="status === 'Generating' || status === 'Importing'"
           ></span>
-          <span> {{ currentTask.status }}</span>
+          <span> {{ status }}</span>
         </ng-container>
         <ng-container
           class="key-button align-middle"
-          *ngIf="currentTask.status === 'Generate'"
+          *ngIf="status === 'Generate'"
         >
           Generate Keys
         </ng-container>

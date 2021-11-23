@@ -30,7 +30,6 @@ export class SoftwareService {
               humanReadableName: release.humanReadableName,
               downloadInfo: Object.entries(release.downloadInfo)
                 .map(([tag, { downloadUrl }]) => {
-                  console.log(downloadUrl);
                   return { tag, name, downloadUrl } as DownloadInfo;
                 })
                 .reverse(),
@@ -73,12 +72,11 @@ export class SoftwareService {
     }) as Observable<Settings>;
   }
 
-  setConfig(network: string, settings: Settings) {
-    console.log(settings);
+  setSettings(network: string, settings: Settings) {
     return this.httpClient.post('/api/settings', {
       network,
       settings,
-    }) as Observable<Settings>;
+    });
   }
 
   getAvailableVersions$() {

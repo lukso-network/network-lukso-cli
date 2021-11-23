@@ -17,12 +17,14 @@ import { coinbaseValidator } from '../../shared/eth-address-validator';
 import { RxState } from '@rx-angular/state';
 import { GlobalState, GLOBAL_RX_STATE } from '../../shared/rx-state';
 import { Settings } from '../../interfaces/settings';
-import { switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 interface SettingsState {
   network: NETWORKS;
   settings: Settings;
+  isSaving: boolean;
+  isResettingValidator: boolean;
 }
 
 @Component({
@@ -37,6 +39,8 @@ export class SettingsComponent
 {
   readonly network$ = this.select('network');
   readonly settings$ = this.select('settings');
+  readonly isSaving$ = this.select('isSaving');
+  readonly isResettingValidator$ = this.select('isResettingValidator');
 
   resetValidator$ = new Subject<NETWORKS>();
   saveSettings$ = new Subject<{ network: NETWORKS; settings: Settings }>();
@@ -56,13 +60,25 @@ export class SettingsComponent
     this.connect('network', this.globalState.select('network'));
     this.connect('settings', this.globalState.select('settings'));
 
-    // Side Effects
-    this.hold(this.resetValidator$, (network) =>
-      validatorService.resetValidator(network)
-    );
+    this.connect(this.resetValidator$, () => ({ isResettingValidator: true }));
+    this.connect(this.saveSettings$, () => ({ isSaving: true }));
 
     this.hold(this.saveSettings$, (values) =>
-      softwareService.setConfig(values.network, values.settings).subscribe()
+      softwareService
+        .setSettings(values.network, values.settings)
+        .pipe(delay(1000))
+        .subscribe(() => {
+          this.set({ isSaving: false });
+        })
+    );
+
+    this.hold(this.resetValidator$, (network) =>
+      validatorService
+        .resetValidator(network)
+        .pipe(delay(1000))
+        .subscribe(() => {
+          this.set({ isResettingValidator: false });
+        })
     );
   }
 

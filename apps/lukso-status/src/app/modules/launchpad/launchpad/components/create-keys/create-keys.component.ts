@@ -32,9 +32,7 @@ import { CustomValidators } from '../../helpers/custom-validators';
 export class CreateKeysComponent extends RxState<any> implements OnInit {
   @Output() createKeys = new EventEmitter<KeyGenerationValues>();
   @Output() switchNetwork = new EventEmitter<NETWORKS>();
-  @Input() currentTask = {
-    status: CURRENT_KEY_ACTION.IDLE,
-  };
+  @Input() status = CURRENT_KEY_ACTION.IDLE;
 
   readonly network$ = this.select('network');
 
