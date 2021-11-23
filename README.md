@@ -5,18 +5,17 @@ Very basic Node GUI. Runs on port `8111`.
 ## How to contribute
 
 ```bash
-npm start
+yarn start
+
+cd apps/lukso-manager && gow run .
 ```
+
+Open http://localhost:4200
 
 ## Unit and E2E
 
 Coming soon.
 
-## How to install (not yet ready)
+## How to install
 
-```
-wget https://github.com/rryter/node-status/releases/download/v0.0.1-alpha.6/lukso-status-v0.0.1-alpha.6-linux-amd64.tar.gz
-tar -xf lukso-status-v0.0.1-alpha.6-linux-amd64.tar.gz
-chmod +x lukso-status
-./lukso-status
-```
+Coming soon.
