@@ -60,7 +60,6 @@ export class SettingsComponent
     this.hold(this.resetValidator$, (network) =>
       validatorService.resetValidator(network)
     );
-
     this.hold(this.saveSettings$, (values) =>
       softwareService.setConfig(values.network, values.settings)
     );

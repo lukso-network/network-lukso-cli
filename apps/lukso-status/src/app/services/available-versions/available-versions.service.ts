@@ -30,7 +30,6 @@ export class SoftwareService {
               humanReadableName: release.humanReadableName,
               downloadInfo: Object.entries(release.downloadInfo)
                 .map(([tag, { downloadUrl }]) => {
-                  console.log(downloadUrl);
                   return { tag, name, downloadUrl } as DownloadInfo;
                 })
                 .reverse(),

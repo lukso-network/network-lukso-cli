@@ -49,7 +49,6 @@ export class AppComponent {
       .getSettings(network)
       .pipe(
         switchMap((settings: Settings) => {
-          console.log(settings, network);
           const clients = ['pandora', 'vanguard', 'orchestrator', 'validator'];
           return this.softwareService.startClients(network, settings, clients);
         })

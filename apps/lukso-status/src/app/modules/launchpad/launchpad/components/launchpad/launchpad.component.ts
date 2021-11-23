@@ -29,7 +29,7 @@ interface LaunchpadState {
 export class LaunchpadComponent extends RxState<LaunchpadState> {
   readonly network$ = this.select('network');
   readonly depositData$ = this.select('depositData');
-  readonly status$ = this.select('status').pipe(tap((a) => console.log(a)));
+  readonly status$ = this.select('status');
 
   state$ = this.select();
   createKeys$ = new Subject<KeyGenerationValues>();
@@ -49,7 +49,6 @@ export class LaunchpadComponent extends RxState<LaunchpadState> {
       'depositData',
       merge(this.status$, this.network$).pipe(
         switchMap(() => {
-          console.log('woot');
           return this.keygenService.getDepositData('l15-dev');
         })
       )
