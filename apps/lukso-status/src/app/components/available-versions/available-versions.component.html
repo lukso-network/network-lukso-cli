@@ -1,12 +1,6 @@
 <div class="container">
   <h4 class="title">Available Clients</h4>
-  <table
-    class="table"
-    *ngIf="
-      availableSoftware$ | async as availableSoftware;
-      else apiLimitExceeded
-    "
-  >
+  <table class="table">
     <thead>
       <tr>
         <th>Software</th>
@@ -14,39 +8,62 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let item of availableSoftware$ | async">
-        <th scope="row">{{ item.humanReadableName }}</th>
-        <td style="padding: 0">
-          <table class="table">
-            <tbody>
-              <tr *ngFor="let release of item.downloadInfo; let i = index">
-                <td>
-                  <div class="tags">
-                    <span class="badge bg-dark">{{ release.tag }} </span>
-                    <span *ngIf="i === 0" class="badge bg-info">latest</span>
-                  </div>
-                </td>
-                <td width="110px">
-                  <button
-                    class="btn btn-primary btn-sm"
-                    type="button"
-                    [disabled]="release.isDownloading"
-                    (click)="install(item.name, release)"
-                  >
-                    <span
-                      *ngIf="release.isDownloading"
-                      class="spinner-border spinner-border-sm"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    <span *ngIf="!release.isDownloading">Download</span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
-      </tr>
+      <ng-container
+        *rxLet="
+          availableSoftware$;
+          let availableSoftware;
+          rxError: error;
+          rxSuspense: suspense
+        "
+      >
+        <tr *ngFor="let item of availableSoftware">
+          <th scope="row">{{ item.humanReadableName }}</th>
+          <td style="padding: 0">
+            <table class="table">
+              <tbody>
+                <tr *ngFor="let release of item.downloadInfo; let i = index">
+                  <td>
+                    <div class="tags">
+                      <span class="badge bg-dark">{{ release.tag }} </span>
+                      <span *ngIf="i === 0" class="badge bg-info">latest</span>
+                    </div>
+                  </td>
+                  <td width="110px">
+                    <button
+                      class="btn btn-primary btn-sm"
+                      type="button"
+                      [disabled]="release.isDownloading"
+                      (click)="install(item.name, release)"
+                    >
+                      <span
+                        *ngIf="release.isDownloading"
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      <span *ngIf="!release.isDownloading">Download</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-template #error>
+        <div class="alert alert-danger">
+          Could not fetch releases from Github.
+        </div>
+      </ng-template>
+      <ng-template #suspense>
+        <div class="d-flex align-items-center">
+          <strong>Loading...</strong>
+          <div
+            class="spinner-border ms-auto"
+            role="status"
+            aria-hidden="true"
+          ></div></div
+      ></ng-template>
     </tbody>
   </table>
   <ng-template #apiLimitExceeded> Github API rate-limit exceeded. </ng-template>

@@ -9,16 +9,16 @@ import { SoftwareService } from '../../services/available-versions/available-ver
   styleUrls: ['./available-versions.component.css'],
 })
 export class AvailableVersionsComponent {
+  readonly availableSoftware$: Observable<Releases[]>;
+
   softwareService: SoftwareService;
   downloadedSoftware$: Observable<any>;
-  availableSoftware$: Observable<Releases[] | null>;
-
   isDownloading = false;
 
   constructor(softwareService: SoftwareService) {
     this.softwareService = softwareService;
-    this.downloadedSoftware$ = softwareService.getDownloadedVersions$();
     this.availableSoftware$ = softwareService.getAvailableVersions$();
+    this.downloadedSoftware$ = softwareService.getDownloadedVersions$();
   }
 
   install(client: string, release: DownloadInfo) {

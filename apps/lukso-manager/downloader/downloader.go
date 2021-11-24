@@ -213,7 +213,7 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 
 		if r.StatusCode == 403 {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Githup API Rate Limit Exceeded"))
+			json.NewEncoder(w).Encode("Github API Rate Limit Exceeded")
 			return
 		}
 
