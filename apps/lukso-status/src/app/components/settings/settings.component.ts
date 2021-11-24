@@ -25,6 +25,7 @@ interface SettingsState {
   settings: Settings;
   isSaving: boolean;
   isResettingValidator: boolean;
+  downloadedVersions: any;
 }
 
 @Component({

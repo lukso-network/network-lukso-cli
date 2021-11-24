@@ -317,16 +317,17 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DownloadClientBinary(client string, version string, url string) {
+func DownloadClientBinary(client string, tag_version string, url string, osType string) {
 	clientFolder := shared.BinaryDir + client + "/"
-	clientFolderWithVersion := clientFolder + version
+	clientFolderWithVersion := clientFolder + tag_version
 
 	createDirIfNotExists(shared.BinaryDir)
 	createDirIfNotExists(clientFolder)
 	createDirIfNotExists(clientFolderWithVersion)
 
-	filePath := clientFolder + version + "/" + client
-	fileUrl := strings.Replace(url, "_TAG_", version, 1)
+	filePath := clientFolder + tag_version + "/" + client
+	urlWithTagSet := strings.Replace(url, "_TAG_", tag_version, 1)
+	fileUrl := strings.Replace(urlWithTagSet, "_OS_TYPE_", osType, 1)
 
 	err := downloadFile(filePath, fileUrl)
 	if err != nil {
