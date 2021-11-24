@@ -23,6 +23,7 @@ import { delay } from 'rxjs/operators';
 interface SettingsState {
   network: NETWORKS;
   settings: Settings;
+  downloadedVersions: any;
   isSaving: boolean;
   isResettingValidator: boolean;
 }
@@ -39,6 +40,7 @@ export class SettingsComponent
 {
   readonly network$ = this.select('network');
   readonly settings$ = this.select('settings');
+  readonly downloadedVersions$ = this.select('downloadedVersions');
   readonly isSaving$ = this.select('isSaving');
   readonly isResettingValidator$ = this.select('isResettingValidator');
 
@@ -59,6 +61,10 @@ export class SettingsComponent
 
     this.connect('network', this.globalState.select('network'));
     this.connect('settings', this.globalState.select('settings'));
+    this.connect(
+      'downloadedVersions',
+      softwareService.getDownloadedVersions$()
+    );
 
     this.connect(this.resetValidator$, () => ({ isResettingValidator: true }));
     this.connect(this.saveSettings$, () => ({ isSaving: true }));

@@ -83,14 +83,17 @@
       </div>
     </fieldset>
 
-    <fieldset>
+    <fieldset *ngIf="downloadedVersions$ | async as versions">
       <legend>Versions</legend>
       <div class="row">
         <div class="col">
           <div class="form-floating mb-3">
             <select class="form-select" [formControl]="vanguard">
-              <option [value]="'v0.1.0-develop'" selected>
-                v0.1.0-develop
+              <option
+                [value]="version"
+                *ngFor="let version of versions['vanguard']"
+              >
+                {{ version }}
               </option>
             </select>
             <label for="newField">Vanguard</label>
@@ -99,8 +102,11 @@
         <div class="col">
           <div class="form-floating mb-3">
             <select class="form-select" [formControl]="pandora">
-              <option [value]="'v0.1.0-develop'" selected>
-                v0.1.0-develop
+              <option
+                [value]="version"
+                *ngFor="let version of versions['pandora']"
+              >
+                {{ version }}
               </option>
             </select>
             <label for="newField">Pandora</label>
@@ -109,8 +115,11 @@
         <div class="col">
           <div class="form-floating mb-3">
             <select class="form-select" [formControl]="orchestrator">
-              <option [value]="'v0.1.0-develop'" selected>
-                v0.1.0-develop
+              <option
+                [value]="version"
+                *ngFor="let version of versions['lukso-orchestrator']"
+              >
+                {{ version }}
               </option>
             </select>
             <label for="newField">Orchestrator</label>
@@ -119,8 +128,11 @@
         <div class="col">
           <div class="form-floating mb-3">
             <select class="form-select" [formControl]="validator">
-              <option [value]="'v0.1.0-develop'" selected>
-                v0.1.0-develop
+              <option
+                [value]="version"
+                *ngFor="let version of versions['lukso-validator']"
+              >
+                {{ version }}
               </option>
             </select>
             <label for="newField">Validator</label>
