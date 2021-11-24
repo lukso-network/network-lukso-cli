@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/urfave/cli"
+
+	"lukso-cli/config"
 )
 
 func InitFlags() {
@@ -23,6 +25,48 @@ func InitFlags() {
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+}
+
+func LoadFlags(LuksoSettings *config.LuksoValues) {
+
+	networksNum := 0
+
+	if FlagValues.Network != "" {
+		networksNum++
+	}
+
+	if FlagValues.l15_prod {
+		networksNum++
+	}
+
+	if FlagValues.l15_staging {
+		networksNum++
+	}
+
+	if FlagValues.l15_dev {
+		networksNum++
+	}
+
+	if networksNum > 1 {
+		log.Fatal("ERROR: You cannot connect to multiple networks, please choose only one.")
+	}
+
+	if FlagValues.Network != "" {
+		LuksoSettings.Network = FlagValues.Network
+	}
+
+	if FlagValues.l15_prod {
+		LuksoSettings.Network = "l15-prod"
+	}
+
+	if FlagValues.l15_staging {
+		LuksoSettings.Network = "l15-staging"
+	}
+
+	if FlagValues.l15_dev {
+		LuksoSettings.Network = "l15-dev"
 	}
 
 }

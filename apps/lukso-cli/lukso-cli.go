@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"reflect"
-
 	"lukso-cli/config"
 	"lukso-cli/flags"
 )
@@ -13,34 +10,22 @@ var LuksoSettings config.LuksoValues
 func main() {
 	flags.InitFlags()
 
-	if flags.FlagValues.Config != "" {
-		println("Config loaded")
-		config.LoadConfig(flags.FlagValues.Config)
-	}
-
-	config.LoadDefaults()
-
 	// Build Settings
 
-	v := reflect.ValueOf(LuksoSettings)
-	typeOfS := v.Type()
+	//Load from default first
+	config.LoadDefaults(&LuksoSettings)
 
-	// Awful but works
-	for i := 0; i < v.NumField(); i++ {
-		fmt.Printf("Field: %s\tValue: %v\n", typeOfS.Field(i).Name, v.Field(i).Interface())
-
-		r := reflect.ValueOf(&flags.FlagValues)
-		f := reflect.Indirect(r).FieldByName(typeOfS.Field(i).Name)
-		println(f.String())
-
-		if f.String() != "" {
-			println(flags.FlagValues.Network)
-		} else if config.ConfigValues.Network != "" {
-			println(config.ConfigValues.Network)
-		} else {
-			println(config.DefaultValues.Network)
-		}
-
+	//Overwrite with config
+	if flags.FlagValues.Config != "" {
+		println("Config loaded")
+		config.LoadConfig(&LuksoSettings, flags.FlagValues.Config)
 	}
 
+	//Overwrite with flags
+	flags.LoadFlags(&LuksoSettings)
+
+	//check
+	println(LuksoSettings.Network)
+	println(LuksoSettings.Orchestrator.Verbosity)
+	println(LuksoSettings.Pandora.Verbosity)
 }
