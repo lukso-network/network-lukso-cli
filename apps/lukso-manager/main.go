@@ -7,6 +7,7 @@ import (
 	"lukso-manager/metrics"
 	"lukso-manager/runner"
 	"lukso-manager/settings"
+	"lukso-manager/setup"
 	"lukso-manager/shared"
 	"lukso-manager/validator"
 	"lukso-manager/webserver"
@@ -26,6 +27,10 @@ func init() {
 	shared.LuksoHomeDir = userHomeDir + "/.lukso"
 	shared.BinaryDir = shared.LuksoHomeDir + "/binaries/"
 	shared.NetworkDir = shared.LuksoHomeDir + "/networks/"
+
+	os.MkdirAll(shared.LuksoHomeDir, 0775)
+	os.MkdirAll(shared.BinaryDir, 0775)
+	os.MkdirAll(shared.NetworkDir, 0775)
 
 	db, err := bolt.Open(shared.LuksoHomeDir+"/lukso-manager.db", 0640, nil)
 	if err != nil {
@@ -62,6 +67,7 @@ func main() {
 	app.Router.Methods("GET").Path("/available-versions").HandlerFunc(downloader.GetAvailableVersions)
 	app.Router.Methods("GET").Path("/deposit-data").HandlerFunc(validator.GetDepositData)
 
+	app.Router.Methods("POST").Path("/initial-setup").HandlerFunc(setup.Setup)
 	app.Router.Methods("POST").Path("/update-client").HandlerFunc(downloader.DownloadClient)
 	app.Router.Methods("POST").Path("/start-clients").HandlerFunc(runner.StartClients)
 	app.Router.Methods("POST").Path("/stop-clients").HandlerFunc(runner.StopClients)

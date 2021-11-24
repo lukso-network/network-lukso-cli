@@ -214,7 +214,7 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 
 		if r.StatusCode == 403 {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Githup API Rate Limit Exceeded"))
+			json.NewEncoder(w).Encode("Github API Rate Limit Exceeded")
 			return
 		}
 
@@ -315,6 +315,30 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode("Download Successful"); err != nil {
 		panic(err)
 	}
+}
+
+func DownloadClientBinary(client string, version string, url string) {
+	clientFolder := shared.BinaryDir + client + "/"
+	clientFolderWithVersion := clientFolder + version
+
+	createDirIfNotExists(shared.BinaryDir)
+	createDirIfNotExists(clientFolder)
+	createDirIfNotExists(clientFolderWithVersion)
+
+	filePath := clientFolder + version + "/" + client
+	fileUrl := strings.Replace(url, "_TAG_", version, 1)
+
+	err := downloadFile(filePath, fileUrl)
+	if err != nil {
+		return
+	}
+
+	_, err = os.Stat(filePath)
+	if err != nil {
+		return
+	}
+
+	os.Chmod(filePath, 0775)
 }
 
 func createDirIfNotExists(folder string) {

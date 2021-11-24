@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, delay, map } from 'rxjs/operators';
 import {
   AvailableSoftwareBackendResponse,
   DownloadInfo,
@@ -13,7 +13,7 @@ import { Settings } from '../../interfaces/settings';
   providedIn: 'root',
 })
 export class SoftwareService {
-  availableSoftware$: Observable<Releases[] | null>;
+  availableSoftware$: Observable<Releases[]>;
   downloadedSoftware$: Observable<any>;
 
   constructor(private httpClient: HttpClient) {
@@ -35,9 +35,6 @@ export class SoftwareService {
                 .reverse(),
             } as Releases;
           });
-        }),
-        catchError((error: any) => {
-          return of(null);
         })
       );
   }

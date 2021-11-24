@@ -1,0 +1,15 @@
+<div class="setup">
+  <img src="assets/lukso_wordmark_black.png" alt="LUKSO Logo" />
+
+  <h1 class="text-center">Welcome on Board</h1>
+  <p class="text-center">
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+    eirmod tempor invidunt ut labore et dolore magna aliquyam era.
+  </p>
+  <lukso-button
+    (click)="installBtn$.next()"
+    [status$]="inProgress$"
+    [defaultText]="'Install now'"
+    [inProgressText]="'Installing'"
+  ></lukso-button>
+</div>

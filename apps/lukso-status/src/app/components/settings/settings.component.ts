@@ -18,7 +18,7 @@ import { RxState } from '@rx-angular/state';
 import { GlobalState, GLOBAL_RX_STATE } from '../../shared/rx-state';
 import { Settings } from '../../interfaces/settings';
 import { Subject } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, tap } from 'rxjs/operators';
 
 interface SettingsState {
   network: NETWORKS;
@@ -39,6 +39,7 @@ export class SettingsComponent
 {
   readonly network$ = this.select('network');
   readonly settings$ = this.select('settings');
+  readonly downloadedVersions$ = this.select('downloadedVersions');
   readonly isSaving$ = this.select('isSaving');
   readonly isResettingValidator$ = this.select('isResettingValidator');
 
@@ -46,7 +47,7 @@ export class SettingsComponent
   saveSettings$ = new Subject<{ network: NETWORKS; settings: Settings }>();
 
   settingsForm: FormGroup;
-
+  defaultTag = 'v0.1.0-develop';
   constructor(
     @Inject(GLOBAL_RX_STATE) private globalState: RxState<GlobalState>,
     fb: FormBuilder,
@@ -59,6 +60,10 @@ export class SettingsComponent
 
     this.connect('network', this.globalState.select('network'));
     this.connect('settings', this.globalState.select('settings'));
+    this.connect(
+      'downloadedVersions',
+      softwareService.getDownloadedVersions$()
+    );
 
     this.connect(this.resetValidator$, () => ({ isResettingValidator: true }));
     this.connect(this.saveSettings$, () => ({ isSaving: true }));
@@ -66,10 +71,13 @@ export class SettingsComponent
     this.hold(this.saveSettings$, (values) =>
       softwareService
         .setSettings(values.network, values.settings)
-        .pipe(delay(1000))
-        .subscribe(() => {
-          this.set({ isSaving: false });
-        })
+        .pipe(
+          delay(1000),
+          tap(() => {
+            this.set({ isSaving: false });
+          })
+        )
+        .subscribe()
     );
 
     this.hold(this.resetValidator$, (network) =>
@@ -121,10 +129,10 @@ export class SettingsComponent
       externalIp: [''],
       isValidatorEnabled: [0, [Validators.required]],
       versions: fb.group({
-        vanguard: [''],
-        pandora: [''],
-        orchestrator: [''],
-        validator: [''],
+        vanguard: [this.defaultTag],
+        pandora: [this.defaultTag],
+        orchestrator: [this.defaultTag],
+        validator: [this.defaultTag],
       }),
       coinbase: [
         '',
