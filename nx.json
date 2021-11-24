@@ -49,5 +49,5 @@
       "prefix": "lukso"
     }
   },
-  "defaultProject": "lukso-status"
+  "defaultProject": "lukso-gui"
 }
