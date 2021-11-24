@@ -1,21 +1,37 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-)
+	"log"
+	"os"
 
+	"github.com/urfave/cli"
+)
 
 func initFlags() {
 
-	help := map[string]string{
-		"help"
-		"pandora": "sets pandora tag to be used",
+	app := cli.NewApp()
+	app.Name = "LUKSO CLI"
+	app.Usage = "Tool for managing LUKSO node"
+	app.UsageText = "lukso <command> <argument> [--flags]"
+
+	luksoFlags := []cli.Flag{
+		cli.StringFlag{
+			Name: "pandora",
+		},
 	}
 
+	app.Commands = []cli.Command{
+		{
+			Name:      "start",
+			Usage:     "Starts up the client",
+			UsageText: "lukso",
+			Flags:     luksoFlags,
+		},
+	}
 
-	var nFlag = flag.Int("pandora", 1234, help["pandora"])
-	var nFlag = flag.Int("pandora", 1234, help["config"])
-	flag.Parse()
-	fmt.Println(*nFlag)
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
