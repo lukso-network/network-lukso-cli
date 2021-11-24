@@ -23,6 +23,8 @@ import {
   PushModule,
   ViewportPrioModule,
 } from '@rx-angular/template';
+import { SetupComponent } from './components/setup/setup.component';
+import { SharedModule } from './modules/shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,7 @@ import {
     SettingsComponent,
     NetworkStatusComponent,
     StatusBoxComponent,
+    SetupComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -46,6 +49,7 @@ import {
     LetModule,
     PushModule,
     ViewportPrioModule,
+    SharedModule,
   ],
   providers: [
     {
