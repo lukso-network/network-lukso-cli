@@ -65,8 +65,6 @@ func getPeersOverTime(client string) (map[int64]float64, error) {
 		var err error
 		b := tx.Bucket([]byte("peers"))
 		k := []byte(client + "peersOverTime")
-		fmt.Println("b.Get(k)")
-		fmt.Println(b.Get(k))
 		peersOverTime, err = decodeSettings(b.Get(k))
 
 		if err != nil {
