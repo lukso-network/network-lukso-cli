@@ -1,3 +1,45 @@
-:host {
-  display: block;
+lukso-setup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 80px);
+}
+
+.navbar {
+  display: none;
+}
+
+div.setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+  max-width: 700px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.13);
+
+  h1 {
+    font-size: 35px;
+    padding-bottom: 21px;
+  }
+
+  img {
+    display: block;
+    max-width: 210px;
+    margin: 0 auto;
+    padding-bottom: 150px;
+  }
+
+  p {
+    font-family: 'Sofia W05 Light';
+    max-width: 440px;
+    padding-bottom: 130px;
+  }
+
+  lukso-button {
+    text-align: center;
+  }
 }
