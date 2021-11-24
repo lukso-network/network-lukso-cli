@@ -6,12 +6,18 @@ Very basic Node GUI. Runs on port `8111`.
 Prepared directories and settings.db file:
 
 ```bash
-mkdir -p ~/.lukso && touch ~/.lukso/settings.db 
+mkdir ~/.lukso && touch ~/.lukso/settings.db 
 ```
 install npm packages using yarn:
 
 ```bash
 yarn install 
+```
+
+build lukso-status angular to be part of GO app
+
+```bash
+yarn build lukso-status
 ```
 
 Install gow - the [Go Watcher](https://github.com/mitranim/gow):
