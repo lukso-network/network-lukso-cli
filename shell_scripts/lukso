@@ -1139,6 +1139,9 @@ help() {
   echo "--vanguard-monitoring-host Sets vanguard monitoring listening interface"
   echo "                       [IP, ex. 127.0.0.1]"
   echo
+  echo "--vanguard-monitoring-port Sets vanguard monitoring port"
+  echo "                       [Port, ex. 8080]"
+  echo
   echo "--validator            Sets validator tag to be used"
   echo "                       [Tag name ex. v0.2.0-rc.1]"
   echo
