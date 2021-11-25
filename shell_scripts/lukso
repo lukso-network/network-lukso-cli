@@ -1146,8 +1146,7 @@ help() {
   echo
   echo "--force                Enables force mode for stopping"
   echo
-  echo "--http-connectivity                   Switches connectivity between clients from IPC to local HTTP (less secure)"
-  echo
+  echo "--http-connectivity                   Switches connectivity between clients from IPC to local HTTP - less secure! (default: uses IPC sockets path like: $DATADIR/pandora/geth.ipc, instead of http://127.0.0.1:8545 endpoint)"
   echo
   echo "--vanguard-http-web3provider          An eth1 web3 provider string http endpoint or IPC socket path. (default: http://127.0.0.1:8545)"
   echo
