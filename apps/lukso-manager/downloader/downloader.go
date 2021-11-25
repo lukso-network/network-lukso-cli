@@ -163,6 +163,11 @@ func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 
 	downloads := shared.BinaryDir
 
+	_, err1 := os.Stat(downloads)
+	if err1 != nil {
+		os.MkdirAll(downloads, 0775)
+	}
+
 	err := filepath.Walk(downloads,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -177,9 +182,9 @@ func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 			return nil
 		})
 	if err != nil {
-		log.Println(err)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusOK)
+		w.Write(nil)
 		return
 	}
 
@@ -265,6 +270,7 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 func getDownloadUrlFromAsset(name string, assets []Assets) string {
 	var downloadUrl string
 	os_type := strings.Title(runtime.GOOS)
+
 	for i := range assets {
 		if assets[i].Name == name+"-"+os_type+"-x86_64" {
 			downloadUrl = assets[i].BrowserDownloadURL
@@ -317,7 +323,7 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DownloadClientBinary(client string, tag_version string, url string, osType string) {
+func DownloadClientBinary(client string, tag_version string, url string) {
 	clientFolder := shared.BinaryDir + client + "/"
 	clientFolderWithVersion := clientFolder + tag_version
 
@@ -327,7 +333,7 @@ func DownloadClientBinary(client string, tag_version string, url string, osType 
 
 	filePath := clientFolder + tag_version + "/" + client
 	urlWithTagSet := strings.Replace(url, "_TAG_", tag_version, 1)
-	fileUrl := strings.Replace(urlWithTagSet, "_OS_TYPE_", osType, 1)
+	fileUrl := strings.Replace(urlWithTagSet, "_OS_TYPE_", strings.Title(runtime.GOOS)+"-x86_64", 1)
 
 	err := downloadFile(filePath, fileUrl)
 	if err != nil {

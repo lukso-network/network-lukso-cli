@@ -1,0 +1,20 @@
+version: '3'
+services:
+  backend:
+    build: ./apps/lukso-manager
+    container_name: lukso-gui-backend
+    ports:
+      - '3000:3000'
+    networks:
+      app-env:
+  frontend:
+    build: ./apps/lukso-gui
+    container_name: lukso-gui-frontend
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
+    networks:
+      app-env:
+networks:
+  app-env:

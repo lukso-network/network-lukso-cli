@@ -2,11 +2,12 @@ lukso-setup {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: calc(100vh - 80px);
-}
-
-.navbar {
-  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f2f2f6;
 }
 
 div.setup {

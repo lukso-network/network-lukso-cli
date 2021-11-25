@@ -6,6 +6,7 @@ import { NETWORKS } from '../modules/launchpad/launchpad/helpers/create-keys';
 export interface GlobalState {
   network: NETWORKS;
   settings: Settings;
+  setupPerformed: boolean;
 }
 
 export const GLOBAL_RX_STATE = new InjectionToken<RxState<GlobalState>>(

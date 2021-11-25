@@ -11,7 +11,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "outputPath": "apps/lukso-manager/webserver/dist/apps/lukso-gui",
+            "outputPath": "dist/apps/lukso-gui",
             "index": "apps/lukso-gui/src/index.html",
             "main": "apps/lukso-gui/src/main.ts",
             "polyfills": "apps/lukso-gui/src/polyfills.ts",

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { RxState } from '@rx-angular/state';
-import { startWith, switchMap } from 'rxjs/operators';
+import { map, startWith, switchMap } from 'rxjs/operators';
 import { Settings } from './interfaces/settings';
 import { NETWORKS } from './modules/launchpad/launchpad/helpers/create-keys';
 import { SoftwareService } from './services/available-versions/available-versions.service';
@@ -41,6 +41,26 @@ export class AppComponent {
       this.state
         .select('network')
         .pipe(switchMap((network) => this.softwareService.getSettings(network)))
+    );
+    console.log('SETUP STATE');
+    this.state.connect(
+      'setupPerformed',
+      this.softwareService.getDownloadedVersions$().pipe(
+        map((a) => {
+          console.log(
+            !(
+              a &&
+              Object.keys(a).length === 0 &&
+              Object.getPrototypeOf(a) === Object.prototype
+            )
+          );
+          return !(
+            a &&
+            Object.keys(a).length === 0 &&
+            Object.getPrototypeOf(a) === Object.prototype
+          );
+        })
+      )
     );
   }
 
