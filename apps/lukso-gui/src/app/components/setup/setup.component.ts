@@ -31,6 +31,7 @@ export class SetupComponent extends RxState<SetupState> implements OnInit {
         })
         .pipe(tap(() => this.set({ inProgress: false })))
         .subscribe(() => {
+          console.log('NAVIGATE NOW');
           this.router.navigate(['/settings']);
         })
     );

@@ -42,26 +42,6 @@ export class AppComponent {
         .select('network')
         .pipe(switchMap((network) => this.softwareService.getSettings(network)))
     );
-    console.log('SETUP STATE');
-    this.state.connect(
-      'setupPerformed',
-      this.softwareService.getDownloadedVersions$().pipe(
-        map((a) => {
-          console.log(
-            !(
-              a &&
-              Object.keys(a).length === 0 &&
-              Object.getPrototypeOf(a) === Object.prototype
-            )
-          );
-          return !(
-            a &&
-            Object.keys(a).length === 0 &&
-            Object.getPrototypeOf(a) === Object.prototype
-          );
-        })
-      )
-    );
   }
 
   startClients(network: string) {
