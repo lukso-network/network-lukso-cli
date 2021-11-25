@@ -1,11 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
-import {
-  ActivatedRouteSnapshot,
-  CanActivate,
-  Router,
-  RouterStateSnapshot,
-  UrlTree,
-} from '@angular/router';
+import { CanActivate, Router, UrlTree } from '@angular/router';
 import { RxState } from '@rx-angular/state';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -19,11 +13,7 @@ export class SetupGuard implements CanActivate {
     @Inject(GLOBAL_RX_STATE) private state: RxState<GlobalState>,
     private router: Router
   ) {}
-  canActivate():
-    | Observable<boolean | UrlTree>
-    | Promise<boolean | UrlTree>
-    | boolean
-    | UrlTree {
+  canActivate(): Observable<boolean | UrlTree> {
     return this.state.select('setupPerformed').pipe(
       map((setupPerformed) => {
         if (!setupPerformed) {
