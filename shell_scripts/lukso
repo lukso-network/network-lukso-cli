@@ -179,19 +179,15 @@ download_binary() {
     REPO="network-deposit-cli"
     ;;
 
+  eth2stats)
+    REPO="network-vanguard-stats-client"
+    ;;
+
   esac
 
   mkdir -p /opt/lukso/binaries/$CLIENT/$TAG
   download https://github.com/lukso-network/"$REPO"/releases/download/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
   sudo chmod +x /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
-}
-
-download_eth2stats_binary() {
-  TAG="$1"
-
-  mkdir -p /opt/lukso/binaries/eth2stats-client/$TAG
-  download https://github.com/lukso-network/network-vanguard-stats-client/releases/download/$TAG/eth2stats-client /opt/lukso/binaries/eth2stats-client/$TAG/eth2stats-client
-  sudo chmod +x /opt/lukso/binaries/eth2stats-client/$TAG/eth2stats-client
 }
 
 bind_binary() {
@@ -202,15 +198,6 @@ bind_binary() {
   fi
 
   sudo ln -sf "/opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE" /usr/local/bin/$CLIENT
-}
-
-bind_eth2stats_binary() {
-  TAG="$1"
-  if [[ ! -f /opt/lukso/binaries/eth2stats-client/$TAG/eth2stats-client ]]; then
-    download_eth2stats_binary $TAG
-  fi
-
-  sudo ln -sf "/opt/lukso/binaries/eth2stats-client/$TAG/eth2stats-client" /usr/local/bin/eth2stats-client
 }
 
 bind_binaries() {
@@ -1311,22 +1298,9 @@ while getopts "$optspec" optchar; do
       ;;
 
     eth2stats)
-      # Temporary fix
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      mkdir -p /opt/lukso/binaries/eth2stats-client/$val
-
-      if [[ $PLATFORM == "Linux" ]]; then
-        download https://storage.googleapis.com/lukso-assets/eth2stats/eth2stats-client-linux /opt/lukso/binaries/eth2stats-client/$val/eth2stats-client
-      fi
-
-      if [[ $PLATFORM == "Darwin" ]]; then
-        download https://storage.googleapis.com/lukso-assets/eth2stats/eth2stats-client-darwin /opt/lukso/binaries/eth2stats-client/$val/eth2stats-client
-      fi
-
-      chmod +x /opt/lukso/binaries/eth2stats-client/$val/eth2stats-client
-      ln -sf /opt/lukso/binaries/eth2stats-client/$val/eth2stats-client /usr/local/bin/eth2stats-client
-
+      bind_binary eth2stats-client $val
       ;;
 
     lukso-status)
