@@ -8,7 +8,9 @@ services:
     networks:
       app-env:
   frontend:
-    build: ./apps/lukso-gui
+    build:
+      context: .
+      dockerfile: ./apps/lukso-gui/Dockerfile
     container_name: lukso-gui-frontend
     ports:
       - '80:80'
