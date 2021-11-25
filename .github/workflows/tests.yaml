@@ -40,6 +40,9 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '14'
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17.1' # The Go version to download (if necessary) and use.
       - run: npm install
       - run: npx nx-cloud start-ci-run
       - run: npx nx affected --target=build --parallel --max-parallel=3
