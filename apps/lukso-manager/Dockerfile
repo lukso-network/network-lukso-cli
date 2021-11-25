@@ -18,19 +18,16 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN go build -o main .
-
-# Move to /dist directory as the place for resulting binary folder
-WORKDIR /dist
+RUN go build -o dist/apps/lukso-manager apps/lukso-manager/main.go
 
 # Copy binary from build to main folder
-RUN cp /build/main .
+RUN cp dist/apps/lukso-manager .
 
 # Build a small image
 FROM golang:1.17.3
 RUN apt-get update && apt-get install bash
 
-COPY --from=builder /dist/main /
+COPY --from=builder /build/lukso-manager /
 
 # Command to run
-ENTRYPOINT ["/main"]
+ENTRYPOINT ["/lukso-manager"]

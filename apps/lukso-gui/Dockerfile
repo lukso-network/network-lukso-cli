@@ -8,7 +8,6 @@ RUN yarn install
 ENV PATH="./node_modules/.bin:$PATH" 
 COPY . ./
 RUN nx build lukso-gui --prod
-RUN ls -al
 
 FROM nginx
 COPY apps/lukso-gui/nginx.conf /etc/nginx/nginx.conf

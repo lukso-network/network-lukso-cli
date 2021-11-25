@@ -16,20 +16,21 @@ type release struct {
 	URL  string `json:"url"`
 }
 
+var defaultTag = "v0.1.0-develop"
 var ReleaseLocations = map[string]release{
 	"pandora": {
 		Name: "Pandora",
-		Tag:  "v0.2.0-rc.1",
+		Tag:  defaultTag,
 		URL:  "https://github.com/lukso-network/pandora-execution-engine/releases/download/_TAG_/pandora-_OS_TYPE_",
 	},
 	"vanguard": {
 		Name: "Vanguard",
-		Tag:  "v0.2.0-rc.1",
+		Tag:  defaultTag,
 		URL:  "https://github.com/lukso-network/vanguard-consensus-engine/releases/download/_TAG_/vanguard-_OS_TYPE_",
 	},
 	"lukso-orchestrator": {
 		Name: "Orchestrator",
-		Tag:  "v0.2.0-rc.1",
+		Tag:  defaultTag,
 		URL:  "https://github.com/lukso-network/lukso-orchestrator/releases/download/_TAG_/lukso-orchestrator-_OS_TYPE_",
 	},
 	"lukso-deposit-cli": {
@@ -39,12 +40,12 @@ var ReleaseLocations = map[string]release{
 	},
 	"lukso-validator": {
 		Name: "Validator",
-		Tag:  "v0.2.0-rc.1",
+		Tag:  defaultTag,
 		URL:  "https://github.com/lukso-network/vanguard-consensus-engine/releases/download/_TAG_/lukso-validator-_OS_TYPE_",
 	},
 	"eth2stats": {
 		Name: "ETH 2 Stats",
-		Tag:  "v0.2.0-rc.1",
+		Tag:  defaultTag,
 		URL:  "https://github.com/lukso-network/network-vanguard-stats-client/releases/download/_TAG_/eth2stats-client-_OS_TYPE_",
 	},
 }

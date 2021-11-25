@@ -1,7 +1,9 @@
 version: '3'
 services:
   backend:
-    build: ./apps/lukso-manager
+    build:
+      context: .
+      dockerfile: ./apps/lukso-manager/Dockerfile
     container_name: lukso-gui-backend
     ports:
       - '3000:3000'
