@@ -702,7 +702,6 @@ start_eth2stats_client() {
 
   ARGUMENTS=(
     "--beacon.type=prysm"
-    "--beacon.addr=$ETH2STATS_BEACON_ADDR"
     "--data.folder=$DATADIR/eth2stats-client"
     "--eth2stats.node-name=$NODE_NAME"
     "--eth2stats.addr=$VAN_ETHSTATS"
@@ -712,8 +711,14 @@ start_eth2stats_client() {
   if [[ $HTTP_CONNECTIVITY == "true" ]]; then
     HTTP_FLAGS=(
       "--beacon.metrics-addr=$VAN_ETHSTATS_METRICS"
+      "--beacon.addr=$ETH2STATS_BEACON_ADDR"
     )
     ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
+  else
+    IPC_FLAGS=(
+      "--beacon.addr=$DATADIR/vanguard/vanguard.ipc"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${IPC_FLAGS[@]}")
   fi
 
   nohup eth2stats-client run \
