@@ -40,15 +40,29 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	var body startClientsRequestBody
 	err := decoder.Decode(&body)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		shared.HandleError(err, w)
 		return
 	}
 
 	network := body.Network
 
-	oldConfig, _ := ReadConfig(network)
-	downloader.DownloadConfigFiles(network)
-	config, _ := ReadConfig(network)
+	oldConfig, oldConfigError := ReadConfig(network)
+	if oldConfigError != nil {
+		shared.HandleError(oldConfigError, w)
+		return
+	}
+
+	dlError := downloader.DownloadConfigFiles(network)
+	if dlError != nil {
+		shared.HandleError(dlError, w)
+		return
+	}
+
+	config, newConfigError := ReadConfig(network)
+	if newConfigError != nil {
+		shared.HandleError(newConfigError, w)
+		return
+	}
 
 	if oldConfig != nil {
 		if oldConfig.GENESISTIME != config.GENESISTIME {
@@ -72,8 +86,7 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	if shared.Contains(body.Clients, "vanguard") {
 		vanCmd, errVanguard := startVanguard(body.Settings.Versions[settings.Vanguard], network, config, fmt.Sprint(timestamp))
 		if errVanguard != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(errVanguard.Error()))
+			shared.HandleError(errVanguard, w)
 			return
 		}
 		CommandsByClient.vanguard = vanCmd
@@ -82,8 +95,7 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 	if shared.Contains(body.Clients, "orchestrator") {
 		orchCmd, errOrchestrator := startOrchestrator(body.Settings.Versions[settings.Orchestrator], network)
 		if errOrchestrator != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(errOrchestrator.Error()))
+			shared.HandleError(errOrchestrator, w)
 			return
 		}
 		CommandsByClient.orchestrator = orchCmd
@@ -93,8 +105,7 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 		version := body.Settings.Versions[settings.Pandora]
 		cmdPandora, errPandora := startPandora(version, network, body.Settings, config, fmt.Sprint(timestamp))
 		if errPandora != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(errPandora.Error()))
+			shared.HandleError(errPandora, w)
 			return
 		}
 		CommandsByClient.pandora = cmdPandora
@@ -104,8 +115,7 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 		version := body.Settings.Versions[settings.Validator]
 		cmdValidator, errValidator := startValidator(version, network, config, fmt.Sprint(timestamp))
 		if errValidator != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(errValidator.Error()))
+			shared.HandleError(errValidator, w)
 			return
 		}
 		CommandsByClient.validator = cmdValidator
@@ -124,42 +134,34 @@ func StopClients(w http.ResponseWriter, r *http.Request) {
 	var body stopClientsRequestBody
 	err := decoder.Decode(&body)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		shared.HandleError(err, w)
 		return
 	}
 
 	if shared.Contains(body.Clients, "pandora") && CommandsByClient.pandora != nil {
 		if err := CommandsByClient.pandora.Process.Kill(); err != nil {
-			log.Fatal("failed to kill process: ", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			shared.HandleError(err, w)
 			return
 		}
 	}
 
 	if shared.Contains(body.Clients, "vanguard") {
 		if err := CommandsByClient.vanguard.Process.Kill(); err != nil {
-			log.Fatal("failed to kill process: ", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			shared.HandleError(err, w)
 			return
 		}
 	}
 
 	if shared.Contains(body.Clients, "orchestrator") {
 		if err := CommandsByClient.orchestrator.Process.Kill(); err != nil {
-			log.Fatal("failed to kill process: ", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			shared.HandleError(err, w)
 			return
 		}
 	}
 
 	if shared.Contains(body.Clients, "validator") {
 		if err := CommandsByClient.validator.Process.Kill(); err != nil {
-			log.Fatal("failed to kill process: ", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			shared.HandleError(err, w)
 			return
 		}
 	}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"lukso/apps/lukso-manager/shared"
 	"net/http"
 
 	dto "github.com/prometheus/client_model/go"
@@ -19,14 +20,14 @@ type MetricsResponseData struct {
 func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
 	body, metricsError := getMetrics("http://127.0.0.1:8080/metrics", w)
 	if metricsError != nil {
-		handleError(metricsError, w)
+		shared.HandleError(metricsError, w)
 		return
 	}
 
 	metricFamily, parsingMetricsError := parseMetricFamily(body)
 
 	if parsingMetricsError != nil {
-		handleError(parsingMetricsError, w)
+		shared.HandleError(parsingMetricsError, w)
 		return
 	}
 
@@ -46,14 +47,14 @@ func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
 	peersOverTimeError := setPeersOverTime(*peers[1].Gauge.Value, "vanguard")
 	if peersOverTimeError != nil {
 		fmt.Println(peersOverTimeError)
-		handleError(peersOverTimeError, w)
+		shared.HandleError(peersOverTimeError, w)
 		return
 	}
 
 	jsonString, jsonMarshalError := json.Marshal(response)
 	if jsonMarshalError != nil {
 		fmt.Println(jsonMarshalError)
-		handleError(jsonMarshalError, w)
+		shared.HandleError(jsonMarshalError, w)
 		return
 	}
 
@@ -79,14 +80,14 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 	peersOverTimeError := setPeersOverTime(pandoraMetrics["p2p/peers"], "pandora")
 	if peersOverTimeError != nil {
 		fmt.Println(peersOverTimeError)
-		handleError(peersOverTimeError, w)
+		shared.HandleError(peersOverTimeError, w)
 		return
 	}
 
 	jsonString, err := json.Marshal(response)
 	if err != nil {
 		fmt.Println(err)
-		handleError(err, w)
+		shared.HandleError(err, w)
 		return
 	}
 
@@ -96,7 +97,7 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 func ValidatorMetrics(w http.ResponseWriter, r *http.Request) {
 	body, err := getMetrics("http://127.0.0.1:8081/metrics", w)
 	if err != nil {
-		handleError(err, w)
+		shared.HandleError(err, w)
 		return
 	}
 	returnBody(body, w)
@@ -111,13 +112,13 @@ func Health(w http.ResponseWriter, r *http.Request) {
 func getMetrics(url string, w http.ResponseWriter) (body []byte, err error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		handleError(err, w)
+		shared.HandleError(err, w)
 		return
 	}
 
 	body, err2 := ioutil.ReadAll(resp.Body)
 	if err2 != nil {
-		handleError(err, w)
+		shared.HandleError(err, w)
 		return
 	}
 
@@ -127,7 +128,7 @@ func getMetrics(url string, w http.ResponseWriter) (body []byte, err error) {
 func GetPandoraPeersOverTime(w http.ResponseWriter, r *http.Request) {
 	metrics, err := getPeersOverTime("pandora")
 	if err != nil {
-		handleError(err, w)
+		shared.HandleError(err, w)
 		return
 	}
 
@@ -140,7 +141,7 @@ func GetPandoraPeersOverTime(w http.ResponseWriter, r *http.Request) {
 func GetVanguardPeersOverTime(w http.ResponseWriter, r *http.Request) {
 	metrics, err := getPeersOverTime("vanguard")
 	if err != nil {
-		handleError(err, w)
+		shared.HandleError(err, w)
 		return
 	}
 
@@ -148,14 +149,6 @@ func GetVanguardPeersOverTime(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(jsonString))
-}
-
-func handleError(err error, w http.ResponseWriter) {
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(err.Error()))
-		return
-	}
 }
 
 func returnBody(body []byte, w http.ResponseWriter) {

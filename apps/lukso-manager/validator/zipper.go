@@ -63,11 +63,11 @@ func zipFolder(network string, folder string) (filePath string) {
 		log.Println(err)
 	}
 
-	targpath := baseFolder + "/" + folder
+	targetPath := baseFolder + "/" + folder
 	basepath := path
-	relpath, _ := filepath.Rel(basepath, targpath)
+	relativePath, _ := filepath.Rel(basepath, targetPath)
 
-	err = filepath.Walk(relpath, walker)
+	err = filepath.Walk(relativePath, walker)
 	if err != nil {
 		panic(err)
 	}

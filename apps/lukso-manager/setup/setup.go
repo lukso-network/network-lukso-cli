@@ -60,12 +60,12 @@ func Setup(w http.ResponseWriter, r *http.Request) {
 	var body startClientsRequestBody
 	err := decoder.Decode(&body)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		shared.HandleError(err, w)
 		return
 	}
+
 	downloader.DownloadConfigFiles(body.Network)
-	for key, element := range ReleaseLocations {
-		fmt.Println("Key:", key, "=>", "Element:", element)
+	for key := range ReleaseLocations {
 		downloader.DownloadClientBinary(
 			key,
 			ReleaseLocations[key].Tag,
@@ -73,12 +73,20 @@ func Setup(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	shared.SettingsDB.Update(func(tx *bolt.Tx) error {
+	dbError := shared.SettingsDB.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucket([]byte("peers"))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
 		return nil
 	})
+
+	if dbError != nil {
+		shared.HandleError(dbError, w)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 
 }

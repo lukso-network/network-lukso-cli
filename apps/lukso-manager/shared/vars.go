@@ -2,6 +2,7 @@ package shared
 
 import (
 	"net"
+	"net/http"
 
 	"github.com/boltdb/bolt"
 )
@@ -30,4 +31,12 @@ func Contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+func HandleError(err error, w http.ResponseWriter) {
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(err.Error()))
+		return
+	}
 }

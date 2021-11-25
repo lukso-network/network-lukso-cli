@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"lukso/apps/lukso-manager/shared"
 	"net/http"
 	"reflect"
 	"testing"
@@ -156,7 +157,7 @@ func Test_handleError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handleError(tt.args.err, tt.args.w)
+			shared.HandleError(tt.args.err, tt.args.w)
 		})
 	}
 }
