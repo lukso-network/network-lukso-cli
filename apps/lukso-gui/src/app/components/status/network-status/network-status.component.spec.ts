@@ -8,9 +8,8 @@ describe('NetworkStatusComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NetworkStatusComponent ]
-    })
-    .compileComponents();
+      declarations: [NetworkStatusComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -14,12 +14,10 @@ import { PasswordCheckerComponent } from './launchpad/components/password-checke
 import { DepositTransactionComponent } from './launchpad/components/send-transactions/deposit-transaction/deposit-transaction.component';
 import { SendTransactionsComponent } from './launchpad/components/send-transactions/send-transactions.component';
 import { KeygenService } from './launchpad/services/keygen.service';
-import { TestComponent } from './test/test.component';
 
 @NgModule({
   declarations: [
     LaunchpadComponent,
-    TestComponent,
     CreateKeysComponent,
     PasswordCheckerComponent,
     SendTransactionsComponent,
