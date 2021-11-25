@@ -1678,11 +1678,11 @@ if [[ "$USE_CONFIG_FILE" == true ]]; then
   parse_config "$CONFIG_FILE_PATH"
 fi
 
-parse_config "/opt/lukso/networks/$NETWORK/config/network-config.yaml"
-
 if [[ -n $OVERRIDE_NETWORK ]]; then
   pick_network $OVERRIDE_NETWORK
 fi
+
+parse_config "/opt/lukso/networks/$NETWORK/config/network-config.yaml"
 
 # Override config file
 if [[ -n $OVERRIDE_COINBASE ]]; then
