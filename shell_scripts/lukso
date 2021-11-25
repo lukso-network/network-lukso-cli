@@ -633,7 +633,6 @@ start_validator() {
     "--chain-config-file=/opt/lukso/networks/$NETWORK/config/vanguard-config.yaml"
     "--verbosity=$VALIDATOR_VERBOSITY"
     "--wallet-dir=$WALLET_DIR"
-    "--rpc"
     "--log-file=$LOGSDIR/validator/validator_$RUN_DATE.log"
     "--lukso-network"
   )
@@ -648,6 +647,7 @@ start_validator() {
 
   if [[ $HTTP_CONNECTIVITY == "true" ]]; then
     HTTP_FLAGS=(
+      "--rpc"
       "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
       "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
     )
