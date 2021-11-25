@@ -23,9 +23,9 @@ import { delay, tap } from 'rxjs/operators';
 interface SettingsState {
   network: NETWORKS;
   settings: Settings;
-  downloadedVersions: any;
   isSaving: boolean;
   isResettingValidator: boolean;
+  downloadedVersions: any;
 }
 
 @Component({

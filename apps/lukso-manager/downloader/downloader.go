@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -237,7 +238,7 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 		for _, v := range releases {
 			assetURL := getDownloadUrlFromAsset(client, v.Assets)
 			fmt.Println(assetURL)
-			if assetURL != "" && strings.Contains(assetURL, "-rc") {
+			if assetURL != "" {
 				confMap[client].DownloadInfo[v.TagName] = downloadInfo{
 					Tag:         v.TagName,
 					DownloadURL: assetURL,
@@ -263,8 +264,9 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 
 func getDownloadUrlFromAsset(name string, assets []Assets) string {
 	var downloadUrl string
+	os_type := strings.Title(runtime.GOOS)
 	for i := range assets {
-		if assets[i].Name == name+"-Linux-x86_64" {
+		if assets[i].Name == name+"-"+os_type+"-x86_64" {
 			downloadUrl = assets[i].BrowserDownloadURL
 			break
 		}
@@ -315,16 +317,17 @@ func DownloadClient(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DownloadClientBinary(client string, version string, url string) {
+func DownloadClientBinary(client string, tag_version string, url string, osType string) {
 	clientFolder := shared.BinaryDir + client + "/"
-	clientFolderWithVersion := clientFolder + version
+	clientFolderWithVersion := clientFolder + tag_version
 
 	createDirIfNotExists(shared.BinaryDir)
 	createDirIfNotExists(clientFolder)
 	createDirIfNotExists(clientFolderWithVersion)
 
-	filePath := clientFolder + version + "/" + client
-	fileUrl := strings.Replace(url, "_TAG_", version, 1)
+	filePath := clientFolder + tag_version + "/" + client
+	urlWithTagSet := strings.Replace(url, "_TAG_", tag_version, 1)
+	fileUrl := strings.Replace(urlWithTagSet, "_OS_TYPE_", osType, 1)
 
 	err := downloadFile(filePath, fileUrl)
 	if err != nil {
