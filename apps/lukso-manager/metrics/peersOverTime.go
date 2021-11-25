@@ -3,7 +3,7 @@ package metrics
 import (
 	"encoding/json"
 	"fmt"
-	"lukso-manager/shared"
+	"lukso/apps/lukso-manager/shared"
 	"sort"
 	"time"
 

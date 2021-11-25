@@ -2,7 +2,7 @@ package runner
 
 import (
 	"fmt"
-	"lukso-manager/shared"
+	"lukso/apps/lukso-manager/shared"
 	"os/exec"
 )
 

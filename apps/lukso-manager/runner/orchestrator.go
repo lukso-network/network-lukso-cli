@@ -1,7 +1,7 @@
 package runner
 
 import (
-	"lukso-manager/shared"
+	"lukso/apps/lukso-manager/shared"
 	"os/exec"
 )
 

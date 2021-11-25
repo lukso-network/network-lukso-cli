@@ -149,7 +149,7 @@
           "options": {
             "cmd": "gow",
             "cwd": ".",
-            "main": "apps/lukso-manager/src/main.go"
+            "main": "apps/lukso-manager/main.go"
           }
         },
         "test": {

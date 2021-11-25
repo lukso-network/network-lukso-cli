@@ -1,4 +1,4 @@
-module lukso-manager
+module lukso
 
 go 1.16
 

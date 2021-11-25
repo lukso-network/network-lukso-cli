@@ -3,8 +3,8 @@ package setup
 import (
 	"encoding/json"
 	"fmt"
-	"lukso-manager/downloader"
-	"lukso-manager/shared"
+	"lukso/apps/lukso-manager/downloader"
+	"lukso/apps/lukso-manager/shared"
 	"net/http"
 
 	"github.com/boltdb/bolt"

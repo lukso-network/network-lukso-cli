@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"lukso-manager/shared"
+	"lukso/apps/lukso-manager/shared"
 	"net/http"
 	"os"
 	"os/exec"

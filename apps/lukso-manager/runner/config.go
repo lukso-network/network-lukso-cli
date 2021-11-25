@@ -3,7 +3,7 @@ package runner
 import (
 	"fmt"
 	"io/ioutil"
-	"lukso-manager/shared"
+	"lukso/apps/lukso-manager/shared"
 
 	"github.com/go-yaml/yaml"
 )
