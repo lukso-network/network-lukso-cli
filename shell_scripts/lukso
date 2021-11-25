@@ -701,30 +701,24 @@ start_eth2stats_client() {
   echo -n $RUN_DATE >|"$LOGSDIR"/eth2stats/current.tmp
 
   ARGUMENTS=(
-    "--beacon.type=\"prysm\""
-    "--beacon.addr=\"$ETH2STATS_BEACON_ADDR\""
+    "--beacon.type=prysm"
+    "--beacon.addr=$ETH2STATS_BEACON_ADDR"
     "--data.folder=$DATADIR/eth2stats-client"
-    "--eth2stats.node-name=\"$NODE_NAME\""
-    "--eth2stats.addr=\"$VAN_ETHSTATS\""
-    "--eth2stats.tls=\"false\""
+    "--eth2stats.node-name=$NODE_NAME"
+    "--eth2stats.addr=$VAN_ETHSTATS"
+    "--eth2stats.tls=false"
   )
 
   if [[ $HTTP_CONNECTIVITY == "true" ]]; then
     HTTP_FLAGS=(
-      "--beacon.metrics-addr=\"$VAN_ETHSTATS_METRICS\""
+      "--beacon.metrics-addr=$VAN_ETHSTATS_METRICS"
     )
     ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
   fi
 
-
   nohup eth2stats-client run \
-    --beacon.type="prysm" \
-    --beacon.addr="$ETH2STATS_BEACON_ADDR" \
-    --beacon.metrics-addr="$VAN_ETHSTATS_METRICS" \
-    --data.folder=$DATADIR/eth2stats-client \
-    --eth2stats.node-name="$NODE_NAME" \
-    --eth2stats.addr="$VAN_ETHSTATS" \
-    --eth2stats.tls="false" >|"$LOGSDIR"/eth2stats/eth2stats_"$RUN_DATE".log 2>&1 &
+    "${ARGUMENTS[@]}" \
+    >|"$LOGSDIR"/eth2stats/eth2stats_"$RUN_DATE".log 2>&1 &
   disown
 }
 
