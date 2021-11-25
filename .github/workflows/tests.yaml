@@ -7,6 +7,7 @@ on:
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
+  NX_VERBOSE_LOGGING: true
 
 jobs:
   main:
@@ -63,6 +64,6 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '14'
-      - run: npm install
+      - run: yarn install
       - name: Start Nx Agent ${{ matrix.agent }}
         run: npx nx-cloud start-agent
