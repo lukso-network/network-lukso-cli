@@ -639,6 +639,7 @@ start_validator() {
 
   if [[ $HTTP_CONNECTIVITY == "false" ]]; then
     IPC_FLAGS=(
+      "--disable-monitoring"
       "--beacon-rpc-provider=$DATADIR/vanguard/vanguard.ipc"
       "--pandora-http-provider=$DATADIR/pandora/geth.ipc"
     )
