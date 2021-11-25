@@ -88,9 +88,11 @@ VANGUARD_RPC_PORT="4000"
 VANGUARD_UDP_PORT="12000"
 VANGUARD_TCP_PORT="13000"
 VANGUARD_GRPC_GATEWAY_PORT="3500"
+VANGUARD_MONITORING_HOST="127.0.0.1"
+VANGUARD_MONITORING_PORT="8080"
 VAN_MIN_SYNC_PEERS="2"
 VAN_MAX_P2P_PEERS="50"
-VAN_ETHSTATS_METRICS="http://127.0.0.1:8080/metrics"
+VAN_ETHSTATS_METRICS="http://$VANGUARD_MONITORING_HOST:$VANGUARD_MONITORING_PORT/metrics"
 ######
 
 ###### Validator
@@ -580,7 +582,6 @@ start_vanguard() {
     "${BOOTNODES_ARGS[@]}"
     "--deposit-contract=0x000000000000000000000000000000000000cafe"
     "--contract-deployment-block=0"
-    "--monitoring-host=$VANGUARD_MONITORING_HOST"
     "--verbosity=$VANGUARD_VERBOSITY"
     "--min-sync-peers=$VAN_MIN_SYNC_PEERS"
     "--p2p-max-peers=$VAN_MAX_P2P_PEERS"
@@ -606,6 +607,8 @@ start_vanguard() {
       "--rpc-port=$VANGUARD_RPC_PORT"
       "--orc-rpc-provider=$VANGUARD_ORC_RPC_PROVIDER"
       "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
+      "--monitoring-host=$VANGUARD_MONITORING_HOST"
+      "--monitoring-port=$VANGUARD_MONITORING_PORT"
     )
     ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
   fi
@@ -696,6 +699,23 @@ start_validator() {
 start_eth2stats_client() {
   mkdir -p "$LOGSDIR"/eth2stats
   echo -n $RUN_DATE >|"$LOGSDIR"/eth2stats/current.tmp
+
+  ARGUMENTS=(
+    "--beacon.type=\"prysm\""
+    "--beacon.addr=\"$ETH2STATS_BEACON_ADDR\""
+    "--data.folder=$DATADIR/eth2stats-client"
+    "--eth2stats.node-name=\"$NODE_NAME\""
+    "--eth2stats.addr=\"$VAN_ETHSTATS\""
+    "--eth2stats.tls=\"false\""
+  )
+
+  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
+    HTTP_FLAGS=(
+      "--beacon.metrics-addr=\"$VAN_ETHSTATS_METRICS\""
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
+  fi
+
 
   nohup eth2stats-client run \
     --beacon.type="prysm" \
@@ -1672,6 +1692,12 @@ while getopts "$optspec" optchar; do
       OVERRIDE_VANGUARD_MONITORING_HOST="$val"
       ;;
 
+    vanguard-monitoring-port)
+      val="${!OPTIND}"
+      OPTIND=$(($OPTIND + 1))
+      OVERRIDE_VANGUARD_MONITORING_PORT="$val"
+      ;;
+
     validator-verbosity)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
@@ -1861,6 +1887,12 @@ fi
 
 if [[ -n $OVERRIDE_VANGUARD_MONITORING_HOST ]]; then
   VANGUARD_MONITORING_HOST=$OVERRIDE_VANGUARD_MONITORING_HOST
+  VAN_ETHSTATS_METRICS="http://$VANGUARD_MONITORING_HOST:$VANGUARD_MONITORING_PORT/metrics"
+fi
+
+if [[ -n $OVERRIDE_VANGUARD_MONITORING_PORT ]]; then
+  VANGUARD_MONITORING_PORT=$OVERRIDE_VANGUARD_MONITORING_PORT
+  VAN_ETHSTATS_METRICS="http://$VANGUARD_MONITORING_HOST:$VANGUARD_MONITORING_PORT/metrics"
 fi
 
 if [[ -n $OVERRIDE_EXTERNAL_IP ]]; then
