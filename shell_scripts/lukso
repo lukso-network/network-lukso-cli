@@ -592,6 +592,8 @@ start_vanguard() {
     ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
   else
     RPC_ARGUMENTS=(
+      "--disable-monitoring"
+      "--disable-grpc-gateway"
       "--rpc-host=$DATADIR/vanguard/vanguard.ipc"
       "--orc-rpc-provider=$DATADIR/orchestrator/orchestrator.ipc"
       "--http-web3provider=$DATADIR/pandora/geth.ipc"
