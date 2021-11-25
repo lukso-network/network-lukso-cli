@@ -9,6 +9,9 @@ import (
 	"lukso-cli/config"
 )
 
+var Cmd string
+var Arg string
+
 func InitFlags() {
 
 	app := cli.NewApp()
@@ -16,6 +19,7 @@ func InitFlags() {
 	app.Usage = "Tool for managing LUKSO node"
 	app.UsageText = "lukso <command> [argument] [--flags]"
 	app.Flags = getLuksoFlags()
+	app.EnableBashCompletion = true
 
 	app.Commands = []cli.Command{
 		getStartCommand(),
@@ -67,6 +71,10 @@ func LoadFlags(LuksoSettings *config.LuksoValues) {
 
 	if FlagValues.l15_dev {
 		LuksoSettings.Network = "l15-dev"
+	}
+
+	if FlagValues.Orchestrator.Verbosity != "" {
+		LuksoSettings.Orchestrator.Verbosity = FlagValues.Orchestrator.Verbosity
 	}
 
 }

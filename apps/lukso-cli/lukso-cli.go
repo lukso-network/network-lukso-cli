@@ -3,6 +3,7 @@ package main
 import (
 	"lukso-cli/config"
 	"lukso-cli/flags"
+	"lukso-cli/runner"
 )
 
 var LuksoSettings config.LuksoValues
@@ -17,15 +18,14 @@ func main() {
 
 	//Overwrite with config
 	if flags.FlagValues.Config != "" {
-		println("Config loaded")
 		config.LoadConfig(&LuksoSettings, flags.FlagValues.Config)
 	}
 
 	//Overwrite with flags
 	flags.LoadFlags(&LuksoSettings)
 
-	//check
-	println(LuksoSettings.Network)
-	println(LuksoSettings.Orchestrator.Verbosity)
-	println(LuksoSettings.Pandora.Verbosity)
+	// RUN
+
+	runner.Action(flags.Cmd, flags.Arg, &LuksoSettings)
+
 }

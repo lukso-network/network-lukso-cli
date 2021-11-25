@@ -8,7 +8,14 @@ func getStartCommand() cli.Command {
 			Name:  "vanguard",
 			Flags: getLuksoFlags(),
 			Action: func(c *cli.Context) {
-				println("Starting Vanguard")
+				Cmd, Arg = "start", "vanguard"
+			},
+		},
+		{
+			Name:  "pandora",
+			Flags: getLuksoFlags(),
+			Action: func(c *cli.Context) {
+				Cmd, Arg = "start", "pandora"
 			},
 		},
 	}
@@ -19,7 +26,7 @@ func getStartCommand() cli.Command {
 		UsageText: "lukso start [client]\n   [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status, all]",
 		Flags:     getLuksoFlags(),
 		Action: func(c *cli.Context) {
-			println("Starting all")
+			Cmd, Arg = "start", "all"
 		},
 		Subcommands: startCommands,
 	}
