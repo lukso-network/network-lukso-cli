@@ -57,7 +57,7 @@ func getLuksoFlags() []cli.Flag {
 		},
 		cli.StringFlag{
 			Name:        "coinbase",
-			Usage:       "Sets pandora coinbase. This is public address for block mining rewards (default = first account created) (default: \"0\")",
+			Usage:       "Sets pandora coinbase. This is public address for block mining rewards",
 			Destination: &FlagValues.Coinbase,
 		},
 		cli.StringFlag{
@@ -77,8 +77,18 @@ func getLuksoFlags() []cli.Flag {
 		},
 		cli.StringFlag{
 			Name:        "orchestrator-verbosity, orc-verbosity",
-			Usage:       "Sets orchestrator logging depth",
+			Usage:       "Sets orchestrator logging depth (Default: " + DefaultValues.Orchestrator.Verbosity + ")",
 			Destination: &FlagValues.Orchestrator.Verbosity,
+		},
+		cli.StringFlag{
+			Name:        "orchestrator-vanguard-rpc-endpoint, orc-vanguard-rpc-endpoint",
+			Usage:       "Enables Vanguard node RPC provider endpoint.",
+			Destination: &FlagValues.Orchestrator.VanguardRPCEndpoint,
+		},
+		cli.StringFlag{
+			Name:        "orchestrator-pandora-rpc-endpoint, orc-pandora-rpc-endpoint",
+			Usage:       "Pandora node RP provider endpoint.",
+			Destination: &FlagValues.Orchestrator.PandoraRPCEndpoint,
 		},
 	}
 	return luksoFlags
