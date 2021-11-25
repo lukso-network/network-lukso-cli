@@ -1,6 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { providers } from 'ethers';
 import { SendTransactionsComponent } from './send-transactions.component';
+
+jest.mock('ethers');
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare let window: any;
+
+window.ethereum = {
+  provider: {},
+};
 
 describe('SendTransactionsComponent', () => {
   let component: SendTransactionsComponent;
@@ -8,9 +17,8 @@ describe('SendTransactionsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SendTransactionsComponent ]
-    })
-    .compileComponents();
+      declarations: [SendTransactionsComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

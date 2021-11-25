@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { RxState } from '@rx-angular/state';
-import { map, startWith, switchMap } from 'rxjs/operators';
+import { startWith, switchMap } from 'rxjs/operators';
 import { Settings } from './interfaces/settings';
 import { NETWORKS } from './modules/launchpad/launchpad/helpers/create-keys';
 import { SoftwareService } from './services/available-versions/available-versions.service';

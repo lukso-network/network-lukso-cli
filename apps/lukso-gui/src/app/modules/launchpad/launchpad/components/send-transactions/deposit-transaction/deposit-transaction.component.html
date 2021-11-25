@@ -1,7 +1,11 @@
 <div class="public-key">
   <div class="label">Validator</div>
   <div>
-    <a [href]="explorerLink" target="_blank" rel="noopener noreferrer"
+    <a
+      *ngIf="deposit"
+      [href]="explorerLink"
+      target="_blank"
+      rel="noopener noreferrer"
       >0x{{ truncate(deposit.pubkey, 8, 8, 20) }}</a
     >
   </div>
@@ -12,6 +16,7 @@
 </div>
 <div class="transaction-button">
   <button
+    *ngIf="deposit"
     class="btn btn-outline-secondary"
     type="button"
     [disabled]="deposit.transaction"

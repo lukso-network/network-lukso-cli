@@ -2,7 +2,7 @@
   <div class="d-flex flex-column flex-fill">
     <h1 class="title">
       {{ name }}
-      <span>{{ settings?.versions[name.toLowerCase()] }}</span>
+      <span *ngIf="settings?.versions">{{ settings?.versions[name] }}</span>
       <div class="form-check form-switch" style="z-index: 1000">
         <input
           #toggle

@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { RxState } from '@rx-angular/state';
+import { GLOBAL_RX_STATE } from '../../../../../../app/shared/rx-state';
 
 import { CreateKeysComponent } from './create-keys.component';
 
@@ -8,9 +11,10 @@ describe('CreateKeysComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CreateKeysComponent ]
-    })
-    .compileComponents();
+      declarations: [CreateKeysComponent],
+      imports: [ReactiveFormsModule],
+      providers: [{ provide: GLOBAL_RX_STATE, useClass: RxState }],
+    }).compileComponents();
   });
 
   beforeEach(() => {

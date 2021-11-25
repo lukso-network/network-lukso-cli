@@ -1,9 +1,10 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PandoraStatusComponent } from './pandora-status/pandora-status.component';
+import { RxState } from '@rx-angular/state';
+import { GLOBAL_RX_STATE } from '../../shared/rx-state';
 
 import { StatusComponent } from './status.component';
-import { VanguardStatusComponent } from './vanguard-status/vanguard-status.component';
 
 describe('StatusComponent', () => {
   let component: StatusComponent;
@@ -11,12 +12,10 @@ describe('StatusComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [
-        StatusComponent,
-        PandoraStatusComponent,
-        VanguardStatusComponent,
-      ],
+      schemas: [NO_ERRORS_SCHEMA],
+      declarations: [StatusComponent],
       imports: [HttpClientTestingModule],
+      providers: [{ provide: GLOBAL_RX_STATE, useClass: RxState }],
     }).compileComponents();
   });
 

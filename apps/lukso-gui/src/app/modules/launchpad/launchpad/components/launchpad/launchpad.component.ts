@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { map, mapTo, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import {
   CURRENT_KEY_ACTION,
   NETWORKS,
