@@ -179,7 +179,7 @@ download_binary() {
     REPO="network-deposit-cli"
     ;;
 
-  eth2stats)
+  eth2stats-client)
     REPO="network-vanguard-stats-client"
     ;;
 
