@@ -27,7 +27,8 @@ WORKDIR /dist
 RUN cp /build/main .
 
 # Build a small image
-FROM scratch
+FROM golang:1.17.3
+RUN apt-get update && apt-get install bash
 
 COPY --from=builder /dist/main /
 

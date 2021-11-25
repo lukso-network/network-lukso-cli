@@ -337,6 +337,7 @@ func DownloadClientBinary(client string, tag_version string, url string) {
 
 	err := downloadFile(filePath, fileUrl)
 	if err != nil {
+		log.Fatal(err.Error())
 		log.Fatal("Failed to download" + fileUrl)
 		return
 	}
