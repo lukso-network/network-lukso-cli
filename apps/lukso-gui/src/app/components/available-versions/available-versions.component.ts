@@ -6,7 +6,7 @@ import { SoftwareService } from '../../services/available-versions/available-ver
 @Component({
   selector: 'lukso-available-versions',
   templateUrl: './available-versions.component.html',
-  styleUrls: ['./available-versions.component.css'],
+  styleUrls: ['./available-versions.component.scss'],
 })
 export class AvailableVersionsComponent {
   readonly availableSoftware$: Observable<Releases[]>;
