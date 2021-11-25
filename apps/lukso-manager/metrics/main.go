@@ -17,21 +17,21 @@ type MetricsResponseData struct {
 }
 
 func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
-	body, err1 := getMetrics("http://127.0.0.1:8080/metrics", w)
-	if err1 != nil {
-		handleError(err1, w)
+	body, metricsError := getMetrics("http://127.0.0.1:8080/metrics", w)
+	if metricsError != nil {
+		handleError(metricsError, w)
 		return
 	}
 
-	mf, err2 := parseMetricFamily(body)
+	metricFamily, parsingMetricsError := parseMetricFamily(body)
 
-	if err2 != nil {
-		handleError(err2, w)
+	if parsingMetricsError != nil {
+		handleError(parsingMetricsError, w)
 		return
 	}
 
-	peers := mf["p2p_peer_count"].GetMetric()
-	chainData := mf["beacon_head_slot"].GetMetric()
+	peers := metricFamily["p2p_peer_count"].GetMetric()
+	chainData := metricFamily["beacon_head_slot"].GetMetric()
 
 	if peers == nil || chainData == nil {
 		return
@@ -43,15 +43,17 @@ func VanguardMetrics(w http.ResponseWriter, r *http.Request) {
 		ChainData: int64(*chainData[0].Gauge.Value),
 	}
 
-	err := setPeersOverTime(*peers[1].Gauge.Value, "vanguard")
-	if err != nil {
-		fmt.Println(err)
+	peersOverTimeError := setPeersOverTime(*peers[1].Gauge.Value, "vanguard")
+	if peersOverTimeError != nil {
+		fmt.Println(peersOverTimeError)
+		handleError(peersOverTimeError, w)
+		return
 	}
 
-	jsonString, err := json.Marshal(response)
-	if err != nil {
-		fmt.Println(err)
-		handleError(err, w)
+	jsonString, jsonMarshalError := json.Marshal(response)
+	if jsonMarshalError != nil {
+		fmt.Println(jsonMarshalError)
+		handleError(jsonMarshalError, w)
 		return
 	}
 
@@ -74,9 +76,11 @@ func PandoraMetrics(w http.ResponseWriter, r *http.Request) {
 		ChainData: int64(pandoraMetrics["chain/head/block"]),
 	}
 
-	err2 := setPeersOverTime(pandoraMetrics["p2p/peers"], "pandora")
-	if err2 != nil {
-		fmt.Println(err2)
+	peersOverTimeError := setPeersOverTime(pandoraMetrics["p2p/peers"], "pandora")
+	if peersOverTimeError != nil {
+		fmt.Println(peersOverTimeError)
+		handleError(peersOverTimeError, w)
+		return
 	}
 
 	jsonString, err := json.Marshal(response)

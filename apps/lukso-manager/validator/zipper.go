@@ -19,35 +19,33 @@ func zipFolder(network string, folder string) (filePath string) {
 	sec := now.Unix()
 
 	pathToFile := baseFolder + "/" + folder + "-" + fmt.Sprint(sec) + ".zip"
-	file, err := os.Create(pathToFile)
+	zipFile, err := os.Create(pathToFile)
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer zipFile.Close()
 
-	w := zip.NewWriter(file)
-	defer w.Close()
+	writer := zip.NewWriter(zipFile)
+	defer writer.Close()
 
 	walker := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+
 		if info.IsDir() {
 			return nil
 		}
+
 		file, err := os.Open(path)
 		if err != nil {
 			return err
 		}
 		defer file.Close()
 
-		// Ensure that `path` is not absolute; it should not start with "/".
-		// This snippet happens to work because I don't use
-		// absolute paths, but ensure your real-world code
-		// transforms path into a zip-root relative path.
-		s := strings.Split(path, "/"+folder+"/")
+		s := strings.Split(path, fmt.Sprintf("/%s/", folder))
 
-		f, err := w.Create(s[1])
+		f, err := writer.Create(s[1])
 		if err != nil {
 			return err
 		}

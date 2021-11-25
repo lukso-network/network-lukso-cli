@@ -217,32 +217,31 @@ func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
 			DownloadInfo:      make(map[string]downloadInfo),
 		}
 
-		if r.StatusCode == 403 {
+		if r.StatusCode == http.StatusForbidden {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode("Github API Rate Limit Exceeded")
 			return
 		}
 
-		if r.StatusCode != 200 {
+		if r.StatusCode != http.StatusOK {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			json.NewEncoder(w).Encode(err.Error())
 			return
 		}
 
 		decoder := json.NewDecoder(r.Body)
 		var releases GithubReleases
 
-		err2 := decoder.Decode(&releases)
-		if err2 != nil {
-			log.Fatalln(err2)
+		decodeError := decoder.Decode(&releases)
+		if decodeError != nil {
+			log.Fatalln(decodeError)
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Can not decode releases"))
+			json.NewEncoder(w).Encode(decodeError.Error())
 			return
 		}
 
 		for _, v := range releases {
 			assetURL := getDownloadUrlFromAsset(client, v.Assets)
-			fmt.Println(assetURL)
 			if assetURL != "" {
 				confMap[client].DownloadInfo[v.TagName] = downloadInfo{
 					Tag:         v.TagName,
