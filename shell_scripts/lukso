@@ -22,13 +22,13 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 ARCHITECTURE=$(uname -m)
-LUKSO_SCRIPT_VERSION="v1.7"
+LUKSO_SCRIPT_VERSION="v1.7.1"
 
 RUN_DATE=$(date '+%Y-%m-%d__%H-%M-%S')
 NETWORK="l15-prod"
 IS_VALIDATOR=false
 RUN_LUKSO_STATUS=false
-PAN_ETHSTATS="6Tcpc53R5V763Aur9LgD@stats.pandora.l15.lukso.network"
+PAN_ETHSTATS="S2qDE8rYtFVVGZ@stats.pandora.l15.lukso.network"
 VAN_ETHSTATS="34.141.156.125:9090"
 COINBASE=""
 
