@@ -463,7 +463,7 @@ Function start_orchestrator()
 
     $OrchestratorPath = $(Get-Item "$InstallDir\globalPath\lukso-orchestrator").Target[0]
     echo $OrchestratorPath
-    Start-Process {"$OrchestratorPath $keys"} `
+    Start-Process -FilePath "$OrchestratorPath" `
     -ArgumentList $arguments `
     -WindowStyle hidden `
     -RedirectStandardOutput "$logsdir\orchestrator\orchestrator_$runDate.out" `
@@ -516,7 +516,7 @@ function start_pandora()
     $PandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target[0]
     Start-Process -Wait -FilePath $PandoraPath `
     -ArgumentList $Arguments `
-    -NoNewWindow `
+    -WindowStyle Hidden `
     -RedirectStandardOutput "$logsdir\pandora\init_pandora_$runDate.out" `
     -RedirectStandardError "$logsdir\pandora\init_pandora_$runDate.err"
 
@@ -569,7 +569,7 @@ function start_pandora()
     $PandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target[0]
     Start-Process -FilePath $PandoraPath `
     -ArgumentList $Arguments `
-    -NoNewWindow `
+    -WindowStyle Hidden `
     -RedirectStandardOutput "$logsdir\pandora\pandora_$runDate.out" `
     -RedirectStandardError "$logsdir\pandora\pandora_$runDate.err"
 }
@@ -629,7 +629,7 @@ function start_vanguard() {
     $VanguardPath = $(Get-Item "$InstallDir\globalPath\vanguard").Target[0]
     Start-Process -FilePath $VanguardPath `
     -ArgumentList $Arguments `
-    -NoNewWindow `
+    -WindowStyle Hidden `
     -RedirectStandardOutput "$logsdir\vanguard\vanguard_$runDate.out" `
     -RedirectStandardError "$logsdir\vanguard\vanguard_$runDate.err"
 
@@ -673,7 +673,7 @@ function start_validator() {
     $ValidatorPath = $(Get-Item "$InstallDir\globalPath\lukso-validator").Target[0]
     Start-Process -FilePath $ValidatorPath `
     -ArgumentList $arguments `
-    -NoNewWindow `
+    -WindowStyle Hidden `
     -RedirectStandardOutput "$logsdir\validator\validator_$runDate.out" `
     -RedirectStandardError "$logsdir\validator\validator_$runDate.err"
 
@@ -701,7 +701,7 @@ function start_eth2stats_client() {
     $Eth2StatsPath = $(Get-Item "$InstallDir\globalPath\eth2stats-client").Target[0]
     Start-Process -FilePath $Eth2StatsPath `
     -ArgumentList $Arguments `
-    -NoNewWindow `
+    -WindowStyle Hidden `
     -RedirectStandardOutput "$logsdir\eth2stats\eth2stats_$runDate.out" `
     -RedirectStandardError "$logsdir\eth2stats\eth2stats_$runDate.err"
 
@@ -719,7 +719,7 @@ function start_lukso_status() {
 
     $LuksoStatusPath = $(Get-Item "$InstallDir\globalPath\lukso-status").Target[0]
     Start-Process -FilePath $LuksoStatusPath `
-    -NoNewWindow `
+    -WindowStyle Hidden `
     -RedirectStandardOutput "$logsdir\lukso-status\lukso-status_$runDate.out" `
     -RedirectStandardError "$logsdir\lukso-status\lukso-status_$runDate.err"
 }
@@ -795,7 +795,7 @@ function stop_validator() {
 }
 
 function stop_eth2stats() {
-    Stop-Process -ProcessName "eth2stats-Windows-x86_64"
+    Stop-Process -ProcessName "eth2stats-client-Windows-x86_64"
 }
 
 function stop_lukso_status() {

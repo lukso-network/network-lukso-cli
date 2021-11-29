@@ -7,5 +7,4 @@ $InstallDir = $Env:APPDATA + "\LUKSO"
 $cmd = "$args"
 $cmd = $cmd.Replace(" --", " -")
 
-Write-Output $cmd
 powershell -command "$InstallDir\lukso.ps1 $cmd"

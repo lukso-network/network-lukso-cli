@@ -27,13 +27,13 @@ download_network_config("l15-prod")
 download_network_config("l15-staging")
 download_network_config("l15-dev")
 
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/lukso-network/network-lukso-cli/feature/windows-script/shell_scripts/lukso-win.ps1 -OutFile $InstallDir\lukso.ps1
+download "https://raw.githubusercontent.com/lukso-network/network-lukso-cli/feature/windows-script/shell_scripts/lukso-win.ps1" $InstallDir\lukso.ps1
 if (Test-Path "$InstallDir\globalPath\lukso") {
     rm "$InstallDir\globalPath\lukso"
 }
 
 # Write-Output "powershell.exe -File $InstallDir\lukso.ps1 %*" | Out-File -Encoding ASCII -FilePath "$InstallDir\globalPath\lukso.bat"
-download https://raw.githubusercontent.com/lukso-network/network-lukso-cli/feature/windows-script/shell_scripts/flag_bypasser.ps1 $InstallDir\globalPath\lukso.ps1
+download "https://raw.githubusercontent.com/lukso-network/network-lukso-cli/feature/windows-script/shell_scripts/flag_bypasser.ps1" $InstallDir\globalPath\lukso.ps1
 
 $Env:Path += ";$InstallDir\globalPath"
 
