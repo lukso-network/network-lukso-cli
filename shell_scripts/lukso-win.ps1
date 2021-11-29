@@ -315,7 +315,7 @@ Function generate_keys()
   $Arguments.Add("--folder $(${keys-dir})")
   $Arguments.Add("--num_validators $ValidatorsNumber")
 
-  $depositPath = $(Get-Item "$InstallDir\globalPath\lukso-deposit-cli").Target
+  $depositPath = $(Get-Item "$InstallDir\globalPath\lukso-deposit-cli").Target[0]
   powershell.exe -command "$depositPath $Arguments"
 }
 
@@ -335,7 +335,7 @@ Function import_accounts() {
     $Arguments.Add("--keys-dir=$(${keys-dir})")
     $Arguments.Add("--wallet-dir=$(${wallet-dir})")
 
-    $validatorPath = $(Get-Item "$InstallDir\globalPath\lukso-validator").Target
+    $validatorPath = $(Get-Item "$InstallDir\globalPath\lukso-validator").Target[0]
     powershell.exe -command "$validatorPath $Arguments"
 }
 
@@ -391,7 +391,7 @@ Function check_validator_requirements()
 
   if ( ($argument -eq "validator") -and (!($coinbase)) ) {
 
-    $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target
+    $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target[0]
     if (!($(powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec 'eth.coinbase'") -match '^\"0x[a-fA-F0-9]{40}\"$')) {
         Write-Output "ERROR: Coinbase is not set on already running pandora. Please provide it using:"
         Write-Output "--coinbase 0x<ETH1_ADDRESS>"
@@ -423,7 +423,7 @@ Function check_validator_requirements()
         $value = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
         $global:TempPassFile = "$Env:APPDATA\LUKSO\temp_pass.txt"
         [IO.File]::WriteAllLines($global:TempPassFile, $value)
-        $validatorPath = $(Get-Item "$InstallDir\globalPath\lukso-validator").Target
+        $validatorPath = $(Get-Item "$InstallDir\globalPath\lukso-validator").Target[0]
         powershell.exe -command "$validatorPath accounts list --wallet-dir ${wallet-dir} --wallet-password-file $global:TempPassFile"
         $PasswordCheck = $?
         if (!($PasswordCheck)) {
@@ -461,10 +461,11 @@ Function start_orchestrator()
     "--verbosity=trace"
     )
 
-
-    Start-Process -FilePath lukso-orchestrator `
+    $OrchestratorPath = $(Get-Item "$InstallDir\globalPath\lukso-orchestrator").Target[0]
+    echo $OrchestratorPath
+    Start-Process {"$OrchestratorPath $keys"} `
     -ArgumentList $arguments `
-    -NoNewWindow `
+    -WindowStyle hidden `
     -RedirectStandardOutput "$logsdir\orchestrator\orchestrator_$runDate.out" `
     -RedirectStandardError "$logsdir\orchestrator\orchestrator_$runDate.err" `
 }
@@ -511,7 +512,9 @@ function start_pandora()
     $Arguments.Add("init")
     $Arguments.Add("$InstallDir\networks\$NETWORK\config\pandora-genesis.json")
     $Arguments.Add("--datadir=$datadir\pandora")
-    Start-Process -Wait -FilePath "pandora" `
+
+    $PandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target[0]
+    Start-Process -Wait -FilePath $PandoraPath `
     -ArgumentList $Arguments `
     -NoNewWindow `
     -RedirectStandardOutput "$logsdir\pandora\init_pandora_$runDate.out" `
@@ -563,8 +566,8 @@ function start_pandora()
         $Arguments.Add("--nodekey=${pandora-nodekey}")
     }
 
-
-    Start-Process -FilePath "pandora" `
+    $PandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target[0]
+    Start-Process -FilePath $PandoraPath `
     -ArgumentList $Arguments `
     -NoNewWindow `
     -RedirectStandardOutput "$logsdir\pandora\pandora_$runDate.out" `
@@ -623,7 +626,8 @@ function start_vanguard() {
         $Arguments.Add("--p2p-host-ip=$vanguard_external_ip")
     }
 
-    Start-Process -FilePath "vanguard" `
+    $VanguardPath = $(Get-Item "$InstallDir\globalPath\vanguard").Target[0]
+    Start-Process -FilePath $VanguardPath `
     -ArgumentList $Arguments `
     -NoNewWindow `
     -RedirectStandardOutput "$logsdir\vanguard\vanguard_$runDate.out" `
@@ -634,7 +638,7 @@ function start_vanguard() {
 function start_validator() {
 
     if (($argument -eq "validator") -and ($coinbase)) {
-        $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target
+        $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target[0]
         powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec `"miner.setEtherbase(`'$coinbase`')`""
         powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec 'miner.start()'"
     }
@@ -666,7 +670,8 @@ function start_validator() {
       $Arguments.Add("--wallet-password-file=$Env:APPDATA\LUKSO\temp_pass.txt")
     }
 
-    Start-Process -FilePath "lukso-validator" `
+    $ValidatorPath = $(Get-Item "$InstallDir\globalPath\lukso-validator").Target[0]
+    Start-Process -FilePath $ValidatorPath `
     -ArgumentList $arguments `
     -NoNewWindow `
     -RedirectStandardOutput "$logsdir\validator\validator_$runDate.out" `
@@ -693,7 +698,8 @@ function start_eth2stats_client() {
     $Arguments.Add("--eth2stats.addr=`"$(${van-ethstats})`"")
     $Arguments.Add("--eth2stats.tls=`"false`"")
 
-    Start-Process -FilePath "eth2stats-client" `
+    $Eth2StatsPath = $(Get-Item "$InstallDir\globalPath\eth2stats-client").Target[0]
+    Start-Process -FilePath $Eth2StatsPath `
     -ArgumentList $Arguments `
     -NoNewWindow `
     -RedirectStandardOutput "$logsdir\eth2stats\eth2stats_$runDate.out" `
@@ -711,7 +717,8 @@ function start_lukso_status() {
 
     $Arguments = New-Object System.Collections.Generic.List[System.Object]
 
-    Start-Process -FilePath "lukso-status" `
+    $LuksoStatusPath = $(Get-Item "$InstallDir\globalPath\lukso-status").Target[0]
+    Start-Process -FilePath $LuksoStatusPath `
     -NoNewWindow `
     -RedirectStandardOutput "$logsdir\lukso-status\lukso-status_$runDate.out" `
     -RedirectStandardError "$logsdir\lukso-status\lukso-status_$runDate.err"
@@ -1117,7 +1124,7 @@ switch ($command)
     }
 
     "attach" {
-        $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target
+        $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target[0]
         powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc"
     }
 
@@ -1131,13 +1138,13 @@ switch ($command)
     }
 }
 
-if ($KeepShell)
-{
-    Write-Output "LUKSO clients are working, do not close this shell"
-}
+# if ($KeepShell)
+# {
+#     Write-Output "LUKSO clients are working, do not close this shell"
+# }
 
-while ($KeepShell)
-{
-    Read-Host
-}
+# while ($KeepShell)
+# {
+#     Read-Host
+# }
 
