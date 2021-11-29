@@ -621,14 +621,20 @@ start_validator() {
   if [[ -n $TEMPPASSFILE ]]; then
     # Wait until validator starts
     TRIES=0
-    while [[ ! $(lsof -t -i:7000) ]]; do
+    while [[ $TRIES -lt 5 ]]; do
       sleep 1
-      if [[ $TRIES -ge 10 ]]; then
-        echo "ERROR: Cannot start validator"
-        break;
-      fi
+      echo -n " . "
       TRIES=$((TRIES+1))
     done
+
+    if [[ ! $(pgrep -x "lukso-validator") ]]; then
+      echo "ERROR: Cannot start validator"
+      break;
+    else
+      echo -n "OK "
+      echo
+    fi
+
     rm $TEMPPASSFILE
   fi
 }
