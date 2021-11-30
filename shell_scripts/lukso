@@ -326,6 +326,23 @@ pick_network() {
   if [[ ! -d /opt/lukso/networks/"$NETWORK" ]]; then
     download_network_config $NETWORK
   fi
+
+  if [[ -z $OVERRIDE_DATADIR ]]; then
+    DATADIR="$LUKSO_HOME/$NETWORK/datadirs"
+  fi
+
+  if [[ -z $OVERRIDE_LOGSDIR ]]; then
+    LOGSDIR="$LUKSO_HOME/$NETWORK/logs"
+  fi
+
+  if [[ -z $OVERRIDE_KEYS_DIR ]]; then
+    KEYS_DIR="$LUKSO_HOME/$NETWORK"
+  fi
+
+  if [[ -z $OVERRIDE_WALLET_DIR ]]; then
+    WALLET_DIR="$LUKSO_HOME/$NETWORK/vanguard_wallet"
+  fi
+
 }
 
 check_validator_requirements() {
@@ -1335,7 +1352,7 @@ while getopts "$optspec" optchar; do
     network)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      pick_network $val
+      eval OVERRIDE_NETWORK=$val
       ;;
 
     home)
@@ -1734,6 +1751,10 @@ done
 
 if [[ "$USE_CONFIG_FILE" == true ]]; then
   parse_config "$CONFIG_FILE_PATH"
+fi
+
+if [[ -n $OVERRIDE_NETWORK ]]; then
+  pick_network $OVERRIDE_NETWORK
 fi
 
 parse_config "/opt/lukso/networks/$NETWORK/config/network-config.yaml"
