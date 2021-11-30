@@ -5,6 +5,7 @@ COMMAND=$1
 COMMAND_ARG=$2
 USE_CONFIG_FILE=false
 FORCE=false
+VALIDATOR_LOOPS=5
 #####
 
 ##### network info
@@ -621,7 +622,7 @@ start_validator() {
   if [[ -n $TEMPPASSFILE ]]; then
     # Wait until validator starts
     TRIES=0
-    while [[ $TRIES -lt 5 ]]; do
+    while [[ $TRIES -lt VALIDATOR_LOOPS ]]; do
       sleep 1
       echo -n " . "
       TRIES=$((TRIES+1))
@@ -629,11 +630,11 @@ start_validator() {
 
     if [[ ! $(pgrep -x "lukso-validator") ]]; then
       echo "ERROR: Cannot start validator"
-      break;
-    else
-      echo -n "OK "
-      echo
+      exit
     fi
+
+    echo -n "OK "
+    echo
 
     rm $TEMPPASSFILE
   fi
