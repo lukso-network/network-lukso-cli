@@ -22,7 +22,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 ARCHITECTURE=$(uname -m)
-LUKSO_SCRIPT_VERSION="v1.7.2"
+LUKSO_SCRIPT_VERSION="v1.7.3"
 
 RUN_DATE=$(date '+%Y-%m-%d__%H-%M-%S')
 NETWORK="l15-prod"
@@ -46,6 +46,7 @@ NODE_NAME="$(LC_CTYPE=C LANG=C tr -dc A-F0-9 </dev/urandom | head -c 8)"
 EXTERNAL_IP=$(curl -s ident.me)
 
 ###### General variables
+HTTP_CONNECTIVITY=false
 VANGUARD_RPC="127.0.0.1:4000"
 ORC_PANDORA_RPC="ws://127.0.0.1:8546"
 ######
@@ -87,9 +88,11 @@ VANGUARD_RPC_PORT="4000"
 VANGUARD_UDP_PORT="12000"
 VANGUARD_TCP_PORT="13000"
 VANGUARD_GRPC_GATEWAY_PORT="3500"
+VANGUARD_MONITORING_HOST="127.0.0.1"
+VANGUARD_MONITORING_PORT="8080"
 VAN_MIN_SYNC_PEERS="2"
 VAN_MAX_P2P_PEERS="50"
-VAN_ETHSTATS_METRICS="http://127.0.0.1:8080/metrics"
+VAN_ETHSTATS_METRICS="http://$VANGUARD_MONITORING_HOST:$VANGUARD_MONITORING_PORT/metrics"
 ######
 
 ###### Validator
@@ -176,19 +179,15 @@ download_binary() {
     REPO="network-deposit-cli"
     ;;
 
+  eth2stats-client)
+    REPO="network-vanguard-stats-client"
+    ;;
+
   esac
 
   mkdir -p /opt/lukso/binaries/$CLIENT/$TAG
   download https://github.com/lukso-network/"$REPO"/releases/download/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
   sudo chmod +x /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
-}
-
-download_eth2stats_binary() {
-  TAG="$1"
-
-  mkdir -p /opt/lukso/binaries/eth2stats-client/$TAG
-  download https://github.com/lukso-network/network-vanguard-stats-client/releases/download/$TAG/eth2stats-client /opt/lukso/binaries/eth2stats-client/$TAG/eth2stats-client
-  sudo chmod +x /opt/lukso/binaries/eth2stats-client/$TAG/eth2stats-client
 }
 
 bind_binary() {
@@ -199,15 +198,6 @@ bind_binary() {
   fi
 
   sudo ln -sf "/opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE" /usr/local/bin/$CLIENT
-}
-
-bind_eth2stats_binary() {
-  TAG="$1"
-  if [[ ! -f /opt/lukso/binaries/eth2stats-client/$TAG/eth2stats-client ]]; then
-    download_eth2stats_binary $TAG
-  fi
-
-  sudo ln -sf "/opt/lukso/binaries/eth2stats-client/$TAG/eth2stats-client" /usr/local/bin/eth2stats-client
 }
 
 bind_binaries() {
@@ -394,16 +384,36 @@ start_orchestrator() {
   if [[ ! -d "$DATADIR/orchestrator" ]]; then
     mkdir -p $DATADIR/orchestrator
   fi
-  nohup lukso-orchestrator --datadir=$DATADIR/orchestrator \
-    --vanguard-grpc-endpoint=$ORCHESTRATOR_VANGUARD_RPC_ENDPOINT \
-    --http \
-    --http.addr=$ORC_HTTP_ADDR \
-    --http.port=$ORC_HTTP_PORT \
-    --ws \
-    --ws.addr=$ORC_WS_ADDR \
-    --ws.port=$ORC_WS_PORT \
-    --pandora-rpc-endpoint=$ORCHESTRATOR_PANDORA_RPC_ENDPOINT \
-    --verbosity=$ORC_VERBOSITY >|$LOGSDIR/orchestrator/orchestrator_"$RUN_DATE".log 2>&1 &
+
+  ARGUMENTS=(
+    "--datadir=$DATADIR/orchestrator"
+    "--verbosity=$ORC_VERBOSITY"
+  )
+
+  if [[ "$HTTP_CONNECTIVITY" == "true" ]]; then
+    HTTP_FLAGS=(
+      "--http"
+      "--http.addr=$ORC_HTTP_ADDR"
+      "--http.port=$ORC_HTTP_PORT"
+      "--ws"
+      "--ws.addr=$ORC_WS_ADDR"
+      "--ws.port=$ORC_WS_PORT"
+      "--vanguard-grpc-endpoint=$ORCHESTRATOR_VANGUARD_RPC_ENDPOINT"
+      "--pandora-rpc-endpoint=$ORCHESTRATOR_PANDORA_RPC_ENDPOINT"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
+  else
+    IPC_FLAGS=(
+      "--vanguard-grpc-endpoint=$DATADIR/vanguard/vanguard.ipc"
+      "--pandora-rpc-endpoint=$DATADIR/pandora/geth.ipc"
+      "--ipcpath=$DATADIR/orchestrator"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${IPC_FLAGS[@]}")
+  fi
+
+  nohup lukso-orchestrator \
+  "${ARGUMENTS[@]}" \
+  >|$LOGSDIR/orchestrator/orchestrator_"$RUN_DATE".log 2>&1 &
   disown
 }
 
@@ -443,18 +453,29 @@ start_pandora() {
     "--datadir=$DATADIR/pandora"
     "--networkid=$NETWORK_ID"
     "--port=$PANDORA_PORT"
-    "--http"
-    "--http.addr=$PANDORA_HTTP_ADDR"
     "--bootnodes=$PANDORA_BOOTNODES"
-    "--http.port=$PANDORA_HTTP_PORT"
-    "--ws"
-    "--ws.addr=$PANDORA_WS_ADDR"
-    "--ws.port=$PANDORA_WS_PORT"
-    "--miner.notify=$PAN_WS_MINER_NOTIFY,$PAN_HTTP_MINER_NOTIFY"
     "--miner.gaslimit=80000000"
     "--syncmode=full"
     "--verbosity=$PANDORA_VERBOSITY"
   )
+
+  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
+    FLAGS=(
+      "--http"
+      "--http.addr=$PANDORA_HTTP_ADDR"
+      "--http.port=$PANDORA_HTTP_PORT"
+      "--ws"
+      "--ws.addr=$PANDORA_WS_ADDR"
+      "--ws.port=$PANDORA_WS_PORT"
+      "--miner.notify=$PAN_WS_MINER_NOTIFY,$PAN_HTTP_MINER_NOTIFY"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${FLAGS[@]}")
+  else
+    FLAGS=(
+      "--miner.notify=$DATADIR/orchestrator/orchestrator.ipc"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${FLAGS[@]}")
+  fi
 
   if [[ $COINBASE ]]; then
     MINER_ARGUMENTS=(
@@ -464,7 +485,7 @@ start_pandora() {
     ARGUMENTS=("${ARGUMENTS[@]}" "${MINER_ARGUMENTS[@]}")
   fi
 
-  if [[ $PANDORA_UNIVERSAL_PROFILE_EXPOSE ]] && [[ ! $PANDORA_UNSAFE_EXPOSE ]]; then
+  if [[ $PANDORA_UNIVERSAL_PROFILE_EXPOSE ]] && [[ ! $PANDORA_UNSAFE_EXPOSE ]] && [[ $HTTP_CONNECTIVITY == "true" ]]; then
     API_ARGUMENTS=(
       "--http.api=net,eth,txpool,web3"
       "--ws.api=net,eth,txpool,web3"
@@ -472,7 +493,7 @@ start_pandora() {
     ARGUMENTS=("${ARGUMENTS[@]}" "${API_ARGUMENTS[@]}")
   fi
 
-  if [[ $PANDORA_UNSAFE_EXPOSE ]]; then
+  if [[ $PANDORA_UNSAFE_EXPOSE ]] && [[ $HTTP_CONNECTIVITY == "true" ]]; then
     API_ARGUMENTS=(
       "--http.api=admin,net,eth,debug,miner,personal,txpool,web3"
       "--ws.api=admin,net,eth,debug,miner,personal,txpool,web3"
@@ -480,7 +501,7 @@ start_pandora() {
     ARGUMENTS=("${ARGUMENTS[@]}" "${API_ARGUMENTS[@]}")
   fi
 
-  if [[ -n $CORS_DOMAIN ]]; then
+  if [[ -n $CORS_DOMAIN ]] && [[ $HTTP_CONNECTIVITY == "true" ]]; then
     CORS_DOMAIN_FLAGS=(
       "--http.corsdomain=$CORS_DOMAIN"
       "--ws.origins=$CORS_DOMAIN"
@@ -511,7 +532,7 @@ start_pandora() {
     ARGUMENTS=("${ARGUMENTS[@]}" "${NODEKEY_FLAGS[@]}")
   fi
 
-  if [[ -n $PANDORA_RPCVHOSTS ]]; then
+  if [[ -n $PANDORA_RPCVHOSTS ]] && [[ $HTTP_CONNECTIVITY == "true" ]]; then
     RPCVHOSTS_FLAGS=(
       "--http.vhosts=$PANDORA_RPCVHOSTS"
     )
@@ -547,22 +568,38 @@ start_vanguard() {
     "--datadir=$DATADIR/vanguard/"
     "--chain-config-file=/opt/lukso/networks/$NETWORK/config/vanguard-config.yaml"
     "${BOOTNODES_ARGS[@]}"
-    "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
     "--deposit-contract=0x000000000000000000000000000000000000cafe"
     "--contract-deployment-block=0"
-    "--rpc-host=$VANGUARD_RPC_HOST"
-    "--monitoring-host=$VANGUARD_MONITORING_HOST"
     "--verbosity=$VANGUARD_VERBOSITY"
     "--min-sync-peers=$VAN_MIN_SYNC_PEERS"
     "--p2p-max-peers=$VAN_MAX_P2P_PEERS"
-    "--orc-http-provider=$VANGUARD_ORC_RPC_PROVIDER"
-    "--rpc-port=$VANGUARD_RPC_PORT"
     "--p2p-udp-port=$VANGUARD_UDP_PORT"
     "--p2p-tcp-port=$VANGUARD_TCP_PORT"
     "--grpc-gateway-port=$VANGUARD_GRPC_GATEWAY_PORT"
     "--update-head-timely"
     "--lukso-network"
   )
+
+  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
+    RPC_ARGUMENTS=(
+      "--rpc-host=$VANGUARD_RPC_HOST"
+      "--rpc-port=$VANGUARD_RPC_PORT"
+      "--orc-rpc-provider=$VANGUARD_ORC_RPC_PROVIDER"
+      "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
+      "--monitoring-host=$VANGUARD_MONITORING_HOST"
+      "--monitoring-port=$VANGUARD_MONITORING_PORT"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
+  else
+    RPC_ARGUMENTS=(
+      "--disable-monitoring"
+      "--disable-grpc-gateway"
+      "--rpc-host=$DATADIR/vanguard/vanguard.ipc"
+      "--orc-rpc-provider=$DATADIR/orchestrator/orchestrator.ipc"
+      "--http-web3provider=$DATADIR/pandora/geth.ipc"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
+  fi
 
   if [[ -n $VANGUARD_P2P_PRIV_KEY ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--p2p-priv-key=$VANGUARD_P2P_PRIV_KEY")
@@ -595,15 +632,30 @@ start_validator() {
   ARGUMENTS=(
     "--datadir=$DATADIR/validator/"
     "--accept-terms-of-use"
-    "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
     "--chain-config-file=/opt/lukso/networks/$NETWORK/config/vanguard-config.yaml"
     "--verbosity=$VALIDATOR_VERBOSITY"
-    "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
     "--wallet-dir=$WALLET_DIR"
-    "--rpc"
     "--log-file=$LOGSDIR/validator/validator_$RUN_DATE.log"
     "--lukso-network"
   )
+
+  if [[ $HTTP_CONNECTIVITY == "false" ]]; then
+    IPC_FLAGS=(
+      "--disable-monitoring"
+      "--beacon-rpc-provider=$DATADIR/vanguard/vanguard.ipc"
+      "--pandora-http-provider=$DATADIR/pandora/geth.ipc"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${IPC_FLAGS[@]}")
+  fi
+
+  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
+    HTTP_FLAGS=(
+      "--rpc"
+      "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
+      "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
+  fi
 
   if [[ -n $VALIDATOR_PASSWORD_FILE ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$VALIDATOR_PASSWORD_FILE")
@@ -621,14 +673,20 @@ start_validator() {
   if [[ -n $TEMPPASSFILE ]]; then
     # Wait until validator starts
     TRIES=0
-    while [[ ! $(lsof -t -i:7000) ]]; do
+    while [[ $TRIES -lt 5 ]]; do
       sleep 1
-      if [[ $TRIES -ge 10 ]]; then
-        echo "ERROR: Cannot start validator"
-        break;
-      fi
+      echo -n " . "
       TRIES=$((TRIES+1))
     done
+
+    if [[ ! $(pgrep -x "lukso-validator") ]]; then
+      echo "ERROR: Cannot start validator"
+      exit
+    fi
+
+    echo -n "OK "
+    echo
+
     rm $TEMPPASSFILE
   fi
 }
@@ -637,14 +695,30 @@ start_eth2stats_client() {
   mkdir -p "$LOGSDIR"/eth2stats
   echo -n $RUN_DATE >|"$LOGSDIR"/eth2stats/current.tmp
 
+  ARGUMENTS=(
+    "--beacon.type=prysm"
+    "--data.folder=$DATADIR/eth2stats-client"
+    "--eth2stats.node-name=$NODE_NAME"
+    "--eth2stats.addr=$VAN_ETHSTATS"
+    "--eth2stats.tls=false"
+  )
+
+  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
+    HTTP_FLAGS=(
+      "--beacon.metrics-addr=$VAN_ETHSTATS_METRICS"
+      "--beacon.addr=$ETH2STATS_BEACON_ADDR"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
+  else
+    IPC_FLAGS=(
+      "--beacon.addr=$DATADIR/vanguard/vanguard.ipc"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${IPC_FLAGS[@]}")
+  fi
+
   nohup eth2stats-client run \
-    --beacon.type="prysm" \
-    --beacon.addr="$ETH2STATS_BEACON_ADDR" \
-    --beacon.metrics-addr="$VAN_ETHSTATS_METRICS" \
-    --data.folder=$DATADIR/eth2stats-client \
-    --eth2stats.node-name="$NODE_NAME" \
-    --eth2stats.addr="$VAN_ETHSTATS" \
-    --eth2stats.tls="false" >|"$LOGSDIR"/eth2stats/eth2stats_"$RUN_DATE".log 2>&1 &
+    "${ARGUMENTS[@]}" \
+    >|"$LOGSDIR"/eth2stats/eth2stats_"$RUN_DATE".log 2>&1 &
   disown
 }
 
@@ -687,7 +761,7 @@ start_all() {
     sleep 2
   fi
 
-  if [[ "$RUN_LUKSO_STATUS" = true ]]; then
+  if [[ "$RUN_LUKSO_STATUS" == true ]]; then
     echo "################# Starting lukso status #######################"
     sleep 10
     start_lukso_status
@@ -1059,6 +1133,9 @@ help() {
   echo "--vanguard-monitoring-host Sets vanguard monitoring listening interface"
   echo "                       [IP, ex. 127.0.0.1]"
   echo
+  echo "--vanguard-monitoring-port Sets vanguard monitoring port"
+  echo "                       [Port, ex. 8080]"
+  echo
   echo "--validator            Sets validator tag to be used"
   echo "                       [Tag name ex. v0.2.0-rc.1]"
   echo
@@ -1086,11 +1163,13 @@ help() {
   echo
   echo "--force                Enables force mode for stopping"
   echo
+  echo "--http-connectivity                   Switches connectivity between clients from IPC to local HTTP - less secure! (default: uses IPC sockets path like: $DATADIR/pandora/geth.ipc, instead of http://127.0.0.1:8545 endpoint)"
+  echo
   echo "--vanguard-http-web3provider          An eth1 web3 provider string http endpoint or IPC socket path. (default: http://127.0.0.1:8545)"
   echo
-  echo "--vanguard-rpc-host                   Host on which the RPC server should listen. (default: 127.0.0.1)"
+  echo "--vanguard-rpc-host                   [Requires --http-connectivity] Host on which the RPC server should listen. (default: 127.0.0.1)"
   echo
-  echo "--van-rpc-port                        Port on which the RPC server should listen. (default: 4000)"
+  echo "--van-rpc-port                        [Requires --http-connectivity] Port on which the RPC server should listen. (default: 4000)"
   echo
   echo "--van-udp-port                        Vanguard beacon chain client UDP port. The port used by discv5. (default: 12000)"
   echo
@@ -1098,15 +1177,15 @@ help() {
   echo
   echo "--van-grpc-gateway-port               Vanguard gRPC gateway port. The port on which the gateway server runs on (default: 3500)"
   echo
-  echo "--vanguard-orc-rpc-provider           A orchestrator string rpc endpoint. This is our orchestrator client http endpoint or socket path. (default: http://127.0.0.1:7877)"
+  echo "--vanguard-orc-rpc-provider           [Requires --http-connectivity] A orchestrator string rpc endpoint. This is our orchestrator client http endpoint or socket path. (default: http://127.0.0.1:7877)"
   echo
-  echo "--validator-beacon-rpc-provider       Beacon node (vanguard) RPC provider endpoint. (default: $VANGUARD_RPC)"
+  echo "--validator-beacon-rpc-provider       [Requires --http-connectivity] Beacon node (vanguard) RPC provider endpoint. (default: $VANGUARD_RPC)"
   echo
-  echo "--validator-pandora-http-provider     A pandora string rpc endpoint. This is our pandora client http endpoint. (default: http://127.0.0.1:8545)"
+  echo "--validator-pandora-http-provider     [Requires --http-connectivity] A pandora string rpc endpoint. This is our pandora client http endpoint. (default: http://127.0.0.1:8545)"
   echo
-  echo "--orchestrator-vanguard-rpc-endpoint  Enables Vanguard node RPC provider endpoint. (default: $VANGUARD_RPC)"
+  echo "--orchestrator-vanguard-rpc-endpoint  [Requires --http-connectivity] Enables Vanguard node RPC provider endpoint. (default: $VANGUARD_RPC)"
   echo
-  echo "--orchestrator-pandora-rpc-endpoint   Pandora node RP provider endpoint. (default: $ORC_PANDORA_RPC)"
+  echo "--orchestrator-pandora-rpc-endpoint   [Requires --http-connectivity] Pandora node RP provider endpoint. (default: $ORC_PANDORA_RPC)"
   echo
   echo "--eth2stats-beacon-addr               Beacon node endpoint address for eth2stats-client. (default: $VANGUARD_RPC)"
   echo
@@ -1128,9 +1207,9 @@ help() {
   echo
   echo "--pan-ws-port                         Pandora client websocket port exposed. (default:  8546)"
   echo
-  echo "--pan-http-miner-addr                 Pandora HTTP URL to notify of new work packages. (default:  http://127.0.0.1:7877)"
+  echo "--pan-http-miner-addr                 [Requires --http-connectivity] Pandora HTTP URL to notify of new work packages. (default:  http://127.0.0.1:7877)"
   echo
-  echo "--pan-ws-miner-addr                   Pandora Websocket URL to notify of new work packages. (default:  ws://127.0.0.1:7878)"
+  echo "--pan-ws-miner-addr                   [Requires --http-connectivity] Pandora Websocket URL to notify of new work packages. (default:  ws://127.0.0.1:7878)"
   echo
   echo "--pan-ethstats                        Pandora flag to activate ethstats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. Example: --pan-ethstats token123@stats.example.com. (default:  enabled for l15 testnet)"
   echo
@@ -1143,7 +1222,6 @@ help() {
   echo "--van-ethstats-metrics                The metrics address for Vanguard eth2stats-client service (default: http://127.0.0.1:8080/metrics)"
   echo
   echo "--status-page                         This flag is for lukso-status activation. With this service you can check your node status over web browser (default: disabled). Default web address is: http://127.0.0.1:8111"
-
   exit
 }
 
@@ -1228,22 +1306,9 @@ while getopts "$optspec" optchar; do
       ;;
 
     eth2stats)
-      # Temporary fix
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      mkdir -p /opt/lukso/binaries/eth2stats-client/$val
-
-      if [[ $PLATFORM == "Linux" ]]; then
-        download https://storage.googleapis.com/lukso-assets/eth2stats/eth2stats-client-linux /opt/lukso/binaries/eth2stats-client/$val/eth2stats-client
-      fi
-
-      if [[ $PLATFORM == "Darwin" ]]; then
-        download https://storage.googleapis.com/lukso-assets/eth2stats/eth2stats-client-darwin /opt/lukso/binaries/eth2stats-client/$val/eth2stats-client
-      fi
-
-      chmod +x /opt/lukso/binaries/eth2stats-client/$val/eth2stats-client
-      ln -sf /opt/lukso/binaries/eth2stats-client/$val/eth2stats-client /usr/local/bin/eth2stats-client
-
+      bind_binary eth2stats-client $val
       ;;
 
     lukso-status)
@@ -1611,6 +1676,12 @@ while getopts "$optspec" optchar; do
       OVERRIDE_VANGUARD_MONITORING_HOST="$val"
       ;;
 
+    vanguard-monitoring-port)
+      val="${!OPTIND}"
+      OPTIND=$(($OPTIND + 1))
+      OVERRIDE_VANGUARD_MONITORING_PORT="$val"
+      ;;
+
     validator-verbosity)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
@@ -1635,6 +1706,10 @@ while getopts "$optspec" optchar; do
 
     status-page)
       OVERRIDE_RUN_LUKSO_STATUS=true
+      ;;
+
+    http-connectivity)
+      OVERRIDE_HTTP_CONNECTIVITY=true
       ;;
 
     force)
@@ -1796,6 +1871,12 @@ fi
 
 if [[ -n $OVERRIDE_VANGUARD_MONITORING_HOST ]]; then
   VANGUARD_MONITORING_HOST=$OVERRIDE_VANGUARD_MONITORING_HOST
+  VAN_ETHSTATS_METRICS="http://$VANGUARD_MONITORING_HOST:$VANGUARD_MONITORING_PORT/metrics"
+fi
+
+if [[ -n $OVERRIDE_VANGUARD_MONITORING_PORT ]]; then
+  VANGUARD_MONITORING_PORT=$OVERRIDE_VANGUARD_MONITORING_PORT
+  VAN_ETHSTATS_METRICS="http://$VANGUARD_MONITORING_HOST:$VANGUARD_MONITORING_PORT/metrics"
 fi
 
 if [[ -n $OVERRIDE_EXTERNAL_IP ]]; then
@@ -1912,6 +1993,10 @@ fi
 
 if [[ -n $OVERRIDE_RUN_LUKSO_STATUS ]]; then
   RUN_LUKSO_STATUS=$OVERRIDE_RUN_LUKSO_STATUS
+fi
+
+if [[ -n $OVERRIDE_HTTP_CONNECTIVITY ]]; then
+  HTTP_CONNECTIVITY=$OVERRIDE_HTTP_CONNECTIVITY
 fi
 
 if [[ ! -d $DATADIR ]]; then
