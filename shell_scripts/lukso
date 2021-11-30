@@ -5,6 +5,7 @@ COMMAND=$1
 COMMAND_ARG=$2
 USE_CONFIG_FILE=false
 FORCE=false
+VALIDATOR_LOOPS=5
 #####
 
 ##### network info
@@ -22,7 +23,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 ARCHITECTURE=$(uname -m)
-LUKSO_SCRIPT_VERSION="v1.7.5"
+LUKSO_SCRIPT_VERSION="v1.7.6"
 
 RUN_DATE=$(date '+%Y-%m-%d__%H-%M-%S')
 NETWORK="l15-prod"
@@ -673,7 +674,7 @@ start_validator() {
   if [[ -n $TEMPPASSFILE ]]; then
     # Wait until validator starts
     TRIES=0
-    while [[ $TRIES -lt 5 ]]; do
+    while [[ $TRIES -lt VALIDATOR_LOOPS ]]; do
       sleep 1
       echo -n " . "
       TRIES=$((TRIES+1))
