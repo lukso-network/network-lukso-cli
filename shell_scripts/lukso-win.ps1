@@ -424,7 +424,7 @@ Function check_validator_requirements()
         $global:TempPassFile = "$Env:APPDATA\LUKSO\temp_pass.txt"
         [IO.File]::WriteAllLines($global:TempPassFile, $value)
         $validatorPath = $(Get-Item "$InstallDir\globalPath\lukso-validator").Target[0]
-        powershell.exe -command "$validatorPath accounts list --wallet-dir ${wallet-dir} --wallet-password-file $global:TempPassFile"
+        powershell.exe -command "$validatorPath accounts list --wallet-dir ${wallet-dir} --wallet-password-file $global:TempPassFile" | Out-Null
         $PasswordCheck = $?
         if (!($PasswordCheck)) {
             Write-Output "Wrong password for wallet in ${wallet-dir}"
@@ -639,7 +639,8 @@ function start_validator() {
 
     if (($argument -eq "validator") -and ($coinbase)) {
         $pandoraPath = $(Get-Item "$InstallDir\globalPath\pandora").Target[0]
-        powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec `"miner.setEtherbase(`'$coinbase`')`""
+        $pandoraCommand = "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec `"miner.setEtherbase(`'"+$coinbase+"`')`""
+        "$pandoraPath $pandoraCommand" | Out-Null
         powershell.exe -command "$pandoraPath attach ipc:\\.\pipe\geth.ipc --exec 'miner.start()'"
     }
 
