@@ -4,7 +4,7 @@
 
 # Flags declaration
 param (
-    [Parameter(Position = 0, Mandatory)][String]$command,
+    [Parameter(Position = 0)][String]$command,
     [Parameter(Position = 1)][String]$argument,
     [String]$deposit,
     [String]$eth2stats,
@@ -101,6 +101,8 @@ Function pick_network($picked_network)
     $NetworkConfigFile = "$InstallDir\networks\$network\config\network-config.yaml"
     $NetworkConfig = ConvertFrom-Yaml $(Get-Content -Raw $NetworkConfigFile)
 }
+
+$command = If ($command) {$command} Else {"help"}
 
 $network = If ($network) {$network} ElseIf ($ConfigFile.NETWORK) {$ConfigFile.NETWORK} Else {""}
 
@@ -280,7 +282,7 @@ Function bind_binary($client, $tag)
         download_binary $client $tag
     }
     if (Test-Path "$InstallDir\globalPath\$client") {
-        rm "$InstallDir\globalPath\$client"
+        Remove-Item "$InstallDir\globalPath\$client"
     }
 
     cmd /c mklink "$InstallDir\globalPath\$client" "$InstallDir\binaries\$client\$tag\$client-$platform-$architecture.exe" | Out-Null
@@ -341,7 +343,9 @@ Function import_accounts() {
 
 Function setup_config()
 {
-    $input_configLocation = Read-Host -Prompt "Where to store config file? "
+    $input_configLocation = Read-Host -Prompt "Where to store config file? (Default: config.yaml) "
+    if ($input_configLocation) {$input_configLocation} Else {"config.yaml"}
+
     while (!($input_coinbase -match '^0x[a-fA-F0-9]{40}$'))
     {
         $input_coinbase = Read-Host -Prompt "Enter your coinbase (0x<ETH1_ADDRESS>)"
@@ -350,17 +354,17 @@ Function setup_config()
         }
     }
 
-    while (!($input_walletDir)) {
+    while (!($input_walletDir) -or !($(Resolve-Path -ErrorAction 'silentlycontinue' $input_walletDir))) {
         $input_walletDir = Read-Host -Prompt "Enter wallet directory location"
     }
     $input_walletDir = $(Resolve-Path $input_walletDir).Path
 
-    while (!($input_dataDir)) {
+    while (!($input_dataDir) -or !($(Resolve-Path -ErrorAction 'silentlycontinue' $input_dataDir))) {
         $input_dataDir = Read-Host -Prompt "Enter data directory (chain will be stored there) location"
     }
     $input_dataDir = $(Resolve-Path $input_dataDir).Path
 
-    while (!($input_logsDir)) {
+    while (!($input_logsDir) -or !($(Resolve-Path -ErrorAction 'silentlycontinue' $input_logsDir))) {
         $input_logsDir = Read-Host -Prompt "Enter logs directory location"
     }
     $input_logsDir = $(Resolve-Path $input_logsDir).Path
@@ -378,7 +382,8 @@ Function setup_config()
     }
 
     $yaml = ConvertTo-Yaml $configData
-    Write-Output $yaml > config.yaml
+    Write-Output $yaml > $input_configLocation
+    Write-Output "Saved to $($(Resolve-Path $input_configLocation).Path)"
 }
 
 Function check_validator_requirements()
@@ -462,7 +467,7 @@ Function start_orchestrator()
     )
 
     $OrchestratorPath = $(Get-Item "$InstallDir\globalPath\lukso-orchestrator").Target[0]
-    echo $OrchestratorPath
+
     Start-Process -FilePath "$OrchestratorPath" `
     -ArgumentList $arguments `
     -WindowStyle hidden `
@@ -716,7 +721,6 @@ function start_lukso_status() {
 
     Write-Output $runDate | Out-File -FilePath "$logsdir\lukso-status\current.tmp"
 
-    $Arguments = New-Object System.Collections.Generic.List[System.Object]
 
     $LuksoStatusPath = $(Get-Item "$InstallDir\globalPath\lukso-status").Target[0]
     Start-Process -FilePath $LuksoStatusPath `
@@ -1075,9 +1079,9 @@ if (${lukso-status})
     New-Item -ItemType Directory -Force -Path $InstallDir\binaries\lukso-status\${lukso-status}
     Expand-Archive -Path "$InstallDir\lukso-status-${lukso-status}-windows-amd64.zip" -DestinationPath "$InstallDir\binaries\lukso-status\${lukso-status}" -Force
     if (Test-Path "$InstallDir\globalPath\lukso-status") {
-        rm "$InstallDir\globalPath\lukso-status"
+        Remove-Item "$InstallDir\globalPath\lukso-status"
     }
-    echo "$InstallDir\binaries\lukso-status\${lukso-status}\lukso-status.exe"
+
     cmd /c mklink "$InstallDir\globalPath\lukso-status" "$InstallDir\binaries\lukso-status\${lukso-status}\lukso-status.exe"
 }
 
@@ -1087,7 +1091,7 @@ switch ($command)
 {
     "start" {
         _start $argument
-        $KeepShell = $true
+        # $KeepShell = $true
     }
 
     "stop" {

@@ -29,7 +29,7 @@ download_network_config("l15-dev")
 
 download "https://raw.githubusercontent.com/lukso-network/network-lukso-cli/feature/windows-script/shell_scripts/lukso-win.ps1" $InstallDir\lukso.ps1
 if (Test-Path "$InstallDir\globalPath\lukso") {
-    rm "$InstallDir\globalPath\lukso"
+    Remove-Item "$InstallDir\globalPath\lukso"
 }
 
 # Write-Output "powershell.exe -File $InstallDir\lukso.ps1 %*" | Out-File -Encoding ASCII -FilePath "$InstallDir\globalPath\lukso.bat"
