@@ -7,7 +7,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var ConfigValues LuksoValues
 
 func LoadConfig(LuksoSettings *LuksoValues, configFilePath string) error {
 	buf, err := ioutil.ReadFile(configFilePath)
