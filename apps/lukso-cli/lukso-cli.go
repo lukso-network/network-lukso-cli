@@ -2,14 +2,14 @@ package main
 
 import (
 	"lukso-cli/config"
-	"lukso-cli/flags"
+	"lukso-cli/cli"
 	"lukso-cli/runner"
 )
 
 var LuksoSettings config.LuksoValues
 
 func main() {
-	flags.InitFlags()
+	cli.InitFlags()
 
 	// Build Settings
 
@@ -17,15 +17,15 @@ func main() {
 	config.LoadDefaults(&LuksoSettings)
 
 	//Overwrite with config
-	if flags.FlagValues.Config != "" {
-		config.LoadConfig(&LuksoSettings, flags.FlagValues.Config)
+	if cli.FlagValues.Config != "" {
+		config.LoadConfig(&LuksoSettings, cli.FlagValues.Config)
 	}
 
 	//Overwrite with flags
-	flags.LoadFlags(&LuksoSettings)
+	cli.LoadFlags(&LuksoSettings)
 
 	// RUN
 
-	runner.Action(flags.Cmd, flags.Arg, &LuksoSettings)
+	runner.Action(cli.Cmd, cli.Arg, &LuksoSettings)
 
 }
