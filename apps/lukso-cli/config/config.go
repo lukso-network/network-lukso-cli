@@ -69,10 +69,6 @@ type LuksoValues struct {
 	Validator struct {
 		Tag                 string `yaml:"TAG"`
 		Verbosity           string `yaml:"VERBOSITY"`
-		HttpPort            int    `yaml:"HTTP_PORT"`
-		HttpAddr            string `yaml:"HTTP_ADDR"`
-		WebsocketsPort      int    `yaml:"WS_PORT"`
-		WebsocketsAddr      string `yaml:"WS_ADDR"`
 		BeaconRPCProvider   string `yaml:"BEACON_RPC_PROVIDER"`
 		PandoraHTTPProvider string `yaml:"PANDORA_HTTP_PROVIDER"`
 	}
@@ -124,8 +120,8 @@ func LoadDefaults(LuksoSettings *LuksoValues) {
 
 	LuksoSettings.Orchestrator.Tag = ""
 	LuksoSettings.Orchestrator.Verbosity = "info"
-	LuksoSettings.Orchestrator.VanguardRPCEndpoint = ""
-	LuksoSettings.Orchestrator.PandoraRPCEndpoint = ""
+	LuksoSettings.Orchestrator.VanguardRPCEndpoint = "127.0.0.1:4000"
+	LuksoSettings.Orchestrator.PandoraRPCEndpoint = "ws://127.0.0.1:8546"
 
 	LuksoSettings.Pandora.Tag = ""
 	LuksoSettings.Pandora.Verbosity = "info"
@@ -149,5 +145,18 @@ func LoadDefaults(LuksoSettings *LuksoValues) {
 	LuksoSettings.Vanguard.RPCPort = 4000
 	LuksoSettings.Vanguard.UDPPort = 12000
 	LuksoSettings.Vanguard.TCPPort = 13000
+	LuksoSettings.Vanguard.MonitoringHost = "127.0.0.1"
+	LuksoSettings.Vanguard.HTTPWeb3Provider = "http://127.0.0.1:8545"
+	LuksoSettings.Vanguard.GRPCGatewayPort = 3500
+	LuksoSettings.Vanguard.OrchestratorRPCProvider = "http://127.0.0.1:7877"
+	LuksoSettings.Vanguard.MinSyncPeers = 2
+	LuksoSettings.Vanguard.MaxP2PPeers = 50
+	LuksoSettings.Vanguard.Ethstats = ""
+	LuksoSettings.Vanguard.EthstatsMetrics = ""
+
+	LuksoSettings.Validator.Tag = ""
+	LuksoSettings.Validator.Verbosity = "info"
+	LuksoSettings.Validator.BeaconRPCProvider = "127.0.0.1:4000"
+	LuksoSettings.Validator.PandoraHTTPProvider = "http://127.0.0.1:8545"
 
 }

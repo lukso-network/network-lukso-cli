@@ -23,7 +23,7 @@ func prepare(LuksoSettings *config.LuksoValues) error {
 
 func Start(LuksoSettings *config.LuksoValues) {
 
-	err := prepare(&*LuksoSettings)
+	err := prepare(LuksoSettings)
 
 	if err != nil {
 		println(err)

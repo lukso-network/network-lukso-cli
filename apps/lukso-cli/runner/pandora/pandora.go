@@ -22,7 +22,7 @@ func Prepare(LuksoSettings *config.LuksoValues) {
 }
 
 func Start(LuksoSettings *config.LuksoValues) {
-	Prepare(&*LuksoSettings)
+	Prepare(LuksoSettings)
 	println("Starting Pandora")
 
 	err, NetworkConfig := config.LoadNetworkConfig(LuksoSettings.Network)

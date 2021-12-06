@@ -9,7 +9,9 @@ import (
 var LuksoSettings config.LuksoValues
 
 func main() {
-	cli.InitFlags()
+
+	// Initialize CLI, read values from flags
+	cli.Init()
 
 	// Build Settings
 
@@ -19,10 +21,6 @@ func main() {
 	//Overwrite with config
 	if cli.FlagValues.Config != "" {
 		config.LoadConfig(&LuksoSettings, cli.FlagValues.Config)
-	}
-
-	if cli.FlagValues.GUI {
-		// gui.Start()
 	}
 
 	//Overwrite with flags
@@ -36,5 +34,15 @@ func main() {
 
 	// RUN
 	runner.Action(cli.Cmd, cli.Arg, &LuksoSettings)
+
+	if cli.FlagValues.ApiServer || cli.FlagValues.GUI {
+		//Start API server
+		//HTTPApi.Start()
+	}
+
+	if cli.FlagValues.GUI {
+		// Start Frontend Server
+		// gui.Start()
+	}
 
 }

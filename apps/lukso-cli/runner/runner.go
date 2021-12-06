@@ -13,24 +13,24 @@ func Start(arg string, LuksoSettings *config.LuksoValues) {
 
 	switch arg {
 	case "all":
-		orchestrator.Start(&*LuksoSettings)
-		pandora.Start(&*LuksoSettings)
-		vanguard.Start(&*LuksoSettings)
+		orchestrator.Start(LuksoSettings)
+		pandora.Start(LuksoSettings)
+		vanguard.Start(LuksoSettings)
 		if LuksoSettings.Validate {
-			validator.Start(&*LuksoSettings)
+			validator.Start(LuksoSettings)
 		}
 
 	case "orchestrator":
-		orchestrator.Start(&*LuksoSettings)
+		orchestrator.Start(LuksoSettings)
 
 	case "pandora":
-		pandora.Start(&*LuksoSettings)
+		pandora.Start(LuksoSettings)
 
 	case "vanguard":
-		vanguard.Start(&*LuksoSettings)
+		vanguard.Start(LuksoSettings)
 
 	case "validator":
-		validator.Start(&*LuksoSettings)
+		validator.Start(LuksoSettings)
 	}
 }
 
@@ -49,11 +49,11 @@ func Version() {
 func Action(cmd string, arg string, LuksoSettings *config.LuksoValues) {
 	switch cmd {
 	case "start":
-		Start(arg, &*LuksoSettings)
+		Start(arg, LuksoSettings)
 	case "stop":
-		Stop(arg, &*LuksoSettings)
+		Stop(arg, LuksoSettings)
 	case "reset":
-		Reset(arg, &*LuksoSettings)
+		Reset(arg, LuksoSettings)
 	case "version":
 		Version()
 	}

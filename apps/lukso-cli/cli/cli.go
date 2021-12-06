@@ -12,7 +12,7 @@ import (
 var Cmd string
 var Arg string
 
-func InitFlags() {
+func Init() {
 
 	app := cli.NewApp()
 	app.Name = "LUKSO CLI"

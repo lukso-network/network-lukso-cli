@@ -13,6 +13,7 @@ var FlagValues struct {
 	l15_staging bool
 	l15_dev     bool
 	GUI         bool
+	ApiServer   bool
 }
 
 var luksoFlags []cli.Flag
@@ -23,6 +24,11 @@ func getLuksoFlags() []cli.Flag {
 	config.LoadDefaults(&DefaultValues)
 
 	luksoFlags = []cli.Flag{
+		&cli.BoolFlag{
+			Name:        "gui",
+			Usage:       "Starts GUI",
+			Destination: &FlagValues.GUI,
+		},
 		&cli.StringFlag{
 			Name:        "config",
 			Value:       "",
@@ -35,6 +41,7 @@ func getLuksoFlags() []cli.Flag {
 			Value:       "",
 			Usage:       "Picks which setup to use default: " + DefaultValues.Network,
 			Destination: &FlagValues.Network,
+			EnvVars:     []string{"NETWORK"},
 		},
 		&cli.BoolFlag{
 			Name:        "l15-prod",
@@ -78,7 +85,7 @@ func getLuksoFlags() []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "orchestrator-tag",
-			Aliases:     []string{"orchestrator", "orc-tag"},
+			Aliases:     []string{"orc-tag", "orchestrator"},
 			Usage:       "download and set orchestrator to given tag",
 			Destination: &FlagValues.Orchestrator.Tag,
 		},
@@ -97,7 +104,7 @@ func getLuksoFlags() []cli.Flag {
 		&cli.StringFlag{
 			Name:        "orchestrator-pandora-rpc-endpoint",
 			Aliases:     []string{"orc-pandora-rpc-endpoint"},
-			Usage:       "Pandora node RP provider endpoint.",
+			Usage:       "Pandora node RPC provider endpoint.",
 			Destination: &FlagValues.Orchestrator.PandoraRPCEndpoint,
 		},
 	}
