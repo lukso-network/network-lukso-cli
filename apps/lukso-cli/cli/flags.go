@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"lukso-cli/config"
 )
@@ -21,7 +21,7 @@ func InitFlags() {
 	app.Flags = getLuksoFlags()
 	app.EnableBashCompletion = true
 
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		getStartCommand(),
 		getStopCommand(),
 	}

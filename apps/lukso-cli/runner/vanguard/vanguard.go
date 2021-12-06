@@ -11,7 +11,7 @@ func prepare(LuksoSettings *config.LuksoValues) error {
 	println(LuksoSettings.Network)
 
 	err := os.MkdirAll(LuksoSettings.DataDir+"/vanguard", 0755)
-    
+
 	if err != nil {
 		println(err.Error())
 		return err

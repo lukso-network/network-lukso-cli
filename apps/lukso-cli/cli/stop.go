@@ -1,14 +1,15 @@
 package cli
 
-import "github.com/urfave/cli"
+import "github.com/urfave/cli/v2"
 
-func getStopCommand() cli.Command {
-	stopSubCommands := []cli.Command{
+func getStopCommand() *cli.Command {
+	stopSubCommands := []*cli.Command{
 		{
 			Name:  "vanguard",
 			Flags: getLuksoFlags(),
-			Action: func(c *cli.Context) {
+			Action: func(c *cli.Context) error {
 				println("Stopping Vanguard")
+				return nil
 			},
 		},
 	}
@@ -18,11 +19,12 @@ func getStopCommand() cli.Command {
 		Usage:     "Stop up all or specific client(s)",
 		UsageText: "lukso stop [client]\n   [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status, all]",
 		Flags:     getLuksoFlags(),
-		Action: func(c *cli.Context) {
+		Action: func(c *cli.Context) error {
 			println("Stopping all")
+			return nil
 		},
 		Subcommands: stopSubCommands,
 	}
 
-	return stop
+	return &stop
 }
