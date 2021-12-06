@@ -2,6 +2,8 @@ package validator
 
 import "lukso-cli/config"
 
+func CheckValidatorRequirements(LuksoSettings config.LuksoValues)
+
 func Start(LuksoSettings *config.LuksoValues) {
 	println("Starting Validator")
 }

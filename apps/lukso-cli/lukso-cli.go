@@ -1,8 +1,8 @@
 package main
 
 import (
-	"lukso-cli/config"
 	"lukso-cli/cli"
+	"lukso-cli/config"
 	"lukso-cli/runner"
 )
 
@@ -25,7 +25,7 @@ func main() {
 	cli.LoadFlags(&LuksoSettings)
 
 	// RUN
-
+	println(LuksoSettings.Network)
 	runner.Action(cli.Cmd, cli.Arg, &LuksoSettings)
 
 }

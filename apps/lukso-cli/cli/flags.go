@@ -73,6 +73,13 @@ func LoadFlags(LuksoSettings *config.LuksoValues) {
 		LuksoSettings.Network = "l15-dev"
 	}
 
+	if FlagValues.DataDir != "" {
+		LuksoSettings.DataDir = FlagValues.DataDir
+	} else {
+		homeDir, _ := os.UserHomeDir()
+		LuksoSettings.DataDir = homeDir + "/.lukso/" + LuksoSettings.Network + "/datadir"
+	}
+
 	if FlagValues.Orchestrator.Verbosity != "" {
 		LuksoSettings.Orchestrator.Verbosity = FlagValues.Orchestrator.Verbosity
 	}

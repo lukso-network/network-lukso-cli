@@ -1,5 +1,7 @@
 package config
 
+import "os"
+
 type LuksoValues struct {
 	Force              bool   `yaml:"FORCE"`
 	Network            string `yaml:"NETWORK"`
@@ -73,6 +75,8 @@ type LuksoValues struct {
 func LoadDefaults(LuksoSettings *LuksoValues) {
 	LuksoSettings.Force = false
 	LuksoSettings.Network = "l15"
+	homeDir, _ := os.UserHomeDir()
+	LuksoSettings.DataDir = homeDir + "/.lukso/" + LuksoSettings.Network + "/datadir"
 	LuksoSettings.Orchestrator.Verbosity = "info"
 	LuksoSettings.Pandora.Verbosity = "info"
 }

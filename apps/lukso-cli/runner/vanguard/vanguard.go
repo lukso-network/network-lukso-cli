@@ -8,11 +8,13 @@ import (
 
 func prepare(LuksoSettings *config.LuksoValues) error {
 
-	err := os.Mkdir(LuksoSettings.Network+"/vanguard", 0755)
-	println(LuksoSettings.DataDir)
+	println(LuksoSettings.Network)
 
+	err := os.MkdirAll(LuksoSettings.DataDir+"/vanguard", 0755)
+    
 	if err != nil {
-		return fmt.Errorf("")
+		println(err.Error())
+		return err
 	}
 
 	return nil
@@ -24,6 +26,7 @@ func Start(LuksoSettings *config.LuksoValues) {
 	err := prepare(&*LuksoSettings)
 
 	if err != nil {
+		println(err)
 		fmt.Println("Cannot start vanguard")
 		// os.Exit(1)
 	}
