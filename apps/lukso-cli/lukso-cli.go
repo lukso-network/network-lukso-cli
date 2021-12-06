@@ -21,11 +21,20 @@ func main() {
 		config.LoadConfig(&LuksoSettings, cli.FlagValues.Config)
 	}
 
+	if cli.FlagValues.GUI {
+		// gui.Start()
+	}
+
 	//Overwrite with flags
 	cli.LoadFlags(&LuksoSettings)
 
+	//Download binaries if missing
+
+	if LuksoSettings.Orchestrator.Tag != "" {
+		//runner.Action("download", "orchestrator", &LuksoSettings)
+	}
+
 	// RUN
-	println(LuksoSettings.Network)
 	runner.Action(cli.Cmd, cli.Arg, &LuksoSettings)
 
 }

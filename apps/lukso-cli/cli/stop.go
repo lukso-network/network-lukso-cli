@@ -8,7 +8,7 @@ func getStopCommand() *cli.Command {
 			Name:  "vanguard",
 			Flags: getLuksoFlags(),
 			Action: func(c *cli.Context) error {
-				println("Stopping Vanguard")
+				Cmd, Arg = "stop", "vanguard"
 				return nil
 			},
 		},
@@ -20,7 +20,7 @@ func getStopCommand() *cli.Command {
 		UsageText: "lukso stop [client]\n   [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status, all]",
 		Flags:     getLuksoFlags(),
 		Action: func(c *cli.Context) error {
-			println("Stopping all")
+			Cmd, Arg = "stop", "all"
 			return nil
 		},
 		Subcommands: stopSubCommands,

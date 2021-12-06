@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"fmt"
 	"lukso-cli/config"
 	"lukso-cli/runner/orchestrator"
 	"lukso-cli/runner/pandora"
@@ -33,10 +34,28 @@ func Start(arg string, LuksoSettings *config.LuksoValues) {
 	}
 }
 
+func Stop(arg string, LuksoSettings *config.LuksoValues) error {
+	return nil
+}
+
+func Reset(arg string, LuksoSettings *config.LuksoValues) error {
+	return nil
+}
+
+func Version() {
+	fmt.Println("v0.0.1")
+}
+
 func Action(cmd string, arg string, LuksoSettings *config.LuksoValues) {
 	switch cmd {
 	case "start":
 		Start(arg, &*LuksoSettings)
+	case "stop":
+		Stop(arg, &*LuksoSettings)
+	case "reset":
+		Reset(arg, &*LuksoSettings)
+	case "version":
+		Version()
 	}
 
 }

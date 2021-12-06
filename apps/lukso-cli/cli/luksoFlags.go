@@ -12,6 +12,7 @@ var FlagValues struct {
 	l15_prod    bool
 	l15_staging bool
 	l15_dev     bool
+	GUI         bool
 }
 
 var luksoFlags []cli.Flag

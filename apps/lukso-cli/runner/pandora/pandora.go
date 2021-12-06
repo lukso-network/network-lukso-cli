@@ -5,6 +5,8 @@ import (
 	"lukso-cli/config"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
 )
 
 func Prepare(LuksoSettings *config.LuksoValues) {
@@ -22,7 +24,19 @@ func Prepare(LuksoSettings *config.LuksoValues) {
 func Start(LuksoSettings *config.LuksoValues) {
 	Prepare(&*LuksoSettings)
 	println("Starting Pandora")
-	command := exec.Command("pandora")
+
+	err, NetworkConfig := config.LoadNetworkConfig(LuksoSettings.Network)
+	if err != nil {
+		log.Fatal("Config not loaded")
+	}
+
+	args := []string{
+		"--datadir=" + LuksoSettings.DataDir + "/pandora",
+		"--chainid=" + strconv.Itoa(NetworkConfig.ChainID),
+		"--port=" + strconv.Itoa(LuksoSettings.Pandora.Port),
+	}
+
+	command := exec.Command("pandora" + strings.Join(args, " "))
 	if startError := command.Start(); startError != nil {
 		log.Fatal(startError)
 		return

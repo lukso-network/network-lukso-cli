@@ -24,6 +24,7 @@ func InitFlags() {
 	app.Commands = []*cli.Command{
 		getStartCommand(),
 		getStopCommand(),
+		getVersionCommand(),
 	}
 
 	err := app.Run(os.Args)
