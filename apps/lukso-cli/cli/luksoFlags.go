@@ -169,6 +169,24 @@ func getLuksoFlags() []cli.Flag {
 			Usage:       "Pandora client http address exposed. (Default: " + DefaultValues.Pandora.HttpAddr + ")",
 			Destination: &FlagValues.Pandora.Bootnodes,
 		},
+		&cli.IntFlag{
+			Name:        "pandora-http-port",
+			Aliases:     []string{"pan-http-port"},
+			Usage:       "Pandora client http port exposed. (Default:  " + strconv.Itoa(DefaultValues.Pandora.HttpPort) + ")",
+			Destination: &FlagValues.Pandora.HttpPort,
+		},
+		&cli.StringFlag{
+			Name:        "pandora-ws-addr",
+			Aliases:     []string{"pan-ws-addr"},
+			Usage:       "Pandora client websocket address exposed. (Default: " + DefaultValues.Pandora.WebsocketsAddr + ")",
+			Destination: &FlagValues.Pandora.Bootnodes,
+		},
+		&cli.IntFlag{
+			Name:        "pandora-ws-port",
+			Aliases:     []string{"pan-ws-port"},
+			Usage:       "Pandora client websocket port exposed. (Default:  " + strconv.Itoa(DefaultValues.Pandora.WebsocketsPort) + ")",
+			Destination: &FlagValues.Pandora.HttpPort,
+		},
 	}
 	return luksoFlags
 }
