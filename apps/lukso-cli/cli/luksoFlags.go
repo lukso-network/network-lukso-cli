@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"strconv"
+
 	"github.com/urfave/cli/v2"
 
 	"lukso-cli/config"
@@ -25,6 +27,11 @@ func getLuksoFlags() []cli.Flag {
 
 	luksoFlags = []cli.Flag{
 		&cli.BoolFlag{
+			Name:        "api",
+			Usage:       "Starts API server",
+			Destination: &FlagValues.ApiServer,
+		},
+		&cli.BoolFlag{
 			Name:        "gui",
 			Usage:       "Starts GUI",
 			Destination: &FlagValues.GUI,
@@ -35,13 +42,6 @@ func getLuksoFlags() []cli.Flag {
 			Usage:       "Loads config file",
 			TakesFile:   true,
 			Destination: &FlagValues.Config,
-		},
-		&cli.StringFlag{
-			Name:        "network",
-			Value:       "",
-			Usage:       "Picks which setup to use default: " + DefaultValues.Network,
-			Destination: &FlagValues.Network,
-			EnvVars:     []string{"NETWORK"},
 		},
 		&cli.BoolFlag{
 			Name:        "l15-prod",
@@ -59,6 +59,18 @@ func getLuksoFlags() []cli.Flag {
 			Destination: &FlagValues.l15_dev,
 		},
 		&cli.BoolFlag{
+			Name:        "force",
+			Usage:       "Enables force mode",
+			Destination: &FlagValues.Force,
+		},
+		&cli.StringFlag{
+			Name:        "network",
+			Value:       "",
+			Usage:       "Picks which setup to use default: " + DefaultValues.Network,
+			Destination: &FlagValues.Network,
+			EnvVars:     []string{"NETWORK"},
+		},
+		&cli.BoolFlag{
 			Name:        "validate",
 			Usage:       "Starts validator",
 			Destination: &FlagValues.Validate,
@@ -74,14 +86,34 @@ func getLuksoFlags() []cli.Flag {
 			Destination: &FlagValues.NodeName,
 		},
 		&cli.StringFlag{
+			Name:        "datadir",
+			Usage:       "Sets datadir path",
+			Destination: &FlagValues.DataDir,
+		},
+		&cli.StringFlag{
 			Name:        "logsdir",
 			Usage:       "Sets the logs path",
 			Destination: &FlagValues.LogsDir,
 		},
 		&cli.StringFlag{
-			Name:        "datadir",
-			Usage:       "Sets datadir path",
-			Destination: &FlagValues.DataDir,
+			Name:        "keys-dir",
+			Usage:       "Sets directory of lukso-deposit-cli keys (can be used with \"keygen\" or \"wallet\")",
+			Destination: &FlagValues.LogsDir,
+		},
+		&cli.StringFlag{
+			Name:        "keys-password-file",
+			Usage:       "Sets path to lukso-deposit-cli keys (can be used with \"keygen\" or \"wallet\")",
+			Destination: &FlagValues.LogsDir,
+		},
+		&cli.StringFlag{
+			Name:        "wallet-dir",
+			Usage:       "Sets directory of lukso-validator wallet",
+			Destination: &FlagValues.LogsDir,
+		},
+		&cli.StringFlag{
+			Name:        "wallet-password-file",
+			Usage:       "Password for lukso-validator",
+			Destination: &FlagValues.LogsDir,
 		},
 		&cli.StringFlag{
 			Name:        "orchestrator-tag",
@@ -106,6 +138,36 @@ func getLuksoFlags() []cli.Flag {
 			Aliases:     []string{"orc-pandora-rpc-endpoint"},
 			Usage:       "Pandora node RPC provider endpoint.",
 			Destination: &FlagValues.Orchestrator.PandoraRPCEndpoint,
+		},
+		&cli.StringFlag{
+			Name:        "pandora-tag",
+			Aliases:     []string{"pan-tag", "pandora"},
+			Usage:       "download and set pandora to given tag",
+			Destination: &FlagValues.Pandora.Tag,
+		},
+		&cli.StringFlag{
+			Name:        "pandora-verbosity",
+			Aliases:     []string{"pan-verbosity"},
+			Usage:       "Sets pandora logging depth (Default: " + DefaultValues.Pandora.Verbosity + ")",
+			Destination: &FlagValues.Pandora.Verbosity,
+		},
+		&cli.StringFlag{
+			Name:        "pandora-bootnodes",
+			Aliases:     []string{"pan-bootnodes"},
+			Usage:       "Sets pandora bootnodes (Default: " + DefaultValues.Pandora.Verbosity + ")",
+			Destination: &FlagValues.Pandora.Bootnodes,
+		},
+		&cli.IntFlag{
+			Name:        "pandora-port",
+			Aliases:     []string{"pan-port"},
+			Usage:       "Pandora client TCP/UDP port exposed. (Default:  " + strconv.Itoa(DefaultValues.Pandora.Port) + ")",
+			Destination: &FlagValues.Pandora.Port,
+		},
+		&cli.StringFlag{
+			Name:        "pandora-http-addr",
+			Aliases:     []string{"pan-http-addr"},
+			Usage:       "Pandora client http address exposed. (Default: " + DefaultValues.Pandora.HttpAddr + ")",
+			Destination: &FlagValues.Pandora.Bootnodes,
 		},
 	}
 	return luksoFlags
