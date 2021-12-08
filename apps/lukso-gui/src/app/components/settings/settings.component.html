@@ -1,0 +1,204 @@
+<div class="setup px-5 my-5" *ngIf="network$ | push as network">
+  <form
+    [formGroup]="settingsForm"
+    (ngSubmit)="saveSettings$.next({network, settings: settingsForm.value})"
+    class="needs-validation"
+  >
+    <fieldset>
+      <legend>
+        Settings <span>{{ network$ | push | uppercase }}</span>
+      </legend>
+      <div class="form-floating mb-3">
+        <input
+          class="form-control"
+          id="hostName"
+          type="text"
+          placeholder="Host Name"
+          data-sb-validations="required"
+          aria-describedby="hostNameHelpBlock"
+          [formControl]="hostName"
+        />
+        <label class="form-label" for="hostName"
+          >Host Name
+          <span
+            class="badge bg-danger"
+            *ngIf="hostName.errors?.['required'] && (hostName.dirty || hostName.touched)"
+            >Required</span
+          >
+        </label>
+        <div id="hostNameHelpBlock" class="form-text">
+          This is the name that will be displayed on the
+          <a href="https://stats.pandora.l15.lukso.network">Stats Page</a>
+        </div>
+      </div>
+
+      <div
+        class="form-floating mb-3"
+        [ngClass]="
+          settingsForm.controls.coinbase.errors &&
+          (coinbase.dirty || coinbase.touched)
+            ? 'danger'
+            : 'success'
+        "
+      >
+        <input
+          class="form-control"
+          id="coinbase"
+          type="text"
+          placeholder="Coinbase"
+          data-sb-validations="required"
+          formControlName="coinbase"
+        />
+        <label class="form-label" for="coinbase">
+          Coinbase
+          <span
+            class="badge bg-danger"
+            *ngIf="coinbase.errors?.['required'] && (coinbase.dirty || coinbase.touched)"
+          >
+            Required
+          </span>
+        </label>
+        <div id="hostNameHelpBlock" class="form-text">
+          This address will receive the transaction fees of blocks that the
+          validator client has produced.
+        </div>
+        <div
+          *ngIf="coinbase.invalid && (coinbase.dirty || coinbase.touched)"
+          class="is-danger"
+        >
+          <div
+            *ngIf="coinbase.errors?.['valid_eth1_address']"
+            class="form-text error"
+          >
+            This must be a valid public key / address.
+          </div>
+        </div>
+      </div>
+      <div class="form-floating mb-3">
+        <select class="form-select" [formControl]="isValidatorEnabled">
+          <option value="1">Enabled</option>
+          <option value="0">Disabled</option>
+        </select>
+        <label for="newField">Validator</label>
+      </div>
+    </fieldset>
+
+    <fieldset *ngIf="downloadedVersions$ | async as versions">
+      <legend>Versions</legend>
+      <div class="row">
+        <div class="col">
+          <div class="form-floating mb-3">
+            <select class="form-select" [formControl]="vanguard">
+              <option
+                [value]="version"
+                *ngFor="let version of versions['vanguard']"
+              >
+                {{ version }}
+              </option>
+            </select>
+            <label for="newField">Vanguard</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-floating mb-3">
+            <select class="form-select" [formControl]="pandora">
+              <option
+                [value]="version"
+                *ngFor="let version of versions['pandora']"
+              >
+                {{ version }}
+              </option>
+            </select>
+            <label for="newField">Pandora</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-floating mb-3">
+            <select class="form-select" [formControl]="orchestrator">
+              <option
+                [value]="version"
+                *ngFor="let version of versions['lukso-orchestrator']"
+              >
+                {{ version }}
+              </option>
+            </select>
+            <label for="newField">Orchestrator</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-floating mb-3">
+            <select class="form-select" [formControl]="validator">
+              <option
+                [value]="version"
+                *ngFor="let version of versions['lukso-validator']"
+              >
+                {{ version }}
+              </option>
+            </select>
+            <label for="newField">Validator</label>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    <div class="d-grid">
+      <button class="btn btn-primary" id="submitSettings" type="submit">
+        <ng-container *rxLet="isSaving$; let isSaving; rxSuspense: suspense">
+          <ng-container *ngIf="isSaving">
+            <span
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Saving...
+          </ng-container>
+          <ng-container *ngIf="!isSaving">Save Settings</ng-container>
+        </ng-container>
+        <ng-template #suspense>Save Settings</ng-template>
+      </button>
+    </div>
+  </form>
+</div>
+
+<div
+  class="setup px-5 my-5 alert alert-danger"
+  role="alert"
+  *ngIf="false as network"
+>
+  <h4 class="alert-heading">Danger Zone</h4>
+  <br />
+  <div>
+    <h5 class="alert-heading">Validator Reset</h5>
+    <p>
+      This deletes both your Keys and your Wallet. This action is irreversible.
+    </p>
+    <button class="btn btn-danger btn" (click)="resetValidator$.next(network)">
+      <ng-container
+        *rxLet="
+          isResettingValidator$;
+          let isResettingValidator;
+          rxSuspense: suspense
+        "
+      >
+        <ng-container *ngIf="isResettingValidator">
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          Resetting...
+        </ng-container>
+        <ng-container *ngIf="!isResettingValidator"
+          >Reset Validator Keys</ng-container
+        >
+      </ng-container>
+      <ng-template #suspense>Reset Validator Keys</ng-template>
+    </button>
+  </div>
+  <br />
+  <br />
+  <div>
+    <h5 class="alert-heading">DataDir Reset</h5>
+    <p>This deletes all your datadirs. This action is irreversible.</p>
+    <button class="btn btn-danger btn">DELETE DATADIRS</button>
+  </div>
+</div>

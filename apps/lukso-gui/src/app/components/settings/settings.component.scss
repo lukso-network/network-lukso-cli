@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  padding: 0px 40px 40px;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+form {
+  margin-bottom: 40px;
+}
+
+.setup {
+  margin: 0 auto;
+  display: block;
+  background: white;
+  padding: 40px 100px;
+}
+
+.form-text {
+  font-size: 12px;
+  padding: 0 5px;
+}
+
+.danger {
+  .form-text.error {
+    color: #dc3545;
+  }
+
+  input {
+    background: #dc35466b;
+  }
+}
+
+#submitSettings {
+  height: 60px;
+}

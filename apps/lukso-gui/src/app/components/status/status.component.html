@@ -1,0 +1,50 @@
+<div class="row network-infos">
+  <div class="col">
+    <lukso-network-status
+      [networkData]="networkData$ | async"
+    ></lukso-network-status>
+  </div>
+</div>
+<div class="row flex-nowrap g-5">
+  <div class="col">
+    <lukso-status-box
+      [name]="'Pandora'"
+      [blockMetric]="'chain/head/block'"
+      [blockLabel]="'Last Block'"
+      [metrics]="pandoraMetrics$ | async"
+      [peersOverTime]="pandoraPeersOverTime$ | async"
+      [settings]="settings$ | async"
+      (stopClient)="stopClients(['pandora'])"
+      (startClient)="startClients($event)"
+    ></lukso-status-box>
+  </div>
+  <div class="col">
+    <lukso-status-box
+      [name]="'Vanguard'"
+      [blockMetric]="'headSlot'"
+      [blockLabel]="'Last Slot'"
+      [metrics]="vanguardMetrics$ | async"
+      [peersOverTime]="vanguardPeersOverTime$ | async"
+      [settings]="settings$ | async"
+      (stopClient)="stopClients(['vanguard'])"
+      (startClient)="startClients($event)"
+    >
+    </lukso-status-box>
+  </div>
+  <div class="col">
+    <lukso-validator-status
+      [metrics]="validatorMetrics$ | async"
+      [network]="network$ | async"
+      [version]="(settings$ | async)?.versions"
+    ></lukso-validator-status>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <div class="status-box">CPU (WIP)</div>
+  </div>
+  <div class="col">
+    <div class="status-box">MEMORY (WIP)</div>
+  </div>
+</div>

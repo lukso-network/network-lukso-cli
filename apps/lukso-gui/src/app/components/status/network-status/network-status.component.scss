@@ -1,0 +1,64 @@
+:host {
+  display: block;
+}
+
+.status-box {
+  display: flex;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.1);
+  background: white;
+  padding: 20px;
+  margin-top: 34px;
+  margin-bottom: 40px;
+  height: 80px;
+
+  .metric {
+    position: relative;
+    flex: 1;
+    padding-left: 25px;
+  }
+
+  > div {
+    &::after {
+      content: '';
+      position: absolute;
+      right: 21px;
+      bottom: 0px;
+      display: block;
+      margin-top: 5px;
+      height: 40px;
+      width: 1px;
+      background-color: #f2f2f6;
+    }
+  }
+
+  > div:last-of-type {
+    &:after {
+      display: none;
+    }
+  }
+}
+
+.icon {
+  position: absolute;
+  top: 7px;
+  left: 15px;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1;
+  color: #919cb4;
+  padding-left: 25px;
+}
+
+.value {
+  font-weight: 400;
+  font-size: 20px;
+  padding-left: 25px;
+}
+
+.placeholder-glow {
+  opacity: 0.1;
+}

@@ -1,0 +1,14 @@
+<button class="btn btn-primary" (click)="btn$.next()">
+  <ng-container *rxLet="status$; let status; rxSuspense: suspense">
+    <ng-container *ngIf="status">
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      {{ inProgressText }}...
+    </ng-container>
+    <ng-container *ngIf="!status">{{ defaultText }}</ng-container>
+  </ng-container>
+  <ng-template #suspense>{{ defaultText }}</ng-template>
+</button>

@@ -1,0 +1,19 @@
+<h3 class="text-center">Become a Validator</h3>
+<p class="text-center p-4">
+  Vivamus dui dolor, gravida at ornare a, placerat commodo velit. Nam lobortis
+  ex tellus. Nulla vehicula magna libero. Phasellus dictum laoreet est vitae
+  interdum. Fusce bibendum non lectus eget efficitur.
+</p>
+
+<lukso-create-keys
+  *ngIf="(depositData$ | async) === null"
+  class="shadow-sm bg-body rounded"
+  (createKeys)="createKeys$.next($event)"
+  [status]="status$ | push"
+></lukso-create-keys>
+
+<lukso-send-transactions
+  *ngIf="(depositData$ | async) !== null"
+  [depositData]="depositData$ | async"
+  class="shadow-sm bg-body rounded"
+></lukso-send-transactions>

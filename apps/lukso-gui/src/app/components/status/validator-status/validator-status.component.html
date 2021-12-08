@@ -1,0 +1,84 @@
+<div class="status-box" *ngIf="metrics">
+  <div
+    class="d-flex flex-column flex-fill"
+    *ngIf="
+      !(metrics['process_cpu_seconds_total'] === undefined);
+      else notRunning
+    "
+  >
+    <h1 class="title">
+      (WIP) Validator <span>{{ version?.vanguard }}</span>
+    </h1>
+
+    <div class="peers-container">
+      <span class="peers">{{ validatorData.length }} </span>
+      <span class="label">Validators</span>
+    </div>
+
+    <div class="flex-fill">
+      <table class="table table-borderless table-sm">
+        <tbody>
+          <tr *ngFor="let validator of validatorData | slice: 0:3">
+            <td class="property-name">
+              <a
+                class="explorer-link"
+                href="https://{{
+                  env
+                }}explorer.vanguard.l15.lukso.network/validator/{{
+                  validator.key
+                }}"
+                target="_blank"
+                >{{ truncate(validator.key, 6, 6, 50) }}
+              </a>
+            </td>
+            <td class="property-balance">
+              <span
+                class="d-flex"
+                *ngIf="getValidatorMetric('validator_balance', validator.key)"
+              >
+                {{
+                  getValidatorMetric('validator_balance', validator.key)
+                    | number: '1.2-2'
+                }}&nbsp;LYXt
+              </span>
+            </td>
+            <td class="property-status">
+              <span class="badge bg-dark">{{
+                VALIDATOR_STATUSES[
+                  getValidatorMetric('validator_statuses', validator.key)
+                ]
+              }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="status d-flex flex-row flex-fill">
+      <div>
+        <div class="label">Balance</div>
+        <span class="latest-block"> 64 LYXt</span>
+      </div>
+      <div class="ms-auto">
+        <div class="label">STATUS</div>
+        <span class="badge bg-success">Excellent</span>
+      </div>
+    </div>
+  </div>
+  <ng-template #notRunning>
+    <div
+      class="
+        text-center
+        d-flex
+        flex-fill flex-column
+        justify-content-center
+        align-items-center
+      "
+    >
+      <h5>Become a Validator</h5>
+      <button type="button" class="btn btn-primary" routerLink="/launchpad">
+        Get Started
+      </button>
+    </div>
+  </ng-template>
+</div>

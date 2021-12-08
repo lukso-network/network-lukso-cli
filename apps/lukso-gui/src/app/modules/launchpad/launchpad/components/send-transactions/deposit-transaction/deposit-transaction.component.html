@@ -1,0 +1,37 @@
+<div class="public-key">
+  <div class="label">Validator</div>
+  <div>
+    <a
+      *ngIf="deposit"
+      [href]="explorerLink"
+      target="_blank"
+      rel="noopener noreferrer"
+      >0x{{ truncate(deposit.pubkey, 8, 8, 20) }}</a
+    >
+  </div>
+</div>
+<div class="amount">
+  <div class="label">Amount</div>
+  <div class="value">32 LYXt</div>
+</div>
+<div class="transaction-button">
+  <button
+    *ngIf="deposit"
+    class="btn btn-outline-secondary"
+    type="button"
+    [disabled]="deposit.transaction"
+  >
+    <ng-container *ngIf="!deposit.transaction">Deposit</ng-container>
+    <ng-container *ngIf="deposit.transaction && !deposit.transaction_confirmed">
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      <span>Pending...</span>
+    </ng-container>
+    <ng-container *ngIf="deposit.transaction && deposit.transaction_confirmed">
+      Confirmed
+    </ng-container>
+  </button>
+</div>

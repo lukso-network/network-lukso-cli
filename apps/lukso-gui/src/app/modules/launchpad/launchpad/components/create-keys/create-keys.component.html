@@ -1,0 +1,180 @@
+<div class="key-form">
+  <h5 class="text-center">Generate Keys</h5>
+  <form [formGroup]="form" (submit)="onSubmit()" novalidate>
+    <div class="mb-4">
+      <label class="form-label" for="amountOfValidators">Validators</label>
+      <div class="input-group input-group-lg">
+        <button
+          class="btn btn-outline-secondary"
+          type="button"
+          (click)="decrease()"
+        >
+          -
+        </button>
+        <input
+          #validators
+          class="form-control form-control-lg text-center"
+          id="amountOfValidators"
+          type="text"
+          formControlName="amountOfValidators"
+          placeholder="0"
+          autocomplete="off"
+          (keypress)="filterNonNumeric($event)"
+          [ngClass]="{
+            'is-valid':
+              form.controls.amountOfValidators.dirty &&
+              form.controls.amountOfValidators.valid,
+            'is-invalid':
+              (submitted && form.controls.amountOfValidators.invalid) ||
+              (form.controls.amountOfValidators.dirty &&
+                form.controls.amountOfValidators.invalid)
+          }"
+          required
+        />
+        <button
+          class="btn btn-outline-secondary"
+          type="button"
+          (click)="increase()"
+        >
+          +
+        </button>
+      </div>
+
+      <div
+        *ngIf="
+          submitted &&
+          form.controls.amountOfValidators.errors?.required === true
+        "
+        class="invalid-feedback"
+      >
+        This field is required.
+      </div>
+    </div>
+
+    <div class="password-container">
+      <div class="mb-4">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group input-group-lg">
+          <input
+            #pw1
+            type="password"
+            id="password"
+            formControlName="password"
+            class="form-control form-control-lg"
+            [ngClass]="{
+              'is-invalid':
+                (submitted && form.controls.password?.errors) ||
+                (form.controls.password?.dirty &&
+                  form.controls.password?.errors),
+              'is-valid': !form.controls.password?.errors
+            }"
+            autocomplete="new-password"
+            required
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            id="button-addon1"
+            (click)="
+              pw1.type === 'text'
+                ? (pw1.type = 'password')
+                : (pw1.type = 'text');
+              pw2.type === 'text'
+                ? (pw2.type = 'password')
+                : (pw2.type = 'text')
+            "
+          >
+            <i
+              class="bi"
+              [ngClass]="pw1.type === 'text' ? 'bi-eye-slash' : 'bi-eye-fill'"
+            ></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <lukso-password-checker
+          *ngIf="
+            form.controls.password?.dirty && form.controls.password?.errors
+          "
+          [password]="form.controls.password.value"
+        ></lukso-password-checker>
+      </div>
+
+      <div class="mb-4">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <div class="input-group input-group-lg">
+          <input
+            #pw2
+            type="password"
+            id="confirmPassword"
+            class="form-control form-control-lg"
+            [ngClass]="{
+              'is-invalid':
+                (submitted && form.controls.confirmPassword?.errors) ||
+                (form.controls.confirmPassword?.dirty &&
+                  form.controls.confirmPassword?.errors),
+              'is-valid': !form.controls.confirmPassword?.errors
+            }"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            required
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            id="button-addon2"
+            (click)="
+              pw1.type === 'text'
+                ? (pw1.type = 'password')
+                : (pw1.type = 'text');
+              pw2.type === 'text'
+                ? (pw2.type = 'password')
+                : (pw2.type = 'text')
+            "
+          >
+            <i
+              class="bi"
+              [ngClass]="pw2.type === 'text' ? 'bi-eye-slash' : 'bi-eye-fill'"
+            ></i>
+          </button>
+        </div>
+        <div
+          *ngIf="
+            submitted && form.controls.confirmPassword.errors?.required === true
+          "
+          class="invalid-feedback"
+        >
+          This field is required.
+        </div>
+
+        <small id="passwordHelpBlock" class="form-text text-muted">
+          Please repeat the password to make sure it is correct.
+        </small>
+      </div>
+    </div>
+    <div>
+      <button
+        type="submit"
+        class="btn btn-primary btn-lg btn--generate-keys"
+        [disabled]="!(status === 'Generate')"
+      >
+        <ng-container *ngIf="!(status === 'Generate')">
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+            *ngIf="status === 'Generating' || status === 'Importing'"
+          ></span>
+          <span> {{ status }}</span>
+        </ng-container>
+        <ng-container
+          class="key-button align-middle"
+          *ngIf="status === 'Generate'"
+        >
+          Generate Keys
+        </ng-container>
+      </button>
+    </div>
+  </form>
+</div>

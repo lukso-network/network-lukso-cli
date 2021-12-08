@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  background: white;
+  padding: 40px 50px 70px;
+  margin-bottom: 40px;
+}
+
+.transactions {
+  margin-bottom: 100px;
+}
+
+.label,
+.value {
+  font-size: 10px;
+  display: block;
+  text-align: center;
+}
+
+.label {
+  color: #919cb4;
+}
+
+.value {
+  font-size: 30px;
+}
+
+.total-amount {
+  padding-bottom: 20px;
+}
+
+.title {
+  padding: 20px 20px 40px;
+}
+
+.btn,
+.btn--send-all-transactions {
+  text-transform: uppercase;
+}
+
+.btn--send-all-transactions {
+  display: block;
+  width: 70%;
+  margin: 0 auto;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: 18px;
+  height: 62px;
+}

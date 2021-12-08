@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "projects": {
+    "lukso-gui": {
+      "projectType": "application",
+      "root": "apps/lukso-gui",
+      "sourceRoot": "apps/lukso-gui/src",
+      "prefix": "lukso",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/lukso-gui",
+            "index": "apps/lukso-gui/src/index.html",
+            "main": "apps/lukso-gui/src/main.ts",
+            "polyfills": "apps/lukso-gui/src/polyfills.ts",
+            "tsConfig": "apps/lukso-gui/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "apps/lukso-gui/src/favicon.ico",
+              "apps/lukso-gui/src/assets"
+            ],
+            "styles": [
+              "apps/lukso-gui/src/styles.scss",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css"
+            ],
+            "scripts": [
+              "node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/lukso-gui/src/environments/environment.ts",
+                  "with": "apps/lukso-gui/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "lukso-gui:build:production"
+            },
+            "development": {
+              "disableHostCheck": true,
+              "browserTarget": "lukso-gui:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "lukso-gui:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/lukso-gui/src/**/*.ts",
+              "apps/lukso-gui/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/lukso-gui"],
+          "options": {
+            "jestConfig": "apps/lukso-gui/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
+    "lukso-gui-e2e": {
+      "root": "apps/lukso-gui-e2e",
+      "sourceRoot": "apps/lukso-gui-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/lukso-gui-e2e/cypress.json",
+            "devServerTarget": "lukso-gui:serve:development",
+            "tsConfig": "apps/lukso-gui-e2e/tsconfig.json"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "lukso-gui:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/lukso-gui-e2e/**/*.{js,ts}"]
+          }
+        }
+      },
+      "tags": [],
+      "implicitDependencies": ["lukso-gui"]
+    },
+    "lukso-manager": {
+      "projectType": "application",
+      "root": "apps/lukso-manager",
+      "sourceRoot": "apps/lukso-manager",
+      "architect": {
+        "build": {
+          "builder": "@nx-go/nx-go:build",
+          "options": {
+            "outputPath": "dist/apps/lukso-manager",
+            "main": "apps/lukso-manager/main.go"
+          }
+        },
+        "serve": {
+          "builder": "@nx-go/nx-go:serve",
+          "options": {
+            "cmd": "gow",
+            "cwd": ".",
+            "main": "apps/lukso-manager/main.go"
+          }
+        },
+        "test": {
+          "builder": "@nx-go/nx-go:test"
+        },
+        "lint": {
+          "builder": "@nx-go/nx-go:lint"
+        }
+      },
+      "tags": []
+    }
+  }
+}
