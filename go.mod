@@ -13,8 +13,10 @@ require (
 	github.com/prometheus/common v0.32.1
 	github.com/rs/cors v1.8.0
 	github.com/tyler-smith/go-bip39 v1.1.0
+	github.com/urfave/cli/v2 v2.3.0 // indirect
 	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871 // indirect
 	golang.org/x/sys v0.0.0-20211123173158-ef496fb156ab // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
