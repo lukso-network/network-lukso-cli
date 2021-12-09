@@ -784,27 +784,69 @@ function _start($client)
 }
 
 function stop_orchestrator() {
-    Stop-Process -ProcessName "lukso-orchestrator-Windows-x86_64"
+    $orchestratorProcess = Get-Process -Name "lukso-orchestrator-Windows-x86_64" -ErrorAction SilentlyContinue
+    if ($orchestratorProcess) {
+        Write-Output "Stopping orchestrator"
+        Stop-Process -ProcessName "lukso-orchestrator-Windows-x86_64"
+      } else {
+          Write-Host "Orchestrator not running"
+      }
+      Remove-Variable orchestratorProcess
 }
 
 function stop_pandora() {
-    Stop-Process -ProcessName "pandora-Windows-x86_64"
+    $pandoraProcess = Get-Process -Name "pandora-Windows-x86_64" -ErrorAction SilentlyContinue
+    if ($pandoraProcess) {
+        Write-Output "Stopping pandora"
+        Stop-Process -ProcessName "pandora-Windows-x86_64"
+      } else {
+          Write-Host "Pandora not running"
+      }
+      Remove-Variable pandoraProcess
 }
 
 function stop_vanguard() {
-    Stop-Process -ProcessName "vanguard-Windows-x86_64"
+    $vanguardProcess = Get-Process -Name "vanguard-Windows-x86_64" -ErrorAction SilentlyContinue
+    if ($vanguardProcess) {
+        Write-Output "Stopping vanguard"
+        Stop-Process -ProcessName "vanguard-Windows-x86_64"
+      } else {
+          Write-Host "Vanguard not running"
+      }
+      Remove-Variable vanguardProcess
 }
 
 function stop_validator() {
-    Stop-Process -ProcessName "lukso-validator-Windows-x86_64"
+    $validatorProcess = Get-Process -Name "lukso-validator-Windows-x86_64" -ErrorAction SilentlyContinue
+    if ($validatorProcess) {
+        Write-Output "Stopping validator"
+        Stop-Process -ProcessName "lukso-validator-Windows-x86_64"
+      } else {
+          Write-Host "Validator not running"
+      }
+      Remove-Variable validatorProcess
 }
 
 function stop_eth2stats() {
-    Stop-Process -ProcessName "eth2stats-client-Windows-x86_64"
+    $eth2statsProcess = Get-Process -Name "eth2stats-client-Windows-x86_64" -ErrorAction SilentlyContinue
+    if ($eth2statsProcess) {
+        Write-Output "Stopping eth2stats"
+        Stop-Process -ProcessName "eth2stats-client-Windows-x86_64"
+      } else {
+          Write-Host "eth2stats not running"
+      }
+      Remove-Variable eth2statsProcess
 }
 
 function stop_lukso_status() {
-    Stop-Process -ProcessName "lukso-status"
+    $luksoStatusProcess = Get-Process -Name "lukso-status" -ErrorAction SilentlyContinue
+    if ($luksoStatusProcess) {
+        Write-Output "Stopping lukso-status"
+        Stop-Process -ProcessName "lukso-status"
+      } else {
+          Write-Host "lukso-status not running"
+      }
+      Remove-Variable luksoStatusProcess
 }
 
 function stop_all() {
