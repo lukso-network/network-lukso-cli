@@ -86,7 +86,7 @@ func GetSettingsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	network := keys[0]
 
-	settings, err := getSettings(shared.SettingsDB, network)
+	settings, err := GetSettings(shared.SettingsDB, network)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -108,7 +108,7 @@ func decodeSettings(data []byte) (*Settings, error) {
 	return settings, nil
 }
 
-func getSettings(db *bolt.DB, network string) (*Settings, error) {
+func GetSettings(db *bolt.DB, network string) (*Settings, error) {
 	// Store the user model in the user bucket using the username as the key.
 	var settings *Settings
 	err := db.View(func(tx *bolt.Tx) error {

@@ -6,11 +6,15 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"lukso/apps/lukso-manager/cli/config"
+	"lukso/apps/lukso-manager/cli/router"
+	"lukso/apps/lukso-manager/settings"
 )
 
 var Cmd string
 var Arg string
+
+var API bool
+var GUI bool
 
 func Init() {
 
@@ -20,6 +24,10 @@ func Init() {
 	app.UsageText = "lukso <command> [argument] [--flags]"
 	app.Flags = getLuksoFlags()
 	app.EnableBashCompletion = true
+	app.After = func(c *cli.Context) error {
+		LoadFlags(c)
+		return nil
+	}
 
 	app.Commands = []*cli.Command{
 		getStartCommand(),
@@ -32,25 +40,38 @@ func Init() {
 		log.Fatal(err)
 	}
 
+	router.Handle(Cmd, Arg)
+
 }
 
-func LoadFlags(LuksoSettings *config.LuksoValues) {
+// Loads flag values into settings struct
+func LoadFlags(c *cli.Context) {
+
+	var network string
 
 	networksNum := 0
 
-	if FlagValues.Network != "" {
+	if c.Bool("GUI") {
+		GUI = true
+	}
+
+	if c.String("network") != "" {
+		network = c.String("network")
 		networksNum++
 	}
 
-	if FlagValues.l15_prod {
+	if c.Bool("l15-prod") {
+		network = "l15-prod"
 		networksNum++
 	}
 
-	if FlagValues.l15_staging {
+	if c.Bool("l15-staging") {
+		network = "l15-staging"
 		networksNum++
 	}
 
-	if FlagValues.l15_dev {
+	if c.Bool("l15-dev") {
+		network = "l15-dev"
 		networksNum++
 	}
 
@@ -58,31 +79,11 @@ func LoadFlags(LuksoSettings *config.LuksoValues) {
 		log.Fatal("ERROR: You cannot connect to multiple networks, please choose only one.")
 	}
 
-	if FlagValues.Network != "" {
-		LuksoSettings.Network = FlagValues.Network
-	}
+	var LuksoSettings settings.Settings
+	println(network)
 
-	if FlagValues.l15_prod {
-		LuksoSettings.Network = "l15-prod"
-	}
-
-	if FlagValues.l15_staging {
-		LuksoSettings.Network = "l15-staging"
-	}
-
-	if FlagValues.l15_dev {
-		LuksoSettings.Network = "l15-dev"
-	}
-
-	if FlagValues.DataDir != "" {
-		LuksoSettings.DataDir = FlagValues.DataDir
-	} else {
-		homeDir, _ := os.UserHomeDir()
-		LuksoSettings.DataDir = homeDir + "/.lukso/" + LuksoSettings.Network + "/datadir"
-	}
-
-	if FlagValues.Orchestrator.Verbosity != "" {
-		LuksoSettings.Orchestrator.Verbosity = FlagValues.Orchestrator.Verbosity
+	if c.String("coinbase") != "" {
+		LuksoSettings.Coinbase = c.String("coinbase")
 	}
 
 }
