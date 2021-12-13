@@ -33,6 +33,31 @@ type Commands struct {
 
 var CommandsByClient = Commands{}
 
+func HandleCli(cmd string, arg string) {
+
+	err := downloader.DownloadConfigFiles("l15-prod")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	networkConfig, err := ReadConfig("l15-prod")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	switch cmd {
+	case "start":
+		println("Starting")
+		switch arg {
+		case "all":
+			startPandora("v0.2.0-rc.2", "l15-prod", settings.Settings{
+				HostName: "localhost",
+			}, networkConfig, "1639407392")
+		}
+	}
+}
+
 func StartClients(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

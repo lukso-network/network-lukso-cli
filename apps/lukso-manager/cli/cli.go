@@ -6,7 +6,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"lukso/apps/lukso-manager/cli/router"
+	"lukso/apps/lukso-manager/runner"
 	"lukso/apps/lukso-manager/settings"
 )
 
@@ -40,7 +40,7 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	router.Handle(Cmd, Arg)
+	runner.HandleCli(Cmd, Arg)
 
 }
 
