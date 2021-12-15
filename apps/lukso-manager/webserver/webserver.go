@@ -53,11 +53,11 @@ func StartAPIServer() {
 	app.Start(":3000")
 }
 
-func StartGUIServer() {
-	app := App{
-		Router: mux.NewRouter(),
-	}
-	app.Router.Methods("GET").Path("/health").HandlerFunc(metrics.Health)
+// func StartGUIServer() {
+// 	app := App{
+// 		Router: mux.NewRouter(),
+// 	}
+// 	app.Router.Methods("GET").Path("/health").HandlerFunc(metrics.Health)
 
-	app.Start(":4000")
-}
+// 	app.Start(":4000")
+// }
