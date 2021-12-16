@@ -23,7 +23,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 ARCHITECTURE=$(uname -m)
-LUKSO_SCRIPT_VERSION="v1.7.6"
+LUKSO_SCRIPT_VERSION="v1.7.7"
 
 RUN_DATE=$(date '+%Y-%m-%d__%H-%M-%S')
 NETWORK="l15-prod"
@@ -390,6 +390,20 @@ start_orchestrator() {
     "--datadir=$DATADIR/orchestrator"
     "--verbosity=$ORC_VERBOSITY"
   )
+
+  if [[ -n $CUSTOM_GENESIS_TIME ]]; then
+    CUSTOM_GENESIS_TIME_FLAGS=(
+      "--genesis-time=$CUSTOM_GENESIS_TIME"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${CUSTOM_GENESIS_TIME_FLAGS[@]}")
+  fi
+
+  if [[ -n $SECONDS_PER_SLOT ]]; then
+    SECONDS_PER_SLOT_FLAGS=(
+      "--seconds-per-slot=$SECONDS_PER_SLOT"
+    )
+    ARGUMENTS=("${ARGUMENTS[@]}" "${SECONDS_PER_SLOT_FLAGS[@]}")
+  fi
 
   if [[ "$HTTP_CONNECTIVITY" == "true" ]]; then
     HTTP_FLAGS=(
@@ -1160,6 +1174,12 @@ help() {
   echo "--external-ip          Sets external IP for pandora and vanguard"
   echo "                       [72.122.32.234]"
   echo
+  echo "--genesis-time         Overrides network-config provided genesis time"
+  echo "                       [1639667382]"
+  echo
+  echo "--seconds-per-slot     Overrides network-config provided seconds per slot value"
+  echo "                       [6]"
+  echo
   echo "--allow-respin         Deletes all datadirs IF network config changed (based on genesis time)"
   echo
   echo "--force                Enables force mode for stopping"
@@ -1689,6 +1709,18 @@ while getopts "$optspec" optchar; do
       OVERRIDE_VALIDATOR_VERBOSITY=$val
       ;;
 
+    genesis-time)
+      val="${!OPTIND}"
+      OPTIND=$(($OPTIND + 1))
+      OVERRIDE_CUSTOM_GENESIS_TIME=$val
+      ;;
+
+    seconds-per-slot)
+      val="${!OPTIND}"
+      OPTIND=$(($OPTIND + 1))
+      OVERRIDE_SECONDS_PER_SLOT=$val
+      ;;
+
     external-ip)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
@@ -1998,6 +2030,14 @@ fi
 
 if [[ -n $OVERRIDE_HTTP_CONNECTIVITY ]]; then
   HTTP_CONNECTIVITY=$OVERRIDE_HTTP_CONNECTIVITY
+fi
+
+if [[ -n $OVERRIDE_CUSTOM_GENESIS_TIME ]]; then
+  CUSTOM_GENESIS_TIME=$OVERRIDE_CUSTOM_GENESIS_TIME
+fi
+
+if [[ -n $OVERRIDE_SECONDS_PER_SLOT ]]; then
+  SECONDS_PER_SLOT=$OVERRIDE_SECONDS_PER_SLOT
 fi
 
 if [[ ! -d $DATADIR ]]; then
