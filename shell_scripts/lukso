@@ -1174,6 +1174,12 @@ help() {
   echo "--external-ip          Sets external IP for pandora and vanguard"
   echo "                       [72.122.32.234]"
   echo
+  echo "--genesis-time         Overrides network-config provided genesis time"
+  echo "                       [1639667382]"
+  echo
+  echo "--seconds-per-slot     Overrides network-config provided seconds per slot value"
+  echo "                       [6]"
+  echo
   echo "--allow-respin         Deletes all datadirs IF network config changed (based on genesis time)"
   echo
   echo "--force                Enables force mode for stopping"
