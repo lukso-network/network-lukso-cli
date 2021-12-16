@@ -8,6 +8,7 @@ import (
 
 	"lukso/apps/lukso-manager/runner"
 	"lukso/apps/lukso-manager/settings"
+	"lukso/apps/lukso-manager/shared"
 )
 
 var Cmd string
@@ -24,6 +25,7 @@ func Init() {
 	app.UsageText = "lukso <command> [argument] [--flags]"
 	app.Flags = getLuksoFlags()
 	app.EnableBashCompletion = true
+
 	app.After = func(c *cli.Context) error {
 		LoadFlags(c)
 		return nil
@@ -47,31 +49,33 @@ func Init() {
 // Loads flag values into settings struct
 func LoadFlags(c *cli.Context) {
 
-	var network string
-
 	networksNum := 0
 
+	if c.Bool("API") {
+		shared.EnableAPI = true
+	}
+
 	if c.Bool("GUI") {
-		GUI = true
+		shared.EnableGUI = true
 	}
 
 	if c.String("network") != "" {
-		network = c.String("network")
+		shared.PickedNetwork = c.String("network")
 		networksNum++
 	}
 
 	if c.Bool("l15-prod") {
-		network = "l15-prod"
+		shared.PickedNetwork = "l15-prod"
 		networksNum++
 	}
 
 	if c.Bool("l15-staging") {
-		network = "l15-staging"
+		shared.PickedNetwork = "l15-staging"
 		networksNum++
 	}
 
 	if c.Bool("l15-dev") {
-		network = "l15-dev"
+		shared.PickedNetwork = "l15-dev"
 		networksNum++
 	}
 
@@ -80,7 +84,7 @@ func LoadFlags(c *cli.Context) {
 	}
 
 	var LuksoSettings settings.Settings
-	println(network)
+	println(shared.PickedNetwork)
 
 	if c.String("coinbase") != "" {
 		LuksoSettings.Coinbase = c.String("coinbase")

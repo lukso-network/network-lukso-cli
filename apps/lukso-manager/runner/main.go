@@ -35,12 +35,19 @@ var CommandsByClient = Commands{}
 
 func HandleCli(cmd string, arg string) {
 
-	err := downloader.DownloadConfigFiles("l15-prod")
+	luksoSettings, err := settings.GetSettings(shared.SettingsDB, shared.PickedNetwork)
+	println(luksoSettings.Coinbase)
+
+	if err != nil {
+		
+	}
+
+	err = downloader.DownloadConfigFiles(shared.PickedNetwork)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	networkConfig, err := ReadConfig("l15-prod")
+	networkConfig, err := ReadConfig(shared.PickedNetwork)
 
 	if err != nil {
 		log.Fatal(err)
@@ -51,9 +58,7 @@ func HandleCli(cmd string, arg string) {
 		println("Starting")
 		switch arg {
 		case "all":
-			startPandora("v0.2.0-rc.2", "l15-prod", settings.Settings{
-				HostName: "localhost",
-			}, networkConfig, "1639407392")
+			startPandora("2", "l15-prod", *luksoSettings, networkConfig, "1639407392")
 		}
 	}
 }

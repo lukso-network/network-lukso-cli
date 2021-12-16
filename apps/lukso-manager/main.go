@@ -49,11 +49,11 @@ func main() {
 
 	cli.Init()
 
-	if cli.API || cli.GUI {
+	if shared.EnableAPI || shared.EnableGUI {
 		webserver.StartAPIServer()
 	}
 
-	if cli.GUI {
+	if shared.EnableGUI {
 		//webserver.StartGUIServer()
 	}
 }

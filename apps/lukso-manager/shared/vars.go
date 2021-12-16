@@ -7,9 +7,12 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+var PickedNetwork = ""
 var LuksoHomeDir = ""
 var BinaryDir = ""
 var NetworkDir = ""
+var EnableAPI = false
+var EnableGUI = false
 var OutboundIP net.IP
 var DataDir = "datadirs"
 var SettingsDB *bolt.DB
