@@ -23,7 +23,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 ARCHITECTURE=$(uname -m)
-LUKSO_SCRIPT_VERSION="v1.7.7"
+LUKSO_SCRIPT_VERSION="v1.7.8"
 
 RUN_DATE=$(date '+%Y-%m-%d__%H-%M-%S')
 NETWORK="l15-prod"
@@ -1750,20 +1750,22 @@ while getopts "$optspec" optchar; do
       ;;
 
     *)
-      if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
-        echo "Unknown option --${OPTARG}" >&2
-      fi
+      CLI_ERROR=true
+      echo "--${OPTARG} is not a valid flag" >&2
       ;;
     esac
     ;;
 
   *)
-    if [ "$OPTERR" != 1 ] || [ "${optspec:0:1}" = ":" ]; then
-      echo "Non-option argument: '-${OPTARG}'" >&2
-    fi
+    CLI_ERROR=true
+    echo "-${OPTARG} is not a valid flag" >&2
     ;;
   esac
 done
+
+if [[ $CLI_ERROR ]]; then
+  exit 1
+fi
 
 if [[ "$USE_CONFIG_FILE" == true ]]; then
   parse_config "$CONFIG_FILE_PATH"
