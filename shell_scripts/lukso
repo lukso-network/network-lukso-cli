@@ -1751,20 +1751,20 @@ while getopts "$optspec" optchar; do
 
     *)
       CLI_ERROR=true
-      echo "Unknown option: --${OPTARG}" >&2
+      echo "--${OPTARG} is not a valid flag" >&2
       ;;
     esac
     ;;
 
   *)
     CLI_ERROR=true
-    echo "Unknown option: '-${OPTARG}'" >&2
+    echo "-${OPTARG} is not a valid flag" >&2
     ;;
   esac
 done
 
 if [[ $CLI_ERROR ]]; then
-  exit
+  exit 1
 fi
 
 if [[ "$USE_CONFIG_FILE" == true ]]; then
