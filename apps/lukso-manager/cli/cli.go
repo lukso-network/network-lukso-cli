@@ -51,11 +51,11 @@ func LoadFlags(c *cli.Context) {
 
 	networksNum := 0
 
-	if c.Bool("API") {
+	if c.Bool("api") {
 		shared.EnableAPI = true
 	}
 
-	if c.Bool("GUI") {
+	if c.Bool("gui") {
 		shared.EnableGUI = true
 	}
 

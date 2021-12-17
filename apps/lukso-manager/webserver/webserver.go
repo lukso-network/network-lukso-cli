@@ -50,14 +50,14 @@ func StartAPIServer() {
 	app.Router.Methods("POST").Path("/settings").HandlerFunc(settings.SaveSettingsEndpoint)
 	app.Router.Methods("GET").Path("/settings").HandlerFunc(settings.GetSettingsEndpoint)
 
-	app.Start(":3000")
+	go func() {app.Start(":3000")}()
 }
 
-// func StartGUIServer() {
-// 	app := App{
-// 		Router: mux.NewRouter(),
-// 	}
-// 	app.Router.Methods("GET").Path("/health").HandlerFunc(metrics.Health)
+func StartGUIServer() {
+	app := App{
+		Router: mux.NewRouter(),
+	}
+	app.Router.Methods("GET").Path("/health").HandlerFunc(metrics.Health)
 
-// 	app.Start(":4000")
-// }
+	go func() {app.Start(":4000")}()
+}

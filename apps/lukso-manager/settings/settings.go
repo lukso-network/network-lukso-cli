@@ -129,3 +129,19 @@ func GetSettings(db *bolt.DB, network string) (*Settings, error) {
 	return settings, nil
 
 }
+
+func DefaultSettings(db *bolt.DB, network string) error {
+    var settings Settings
+	settings.Coinbase = ""
+	settings.ValidatorEnabled = false
+	settings.ExternalIP = ""
+	settings.HostName = ""
+	settings.Versions = map[Client]string{
+		Orchestrator: "v0.2.0-rc.2",
+		Pandora: "v0.2.0-rc.2",
+		Vanguard: "v0.2.0-rc.2",
+		Validator: "v0.2.0-rc.2",
+	}
+	SaveSettings(db, &settings, network)
+	return nil
+}

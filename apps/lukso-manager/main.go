@@ -54,6 +54,12 @@ func main() {
 	}
 
 	if shared.EnableGUI {
-		//webserver.StartGUIServer()
+		webserver.StartGUIServer()
 	}
+
+	if shared.EnableAPI || shared.EnableGUI {
+		// TODO: Properize this
+		select {}
+	}
+
 }

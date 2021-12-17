@@ -106,7 +106,7 @@ func ValidatorMetrics(w http.ResponseWriter, r *http.Request) {
 func Health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	w.Write([]byte(`{"ok": "true"}`))
 }
 
 func getMetrics(url string, w http.ResponseWriter) (body []byte, err error) {
