@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"lukso/apps/lukso-manager/cli"
+	"lukso/apps/lukso-manager/settings"
 	"lukso/apps/lukso-manager/shared"
 	"lukso/apps/lukso-manager/webserver"
 	"os"
@@ -48,6 +49,14 @@ func init() {
 func main() {
 
 	cli.Init()
+
+	showSettings, err := settings.GetSettings(shared.SettingsDB, shared.PickedNetwork)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	println("coinbase", showSettings.Coinbase)
 
 	if shared.EnableAPI || shared.EnableGUI {
 		webserver.StartAPIServer()

@@ -21,7 +21,7 @@ func TestApp_Start(t *testing.T) {
 			app := &App{
 				Router: tt.fields.Router,
 			}
-			app.Start()
+			app.Start(":3000")
 		})
 	}
 }

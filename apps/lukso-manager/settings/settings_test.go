@@ -107,7 +107,7 @@ func Test_getSettings(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getSettings(tt.args.db, tt.args.network)
+			got, err := GetSettings(tt.args.db, tt.args.network)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getSettings() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -1,1 +1,4 @@
 FORCE: false
+COINBASE: 0x0123456789abcdef0123456789abcdef01234567
+VERSIONS:
+  pandora: "v0.20-develop"

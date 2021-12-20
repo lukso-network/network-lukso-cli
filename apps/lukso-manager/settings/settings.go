@@ -20,11 +20,11 @@ const (
 )
 
 type Settings struct {
-	HostName         string            `json:"hostName"`
-	Coinbase         string            `json:"coinbase"`
-	ExternalIP       string            `json:"externalIp"`
-	Versions         map[Client]string `json:"versions"`
-	ValidatorEnabled bool              `json:"validatorEnabled"`
+	HostName         string            `json:"hostName" yaml:"HOSTNAME"`
+	Coinbase         string            `json:"coinbase" yaml:"COINBASE"`
+	ExternalIP       string            `json:"externalIp" yaml:"EXTERNAL_IP"`
+	Versions         map[Client]string `json:"versions" yaml:"VERSIONS"`
+	ValidatorEnabled bool              `json:"validatorEnabled" yaml:"IS_VALIDATOR"`
 }
 
 type saveSettingsRequestBody struct {

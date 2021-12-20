@@ -33,39 +33,6 @@ type Commands struct {
 
 var CommandsByClient = Commands{}
 
-func HandleCli(cmd string, arg string) {
-
-	settings.DefaultSettings(shared.SettingsDB, shared.PickedNetwork)
-
-	luksoSettings, err := settings.GetSettings(shared.SettingsDB, shared.PickedNetwork)
-	println(luksoSettings.Coinbase)
-	println(luksoSettings.Versions[settings.Pandora])
-
-	if err != nil {
-
-	}
-
-	err = downloader.DownloadConfigFiles(shared.PickedNetwork)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	networkConfig, err := ReadConfig(shared.PickedNetwork)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	switch cmd {
-	case "start":
-		println("Starting")
-		switch arg {
-		case "pandora":
-			startPandora(luksoSettings.Versions[settings.Pandora], "l15-prod", *luksoSettings, networkConfig, "1639407392")
-		}
-	}
-}
-
 func StartClients(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -115,6 +82,8 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 	timestamp := now.Unix()
+
+	shared.RunningTime = timestamp
 
 	if shared.Contains(body.Clients, "vanguard") {
 		vanCmd, errVanguard := startVanguard(body.Settings.Versions[settings.Vanguard], network, config, fmt.Sprint(timestamp))

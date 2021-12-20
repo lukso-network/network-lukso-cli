@@ -15,6 +15,7 @@ var EnableAPI = false
 var EnableGUI = false
 var OutboundIP net.IP
 var DataDir = "datadirs"
+var RunningTime int64
 var SettingsDB *bolt.DB
 
 var LUKSO_GITHUB = "https://api.github.com/repos/lukso-network/"
