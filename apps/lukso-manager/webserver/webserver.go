@@ -50,14 +50,15 @@ func StartAPIServer() {
 	app.Router.Methods("POST").Path("/settings").HandlerFunc(settings.SaveSettingsEndpoint)
 	app.Router.Methods("GET").Path("/settings").HandlerFunc(settings.GetSettingsEndpoint)
 
-	go func() {app.Start(":3000")}()
+	go func() { app.Start(":3000") }()
 }
 
 func StartGUIServer() {
 	app := App{
 		Router: mux.NewRouter(),
 	}
-	app.Router.Methods("GET").Path("/health").HandlerFunc(metrics.Health)
 
-	go func() {app.Start(":4000")}()
+	app.Router.Handle("/", http.FileServer(http.Dir("../../../dist/apps/lukso-gui")))
+
+	go func() { app.Start(":4000") }()
 }

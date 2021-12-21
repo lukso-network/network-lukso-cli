@@ -6,6 +6,7 @@ import (
 	"lukso/apps/lukso-manager/downloader"
 	"lukso/apps/lukso-manager/settings"
 	"lukso/apps/lukso-manager/shared"
+	"os"
 )
 
 func HandleCli(cmd string, arg string) {
@@ -30,6 +31,9 @@ func HandleCli(cmd string, arg string) {
 	}
 
 	switch cmd {
+	case "version":
+		fmt.Println(shared.ScriptVersion)
+		os.Exit(0)
 	case "start":
 		switch arg {
 		case string(settings.Pandora):

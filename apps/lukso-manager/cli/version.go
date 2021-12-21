@@ -16,7 +16,7 @@ func getVersionCommand() *cli.Command {
 			Name:  "pandora",
 			Flags: getLuksoFlags(),
 			Action: func(c *cli.Context) error {
-				Cmd, Arg = "varsion", "pandora"
+				Cmd, Arg = "version", "pandora"
 				return nil
 			},
 		},
