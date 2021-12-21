@@ -6,7 +6,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"lukso/apps/lukso-manager/cli/config"
+	"lukso/apps/lukso-manager/config"
 	"lukso/apps/lukso-manager/runner"
 	"lukso/apps/lukso-manager/settings"
 	"lukso/apps/lukso-manager/shared"
@@ -101,7 +101,7 @@ func LoadFlags(c *cli.Context) {
 	}
 
 	if c.String("config") != "" {
-		config.LoadConfig(LuksoSettings, c.String("config"))
+		config.LoadNodeConfig(LuksoSettings, c.String("config"))
 	}
 
 	if c.String("coinbase") != "" {
