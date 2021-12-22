@@ -86,8 +86,16 @@ func startPandora(
 
 	cmd, errBinary := StartBinary(client, version, args)
 	if errBinary != nil {
+		log.Fatal(errBinary)
 		return
 	}
 
 	return cmd, nil
+}
+
+func stopPandora() error {
+	if err := CommandsByClient.orchestrator.Process.Kill(); err != nil {
+		return err
+	}
+	return nil
 }

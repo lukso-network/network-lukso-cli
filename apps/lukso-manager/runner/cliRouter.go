@@ -31,13 +31,21 @@ func HandleCli(cmd string, arg string) {
 	}
 
 	switch cmd {
+
 	case "version":
 		fmt.Println(shared.ScriptVersion)
 		os.Exit(0)
+
 	case "start":
 		switch arg {
 		case string(settings.Pandora):
 			startPandora(luksoSettings.Versions[settings.Pandora], shared.PickedNetwork, *luksoSettings, networkConfig, fmt.Sprint(shared.RunningTime))
+		}
+
+	case "stop":
+		switch arg {
+		case string(settings.Pandora):
+			stopPandora()
 		}
 	}
 }
