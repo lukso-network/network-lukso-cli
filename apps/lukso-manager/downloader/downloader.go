@@ -2,6 +2,7 @@ package downloader
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -199,7 +200,57 @@ func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonString)
 }
 
-func GetAvailableVersions(w http.ResponseWriter, r *http.Request) {
+func GetAvailableVersions() (map[string]clientInfo, error) {
+	confMap := map[string]clientInfo{}
+	for client, release := range ReleaseLocations {
+		r, err := http.Get(release.URL + "?per_page=20")
+		if err != nil {
+			fmt.Println("Request to "+release.URL+" failed.", err)
+			log.Fatal(err.Error())
+			return confMap, errors.New("Request Failed")
+		}
+
+		confMap[client] = clientInfo{
+			Name:              client,
+			HumanReadableName: release.Name,
+			DownloadInfo:      make(map[string]downloadInfo),
+		}
+
+		if r.StatusCode == http.StatusForbidden {
+			//log.Fatal("Github API Rate Limit Exceeded")
+			return confMap, errors.New("Github API Rate Limit Exceeded")
+		}
+
+		if r.StatusCode != http.StatusOK {
+			log.Fatal(err.Error())
+			return confMap, errors.New("HTTP Request failed")
+		}
+
+		decoder := json.NewDecoder(r.Body)
+		var releases GithubReleases
+
+		decodeError := decoder.Decode(&releases)
+		if decodeError != nil {
+			log.Fatalln(decodeError)
+			log.Fatal(decodeError.Error())
+			return confMap, errors.New("Cannot decode JSON API")
+		}
+
+		for _, v := range releases {
+			assetURL := getDownloadUrlFromAsset(client, v.Assets)
+			if assetURL != "" {
+				confMap[client].DownloadInfo[v.TagName] = downloadInfo{
+					Tag:         v.TagName,
+					DownloadURL: assetURL,
+				}
+			}
+		}
+
+	}
+	return confMap, nil
+}
+
+func GetAvailableVersionsEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	confMap := map[string]clientInfo{}
@@ -280,7 +331,37 @@ func getDownloadUrlFromAsset(name string, assets []Assets) string {
 	return downloadUrl
 }
 
-func DownloadClient(w http.ResponseWriter, r *http.Request) {
+func DownloadClient(client string, version string) {
+	clientFolder := shared.BinaryDir + client + "/"
+	clientFolderWithVersion := clientFolder + version
+
+	createDirIfNotExists(shared.BinaryDir)
+	createDirIfNotExists(clientFolder)
+	createDirIfNotExists(clientFolderWithVersion)
+
+	filePath := clientFolder + version + "/" + client
+	fileUrl := getDownloadUrlFromAsset(client, []Assets{
+		{
+			URL: "",
+		},
+	})
+
+	err := downloadFile(filePath, fileUrl)
+	if err != nil {
+		log.Fatal("File " + fileUrl + " could not be downloaded: " + err.Error())
+		return
+	}
+
+	_, err = os.Stat(filePath)
+	if err != nil {
+		log.Fatal([]byte("File " + fileUrl + " not found"))
+		return
+	}
+
+	os.Chmod(filePath, 0775)
+}
+
+func DownloadClientEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	decoder := json.NewDecoder(r.Body)

@@ -1,3 +1,5 @@
 package shared
 
-const ScriptVersion = "v2.0.0"
+const (
+	ScriptVersion = "v2.0.0"
+)

@@ -9,6 +9,29 @@ import (
 	"os"
 )
 
+func Prepare() error {
+
+	LuksoSettings, err := settings.GetSettings(shared.SettingsDB, shared.PickedNetwork)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Download network configs if they are not present
+	err = downloader.DownloadConfigFiles(shared.PickedNetwork)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Check whether binary is available and download if not present
+	if LuksoSettings.Versions[settings.Orchestrator] != "" {
+		// downloader.DownloadClient(string(settings.Orchestrator), LuksoSettings.Versions[settings.Orchestrator])
+		// downloader.DownloadClient(string(settings.Orchestrator), "v0.1.0-rc.1-kravitz")
+	}
+
+	return nil
+}
+
 func HandleCli(cmd string, arg string) {
 
 	luksoSettings, err := settings.GetSettings(shared.SettingsDB, shared.PickedNetwork)
@@ -16,19 +39,15 @@ func HandleCli(cmd string, arg string) {
 	println(luksoSettings.Versions[settings.Pandora])
 
 	if err != nil {
-
+		log.Fatal(err.Error())
 	}
 
-	err = downloader.DownloadConfigFiles(shared.PickedNetwork)
+	err = Prepare()
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	// downloader.GetAvailableVersionsDedicated()
+
 	networkConfig, err := ReadConfig(shared.PickedNetwork)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	println(networkConfig.GENESISTIME)
 
 	switch cmd {
 

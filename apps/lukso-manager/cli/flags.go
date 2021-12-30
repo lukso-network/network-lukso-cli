@@ -12,6 +12,7 @@ var Placeholder struct {
 	GUI        bool
 	ConfigFile string
 	Network    string
+	PandoraTag string
 }
 
 var luksoFlags []cli.Flag
@@ -47,6 +48,12 @@ func getLuksoFlags() []cli.Flag {
 			Name:        "coinbase",
 			Usage:       "Sets pandora coinbase. This is public address for block mining rewards",
 			Destination: &Placeholder.Coinbase,
+		},
+		&cli.StringFlag{
+			Name:        "pandora",
+			Aliases:     []string{"pandora-tag", "pan-tag"},
+			Usage:       "Sets pandora tag version to be used",
+			Destination: &Placeholder.PandoraTag,
 		},
 	}
 

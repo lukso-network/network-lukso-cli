@@ -27,15 +27,15 @@ func Init() {
 	app.Flags = getLuksoFlags()
 	app.EnableBashCompletion = true
 
-	app.After = func(c *cli.Context) error {
-		LoadFlags(c)
-		return nil
-	}
-
 	app.Commands = []*cli.Command{
 		getStartCommand(),
 		getStopCommand(),
 		getVersionCommand(),
+	}
+
+	app.After = func(c *cli.Context) error {
+		LoadFlags(c)
+		return nil
 	}
 
 	err := app.Run(os.Args)
@@ -106,6 +106,10 @@ func LoadFlags(c *cli.Context) {
 
 	if c.String("coinbase") != "" {
 		LuksoSettings.Coinbase = c.String("coinbase")
+	}
+
+	if c.String("pandora") != "" {
+		LuksoSettings.Versions[settings.Pandora] = c.String("pandora")
 	}
 
 	err2 := settings.SaveSettings(shared.SettingsDB, LuksoSettings, shared.PickedNetwork)

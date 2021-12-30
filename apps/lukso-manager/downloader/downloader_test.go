@@ -57,7 +57,7 @@ func TestGetAvailableVersions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			GetAvailableVersions(tt.args.w, tt.args.r)
+			GetAvailableVersionsEndpoint(tt.args.w, tt.args.r)
 		})
 	}
 }
@@ -96,7 +96,7 @@ func TestDownloadClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			DownloadClient(tt.args.w, tt.args.r)
+			DownloadClientEndpoint(tt.args.w, tt.args.r)
 		})
 	}
 }
