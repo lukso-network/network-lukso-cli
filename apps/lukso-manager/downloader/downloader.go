@@ -160,7 +160,7 @@ type updateRequestBody struct {
 	Url     string `json:"url"`
 }
 
-func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
+func GetDownloadedVersions() (map[string][]string, error) {
 	var DownloadedVerions = map[string][]string{}
 
 	downloads := shared.BinaryDir
@@ -183,6 +183,18 @@ func GetDownloadedVersions(w http.ResponseWriter, r *http.Request) {
 
 			return nil
 		})
+
+	if err != nil {
+		return DownloadedVerions, errors.New("file system error")
+	}
+
+	return DownloadedVerions, nil
+}
+
+func GetDownloadedVersionsEndpoint(w http.ResponseWriter, r *http.Request) {
+
+	DownloadedVerions, err := GetDownloadedVersions()
+
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -206,7 +218,6 @@ func GetAvailableVersions() (map[string]clientInfo, error) {
 		r, err := http.Get(release.URL + "?per_page=20")
 		if err != nil {
 			fmt.Println("Request to "+release.URL+" failed.", err)
-			log.Fatal(err.Error())
 			return confMap, errors.New("Request Failed")
 		}
 
@@ -217,7 +228,6 @@ func GetAvailableVersions() (map[string]clientInfo, error) {
 		}
 
 		if r.StatusCode == http.StatusForbidden {
-			//log.Fatal("Github API Rate Limit Exceeded")
 			return confMap, errors.New("Github API Rate Limit Exceeded")
 		}
 
@@ -253,55 +263,12 @@ func GetAvailableVersions() (map[string]clientInfo, error) {
 func GetAvailableVersionsEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	confMap := map[string]clientInfo{}
-	for client, release := range ReleaseLocations {
-		r, err := http.Get(release.URL + "?per_page=20")
-		if err != nil {
-			fmt.Println("Request to "+release.URL+" failed.", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			return
-		}
+	confMap, err := GetAvailableVersions()
 
-		confMap[client] = clientInfo{
-			Name:              client,
-			HumanReadableName: release.Name,
-			DownloadInfo:      make(map[string]downloadInfo),
-		}
-
-		if r.StatusCode == http.StatusForbidden {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("Github API Rate Limit Exceeded")
-			return
-		}
-
-		if r.StatusCode != http.StatusOK {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(err.Error())
-			return
-		}
-
-		decoder := json.NewDecoder(r.Body)
-		var releases GithubReleases
-
-		decodeError := decoder.Decode(&releases)
-		if decodeError != nil {
-			log.Fatalln(decodeError)
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(decodeError.Error())
-			return
-		}
-
-		for _, v := range releases {
-			assetURL := getDownloadUrlFromAsset(client, v.Assets)
-			if assetURL != "" {
-				confMap[client].DownloadInfo[v.TagName] = downloadInfo{
-					Tag:         v.TagName,
-					DownloadURL: assetURL,
-				}
-			}
-		}
-
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
 	}
 
 	jsonString, err := json.Marshal(confMap)

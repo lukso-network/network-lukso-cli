@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"lukso/apps/lukso-manager/cli"
 	"lukso/apps/lukso-manager/settings"
@@ -39,8 +38,8 @@ func init() {
 	// Get your IP,
 	// which is never <nil> when err is <nil>.
 	ip, err := consensus.ExternalIP()
-	if err == nil {
-		fmt.Println(ip.String()) // print IPv4/IPv6 in string format
+	if err != nil {
+		log.Fatal("Cannot get IP")
 	}
 	shared.OutboundIP = ip
 

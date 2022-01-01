@@ -24,9 +24,16 @@ func Prepare() error {
 	}
 
 	// Check whether binary is available and download if not present
-	if LuksoSettings.Versions[settings.Orchestrator] != "" {
-		// downloader.DownloadClient(string(settings.Orchestrator), LuksoSettings.Versions[settings.Orchestrator])
-		// downloader.DownloadClient(string(settings.Orchestrator), "v0.1.0-rc.1-kravitz")
+
+	downloadedVersions, err := downloader.GetDownloadedVersions()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if pandoraVersion := LuksoSettings.Versions[settings.Pandora]; !(shared.Contains(downloadedVersions[string(settings.Pandora)], pandoraVersion)) {
+		fmt.Println("Downloading:", "Pandora with tag", pandoraVersion)
+		downloader.DownloadClient(string(settings.Pandora), pandoraVersion)
 	}
 
 	return nil
@@ -43,8 +50,6 @@ func HandleCli(cmd string, arg string) {
 	}
 
 	err = Prepare()
-
-	// downloader.GetAvailableVersionsDedicated()
 
 	networkConfig, err := ReadConfig(shared.PickedNetwork)
 	println(networkConfig.GENESISTIME)

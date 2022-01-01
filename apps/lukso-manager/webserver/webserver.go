@@ -36,7 +36,7 @@ func StartAPIServer() {
 	app.Router.Methods("GET").Path("/pandora/debug/metrics").HandlerFunc(metrics.PandoraMetrics)
 	app.Router.Methods("GET").Path("/pandora/peers-over-time").HandlerFunc(metrics.GetPandoraPeersOverTime)
 	app.Router.Methods("GET").Path("/vanguard/peers-over-time").HandlerFunc(metrics.GetVanguardPeersOverTime)
-	app.Router.Methods("GET").Path("/downloaded-versions").HandlerFunc(downloader.GetDownloadedVersions)
+	app.Router.Methods("GET").Path("/downloaded-versions").HandlerFunc(downloader.GetDownloadedVersionsEndpoint)
 	app.Router.Methods("GET").Path("/available-versions").HandlerFunc(downloader.GetAvailableVersionsEndpoint)
 	app.Router.Methods("GET").Path("/deposit-data").HandlerFunc(validator.GetDepositData)
 
