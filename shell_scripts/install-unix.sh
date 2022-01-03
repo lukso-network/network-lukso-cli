@@ -67,7 +67,7 @@ sudo mkdir \
 /opt/lukso/networks/"$NETWORK" \
 /opt/lukso/networks/"$NETWORK"/config;
 
-download https://raw.githubusercontent.com/lukso-network/network-lukso-cli/main/shell_scripts/lukso /opt/lukso/lukso;
+download https://raw.githubusercontent.com/lukso-network/network-lukso-cli/v1.7.10/shell_scripts/lukso /opt/lukso/lukso;
 
 sudo chmod +x /opt/lukso/lukso;
 sudo ln -sfn /opt/lukso/lukso /usr/local/bin/lukso;
