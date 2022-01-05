@@ -410,23 +410,15 @@ start_pandora() {
     "--miner.gaslimit=80000000"
     "--syncmode=full"
     "--verbosity=$PANDORA_VERBOSITY"
+    "--http"
+    "--http.addr=$PANDORA_HTTP_ADDR"
+    "--http.port=$PANDORA_HTTP_PORT"
+    "--ws"
+    "--ws.addr=$PANDORA_WS_ADDR"
+    "--ws.port=$PANDORA_WS_PORT"
+    "--miner.notify=$PAN_WS_MINER_NOTIFY,$PAN_HTTP_MINER_NOTIFY"
   )
 
-  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
-    FLAGS=(
-      "--http"
-      "--http.addr=$PANDORA_HTTP_ADDR"
-      "--http.port=$PANDORA_HTTP_PORT"
-      "--ws"
-      "--ws.addr=$PANDORA_WS_ADDR"
-      "--ws.port=$PANDORA_WS_PORT"
-      "--miner.notify=$PAN_WS_MINER_NOTIFY,$PAN_HTTP_MINER_NOTIFY"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${FLAGS[@]}")
-  else
-    FLAGS=()
-    ARGUMENTS=("${ARGUMENTS[@]}" "${FLAGS[@]}")
-  fi
 
   if [[ $COINBASE ]]; then
     MINER_ARGUMENTS=(
@@ -529,26 +521,13 @@ start_vanguard() {
     "--grpc-gateway-port=$VANGUARD_GRPC_GATEWAY_PORT"
     "--update-head-timely"
     "--lukso-network"
+    "--rpc-host=$VANGUARD_RPC_HOST"
+    "--rpc-port=$VANGUARD_RPC_PORT"
+    "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
+    "--monitoring-host=$VANGUARD_MONITORING_HOST"
+    "--monitoring-port=$VANGUARD_MONITORING_PORT"
   )
 
-  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
-    RPC_ARGUMENTS=(
-      "--rpc-host=$VANGUARD_RPC_HOST"
-      "--rpc-port=$VANGUARD_RPC_PORT"
-      "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
-      "--monitoring-host=$VANGUARD_MONITORING_HOST"
-      "--monitoring-port=$VANGUARD_MONITORING_PORT"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
-  else
-    RPC_ARGUMENTS=(
-      "--disable-monitoring"
-      "--disable-grpc-gateway"
-      "--rpc-host=$DATADIR/vanguard/vanguard.ipc"
-      "--http-web3provider=$DATADIR/pandora/geth.ipc"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
-  fi
 
   if [[ -n $VANGUARD_P2P_PRIV_KEY ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--p2p-priv-key=$VANGUARD_P2P_PRIV_KEY")
@@ -586,25 +565,10 @@ start_validator() {
     "--wallet-dir=$WALLET_DIR"
     "--log-file=$LOGSDIR/validator/validator_$RUN_DATE.log"
     "--lukso-network"
+    "--rpc"
+    "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
+    "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
   )
-
-  if [[ $HTTP_CONNECTIVITY == "false" ]]; then
-    IPC_FLAGS=(
-      "--disable-monitoring"
-      "--beacon-rpc-provider=$DATADIR/vanguard/vanguard.ipc"
-      "--pandora-http-provider=$DATADIR/pandora/geth.ipc"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${IPC_FLAGS[@]}")
-  fi
-
-  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
-    HTTP_FLAGS=(
-      "--rpc"
-      "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
-      "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
-  fi
 
   if [[ -n $VALIDATOR_PASSWORD_FILE ]]; then
     ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$VALIDATOR_PASSWORD_FILE")
@@ -650,20 +614,9 @@ start_eth2stats_client() {
     "--eth2stats.node-name=$NODE_NAME"
     "--eth2stats.addr=$VAN_ETHSTATS"
     "--eth2stats.tls=false"
+    "--beacon.metrics-addr=$VAN_ETHSTATS_METRICS"
+    "--beacon.addr=$ETH2STATS_BEACON_ADDR"
   )
-
-  if [[ $HTTP_CONNECTIVITY == "true" ]]; then
-    HTTP_FLAGS=(
-      "--beacon.metrics-addr=$VAN_ETHSTATS_METRICS"
-      "--beacon.addr=$ETH2STATS_BEACON_ADDR"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
-  else
-    IPC_FLAGS=(
-      "--beacon.addr=$DATADIR/vanguard/vanguard.ipc"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${IPC_FLAGS[@]}")
-  fi
 
   nohup eth2stats-client run \
     "${ARGUMENTS[@]}" \
