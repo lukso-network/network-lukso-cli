@@ -33,6 +33,16 @@ func startPandora(
 		statsPrefix = strings.Split(network, "-")[1] + "."
 	}
 
+	err = os.MkdirAll(dataDir, 0775)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = os.MkdirAll(dataDir+"/geth", 0775)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	args := []string{
 		"--datadir=" + dataDir,
 		"--networkid=" + fmt.Sprint(config.NETWORKID),

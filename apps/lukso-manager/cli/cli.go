@@ -108,8 +108,20 @@ func LoadFlags(c *cli.Context) {
 		LuksoSettings.Coinbase = c.String("coinbase")
 	}
 
+	if c.String("orchestrator") != "" {
+		LuksoSettings.Versions[settings.Pandora] = c.String("orchestrator")
+	}
+
 	if c.String("pandora") != "" {
 		LuksoSettings.Versions[settings.Pandora] = c.String("pandora")
+	}
+
+	if c.String("vanguard") != "" {
+		LuksoSettings.Versions[settings.Vanguard] = c.String("vanguard")
+	}
+
+	if c.String("validator") != "" {
+		LuksoSettings.Versions[settings.Vanguard] = c.String("validator")
 	}
 
 	err2 := settings.SaveSettings(shared.SettingsDB, LuksoSettings, shared.PickedNetwork)

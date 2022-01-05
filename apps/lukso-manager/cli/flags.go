@@ -50,6 +50,12 @@ func getLuksoFlags() []cli.Flag {
 			Destination: &Placeholder.Coinbase,
 		},
 		&cli.StringFlag{
+			Name:        "orchestrator",
+			Aliases:     []string{"orchestrator-tag", "orc-tag"},
+			Usage:       "Sets pandora tag version to be used",
+			Destination: &Placeholder.PandoraTag,
+		},
+		&cli.StringFlag{
 			Name:        "pandora",
 			Aliases:     []string{"pandora-tag", "pan-tag"},
 			Usage:       "Sets pandora tag version to be used",
