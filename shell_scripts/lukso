@@ -49,19 +49,12 @@ EXTERNAL_IP=$(curl -s ident.me)
 ###### General variables
 HTTP_CONNECTIVITY=false
 VANGUARD_RPC="127.0.0.1:4000"
-ORC_PANDORA_RPC="ws://127.0.0.1:8546"
 ######
 
-###### Orchestrator settings
-ORC_HTTP_ADDR="127.0.0.1"
-ORC_HTTP_PORT="7877"
-ORC_WS_ADDR="127.0.0.1"
-ORC_WS_PORT="7878"
-ORC_VERBOSITY=info
-ORCHESTRATOR_VANGUARD_RPC_ENDPOINT=$VANGUARD_RPC
-ORCHESTRATOR_PANDORA_RPC_ENDPOINT=$ORC_PANDORA_RPC
+
+
 SECONDS_PER_SLOT=6
-######
+
 
 ###### Pandora settings
 PANDORA_PORT="30405"
@@ -82,7 +75,6 @@ CORS_DOMAIN=""
 VANGUARD_VERBOSITY=info
 VANGUARD_HTTP_WEB3PROVIDER="http://127.0.0.1:8545"
 VANGUARD_RPC_HOST="127.0.0.1"
-VANGUARD_ORC_RPC_PROVIDER="http://127.0.0.1:7877"
 VANGUARD_BOOTNODES=""
 VANGUARD_P2P_PRIV_KEY=""
 VANGUARD_P2P_HOST_DNS=""
@@ -161,9 +153,6 @@ download_binary() {
   TAG="$2"
 
   case $CLIENT in
-  lukso-orchestrator)
-    REPO="lukso-orchestrator"
-    ;;
 
   pandora)
     REPO="pandora-execution-engine"
@@ -380,58 +369,6 @@ check_validator_requirements() {
 
 }
 
-start_orchestrator() {
-  mkdir -p "$LOGSDIR"/orchestrator
-  echo -n $RUN_DATE >|"$LOGSDIR"/orchestrator/current.tmp
-  if [[ ! -d "$DATADIR/orchestrator" ]]; then
-    mkdir -p $DATADIR/orchestrator
-  fi
-
-  ARGUMENTS=(
-    "--datadir=$DATADIR/orchestrator"
-    "--verbosity=$ORC_VERBOSITY"
-  )
-
-  if [[ -n $CUSTOM_GENESIS_TIME ]]; then
-    CUSTOM_GENESIS_TIME_FLAGS=(
-      "--genesis-time=$CUSTOM_GENESIS_TIME"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${CUSTOM_GENESIS_TIME_FLAGS[@]}")
-  fi
-
-  if [[ -n $SECONDS_PER_SLOT ]]; then
-    SECONDS_PER_SLOT_FLAGS=(
-      "--seconds-per-slot=$SECONDS_PER_SLOT"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${SECONDS_PER_SLOT_FLAGS[@]}")
-  fi
-
-  if [[ "$HTTP_CONNECTIVITY" == "true" ]]; then
-    HTTP_FLAGS=(
-      "--http"
-      "--http.addr=$ORC_HTTP_ADDR"
-      "--http.port=$ORC_HTTP_PORT"
-      "--ws"
-      "--ws.addr=$ORC_WS_ADDR"
-      "--ws.port=$ORC_WS_PORT"
-      "--vanguard-grpc-endpoint=$ORCHESTRATOR_VANGUARD_RPC_ENDPOINT"
-      "--pandora-rpc-endpoint=$ORCHESTRATOR_PANDORA_RPC_ENDPOINT"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${HTTP_FLAGS[@]}")
-  else
-    IPC_FLAGS=(
-      "--vanguard-grpc-endpoint=$DATADIR/vanguard/vanguard.ipc"
-      "--pandora-rpc-endpoint=$DATADIR/pandora/geth.ipc"
-      "--ipcpath=$DATADIR/orchestrator"
-    )
-    ARGUMENTS=("${ARGUMENTS[@]}" "${IPC_FLAGS[@]}")
-  fi
-
-  nohup lukso-orchestrator \
-  "${ARGUMENTS[@]}" \
-  >|$LOGSDIR/orchestrator/orchestrator_"$RUN_DATE".log 2>&1 &
-  disown
-}
 
 start_pandora() {
 
@@ -487,9 +424,7 @@ start_pandora() {
     )
     ARGUMENTS=("${ARGUMENTS[@]}" "${FLAGS[@]}")
   else
-    FLAGS=(
-      "--miner.notify=$DATADIR/orchestrator/orchestrator.ipc"
-    )
+    FLAGS=()
     ARGUMENTS=("${ARGUMENTS[@]}" "${FLAGS[@]}")
   fi
 
@@ -600,7 +535,6 @@ start_vanguard() {
     RPC_ARGUMENTS=(
       "--rpc-host=$VANGUARD_RPC_HOST"
       "--rpc-port=$VANGUARD_RPC_PORT"
-      "--orc-rpc-provider=$VANGUARD_ORC_RPC_PROVIDER"
       "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
       "--monitoring-host=$VANGUARD_MONITORING_HOST"
       "--monitoring-port=$VANGUARD_MONITORING_PORT"
@@ -611,7 +545,6 @@ start_vanguard() {
       "--disable-monitoring"
       "--disable-grpc-gateway"
       "--rpc-host=$DATADIR/vanguard/vanguard.ipc"
-      "--orc-rpc-provider=$DATADIR/orchestrator/orchestrator.ipc"
       "--http-web3provider=$DATADIR/pandora/geth.ipc"
     )
     ARGUMENTS=("${ARGUMENTS[@]}" "${RPC_ARGUMENTS[@]}")
@@ -753,9 +686,6 @@ start_all() {
   if [[ "$IS_VALIDATOR" == true ]]; then
     check_validator_requirements
   fi
-  echo "################# Starting orchestrator #################"
-  start_orchestrator
-  sleep 2
 
   echo "################# Starting pandora #######################"
   start_pandora
@@ -795,10 +725,6 @@ start() {
 
   echo -n "Starting: "
   case $ARGUMENT in
-  orchestrator)
-    echo "orchestrator client"
-    start_orchestrator
-    ;;
   pandora)
     echo "pandora client"
     start_pandora
@@ -825,19 +751,6 @@ start() {
     start_all
     ;;
   esac
-}
-
-stop_orchestrator() {
-  echo -n "Stopping orchestrator client "
-  if [[ "$FORCE" == true ]]; then
-    echo "[FORCE]"
-    sudo kill -9 $(sudo lsof -t -i:7877) &>/dev/null
-    sleep 1
-  else
-    echo
-    sudo kill $(sudo lsof -t -i:7877) &>/dev/null
-    sleep 1
-  fi
 }
 
 stop_pandora() {
@@ -918,7 +831,6 @@ stop_all() {
   stop_validator &
   stop_vanguard &
   stop_pandora &
-  stop_orchestrator &
   stop_eth2stats_client &
   stop_lukso_status
 }
@@ -939,9 +851,6 @@ stop() {
     fi
   fi
   case "$ARGUMENT" in
-  orchestrator)
-    stop_orchestrator
-    ;;
   pandora)
     stop_pandora
     ;;
@@ -963,10 +872,6 @@ stop() {
   esac
 }
 
-reset_orchestrator() {
-  rm -rf $DATADIR/orchestrator
-}
-
 reset_pandora() {
   rm -rf $DATADIR/pandora
 }
@@ -984,7 +889,6 @@ reset_eth2stats_client() {
 }
 
 reset_all() {
-  reset_orchestrator
   reset_pandora
   reset_vanguard
   reset_validator
@@ -1000,9 +904,6 @@ reset() {
   fi
 
   case "$ARGUMENT" in
-  orchestrator)
-    reset_orchestrator
-    ;;
   pandora)
     reset_pandora
     ;;
@@ -1019,7 +920,7 @@ reset() {
     reset_all
     ;;
   *)
-    echo "Choose a client: [orchestrator, pandora, vanguard, validator, all] "
+    echo "Choose a client: [pandora, vanguard, validator, all] "
     ;;
   esac
 }
@@ -1030,13 +931,13 @@ help() {
   echo
   echo "Available commands with arguments:"
   echo "start         Starts up all or specific client(s)"
-  echo "               [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status, all]"
+  echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status, all]"
   echo
   echo "stop          Stops all or specific client(s)"
-  echo "               [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status, all]"
+  echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status, all]"
   echo
   echo "reset         Clears client(s) datadirs (this also removes chain-data) 	"
-  echo "               [orchestrator, pandora, vanguard, validator, all, none]"
+  echo "               [pandora, vanguard, validator, all, none]"
   echo
   echo "config        Interactive tool for creating config file"
   echo
@@ -1045,11 +946,11 @@ help() {
   echo "wallet        Imports lukso-deposit-cli keys"
   echo
   echo "logs          Shows logs"
-  echo "               [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status]"
+  echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status]"
   echo
   echo "attach        Attaches to pandora console via IPC socket (use with --datadir if not default). You cannot reach remote HTTP or WS via this command"
   echo
-  echo "bind-binaries sets client(s) to desired version, use with flags for setting tag: --orchestrator v0.2.0-rc.1, --pandora v0.2.0-rc.1, --vanguard v0.2.0-rc.1, --validator v0.2.0-rc.1"
+  echo "bind-binaries sets client(s) to desired version, use with flags for setting tag: --pandora v0.2.0-rc.1, --vanguard v0.2.0-rc.1, --validator v0.2.0-rc.1"
   echo
   echo
   echo "Available commands without arguments:"
@@ -1094,12 +995,6 @@ help() {
   echo
   echo "--lukso-status         Sets lukso-status tag to be used"
   echo "                       [Tag name ex. v0.2.0-rc.1]"
-  echo
-  echo "--orchestrator         Sets orchestrator tag to be used"
-  echo "                       [Tag name ex. v0.2.0-rc.1]"
-  echo
-  echo "--orchestrator-verbosity Sets orchestrator logging depth"
-  echo "                       [silent, error, warn, info, debug, trace]"
   echo
   echo "--pandora              Sets pandora tag to be used"
   echo "                       [Tag name ex. v0.2.0-rc.1]"
@@ -1199,25 +1094,11 @@ help() {
   echo
   echo "--van-grpc-gateway-port               Vanguard gRPC gateway port. The port on which the gateway server runs on (default: 3500)"
   echo
-  echo "--vanguard-orc-rpc-provider           [Requires --http-connectivity] A orchestrator string rpc endpoint. This is our orchestrator client http endpoint or socket path. (default: http://127.0.0.1:7877)"
-  echo
   echo "--validator-beacon-rpc-provider       [Requires --http-connectivity] Beacon node (vanguard) RPC provider endpoint. (default: $VANGUARD_RPC)"
   echo
   echo "--validator-pandora-http-provider     [Requires --http-connectivity] A pandora string rpc endpoint. This is our pandora client http endpoint. (default: http://127.0.0.1:8545)"
   echo
-  echo "--orchestrator-vanguard-rpc-endpoint  [Requires --http-connectivity] Enables Vanguard node RPC provider endpoint. (default: $VANGUARD_RPC)"
-  echo
-  echo "--orchestrator-pandora-rpc-endpoint   [Requires --http-connectivity] Pandora node RP provider endpoint. (default: $ORC_PANDORA_RPC)"
-  echo
   echo "--eth2stats-beacon-addr               Beacon node endpoint address for eth2stats-client. (default: $VANGUARD_RPC)"
-  echo
-  echo "--orc-http-port                       Orchestrator HTTP port exposed. (default:  7877)"
-  echo
-  echo "--orc-http-addr                       Orchestrator HTTP address exposed. (default:  127.0.0.1)"
-  echo
-  echo "--orc-ws-port                         Orchestrator websocket port exposed. (default:  7878)"
-  echo
-  echo "--orc-ws-addr                         Orchestrator websocket address exposed. (default:  127.0.0.1)"
   echo
   echo "--pan-port                            Pandora client TCP/UDP port exposed. (default:  30405)"
   echo
@@ -1249,9 +1130,6 @@ help() {
 
 logs() {
   case "$1" in
-  orchestrator)
-    CLIENT="orchestrator"
-    ;;
   pandora)
     CLIENT="pandora"
     ;;
@@ -1296,12 +1174,6 @@ while getopts "$optspec" optchar; do
     ;;
   -)
     case "${OPTARG}" in
-
-    orchestrator)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      bind_binary lukso-orchestrator $val
-      ;;
 
     pandora)
       val="${!OPTIND}"
@@ -1443,12 +1315,6 @@ while getopts "$optspec" optchar; do
       OVERRIDE_WITH_ETH2STATS=$val
       ;;
 
-    orchestrator-verbosity)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      OVERRIDE_ORCHESTRATOR_VERBOSITY=$val
-      ;;
-
     pandora-bootnodes)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
@@ -1548,12 +1414,6 @@ while getopts "$optspec" optchar; do
       OVERRIDE_VANGUARD_RPC_HOST="$val"
       ;;
 
-    vanguard-orc-rpc-provider)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      OVERRIDE_VANGUARD_ORC_RPC_PROVIDER=$val
-      ;;
-
     van-min-sync-peers)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
@@ -1570,42 +1430,6 @@ while getopts "$optspec" optchar; do
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VAN_ETHSTATS_METRICS=$val
-      ;;
-
-    orchestrator-vanguard-rpc-endpoint)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      OVERRIDE_ORCHESTRATOR_VANGUARD_RPC_ENDPOINT=$val
-      ;;
-
-    orchestrator-pandora-rpc-endpoint)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      OVERRIDE_ORCHESTRATOR_PANDORA_RPC_ENDPOINT=$val
-      ;;
-
-    orc-http-address)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      OVERRIDE_ORC_HTTP_ADDR=$val
-      ;;
-
-    orc-http-port)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      OVERRIDE_ORC_HTTP_PORT=$val
-      ;;
-
-    orc-ws-address)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      OVERRIDE_ORC_WS_ADDR=$val
-      ;;
-
-    orc-ws-port)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      OVERRIDE_ORC_WS_PORT=$val
       ;;
 
     pan-port)
@@ -1772,7 +1596,7 @@ fi
 
 parse_config "/opt/lukso/networks/$NETWORK/config/network-config.yaml"
 
-# Prepare custom genesis timestamp for Orchestrator genesis flag based on downloaded network-config value
+# Prepare custom genesis timestamp for genesis flag based on downloaded network-config value
 CUSTOM_GENESIS_TIME=$(echo -n $GENESIS_TIME)
 
 # Override config file
@@ -1786,10 +1610,6 @@ fi
 
 if [[ -n $OVERRIDE_IS_VALIDATOR ]]; then
   IS_VALIDATOR=$OVERRIDE_IS_VALIDATOR
-fi
-
-if [[ -n $OVERRIDE_ORCHESTRATOR_VERBOSITY ]]; then
-  ORC_VERBOSITY=$OVERRIDE_ORCHESTRATOR_VERBOSITY
 fi
 
 if [[ -n $OVERRIDE_PANDORA_BOOTNODES ]]; then
@@ -1882,18 +1702,6 @@ if [[ -n $OVERRIDE_VANGUARD_RPC_HOST ]]; then
   VANGUARD_RPC_HOST=$OVERRIDE_VANGUARD_RPC_HOST
 fi
 
-if [[ -n $OVERRIDE_VANGUARD_ORC_RPC_PROVIDER ]]; then
-  VANGUARD_ORC_RPC_PROVIDER=$OVERRIDE_VANGUARD_ORC_RPC_PROVIDER
-fi
-
-if [[ -n $OVERRIDE_ORCHESTRATOR_VANGUARD_RPC_ENDPOINT ]]; then
-  ORCHESTRATOR_VANGUARD_RPC_ENDPOINT=$OVERRIDE_ORCHESTRATOR_VANGUARD_RPC_ENDPOINT
-fi
-
-if [[ -n $OVERRIDE_ORCHESTRATOR_PANDORA_RPC_ENDPOINT ]]; then
-  ORCHESTRATOR_PANDORA_RPC_ENDPOINT=$OVERRIDE_ORCHESTRATOR_PANDORA_RPC_ENDPOINT
-fi
-
 if [[ -n $OVERRIDE_VALIDATOR_BEACON_RPC_PROVIDER ]]; then
   VALIDATOR_BEACON_RPC_PROVIDER=$OVERRIDE_VALIDATOR_BEACON_RPC_PROVIDER
 fi
@@ -1948,22 +1756,6 @@ if [[ -n $OVERRIDE_ALLOW_RESPIN ]]; then
   ALLOW_RESPIN=$OVERRIDE_ALLOW_RESPIN
 fi
 
-if [[ -n $OVERRIDE_ORC_HTTP_ADDR ]]; then
-  ORC_HTTP_ADDR=$OVERRIDE_ORC_HTTP_ADDR
-fi
-
-if [[ -n $OVERRIDE_ORC_HTTP_PORT ]]; then
-  ORC_HTTP_PORT=$OVERRIDE_ORC_HTTP_PORT
-fi
-
-if [[ -n $OVERRIDE_ORC_WS_ADDR ]]; then
-  ORC_WS_ADDR=$OVERRIDE_ORC_WS_ADDR
-fi
-
-if [[ -n $OVERRIDE_ORC_WS_PORT ]]; then
-  ORC_WS_PORT=$OVERRIDE_ORC_WS_PORT
-fi
-
 if [[ -n $OVERRIDE_PANDORA_PORT ]]; then
   PANDORA_PORT=$OVERRIDE_PANDORA_PORT
 fi
@@ -1974,14 +1766,6 @@ fi
 
 if [[ -n $OVERRIDE_PANDORA_HTTP_PORT ]]; then
   PANDORA_HTTP_PORT=$OVERRIDE_PANDORA_HTTP_PORT
-fi
-
-if [[ -n $OVERRIDE_ORC_WS_ADDR ]]; then
-  ORC_WS_ADDR=$OVERRIDE_ORC_WS_ADDR
-fi
-
-if [[ -n $OVERRIDE_ORC_WS_PORT ]]; then
-  ORC_WS_PORT=$OVERRIDE_ORC_WS_PORT
 fi
 
 if [[ -n $OVERRIDE_PANDORA_WS_ADDR ]]; then

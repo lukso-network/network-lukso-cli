@@ -79,7 +79,6 @@ download_network_config l15-dev;
 sudo rm -rf /opt/lukso/tmp;
 
 sudo lukso bind-binaries \
---orchestrator v0.2.0-rc.2 \
 --pandora v0.2.0-rc.2 \
 --vanguard v0.2.0-rc.2 \
 --validator v0.2.0-rc.2 \
