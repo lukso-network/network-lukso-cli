@@ -17,7 +17,7 @@ type NetworkConfig struct {
 	VANGUARDBOOTNODES string `yaml:"VANGUARD_BOOTNODES"`
 }
 
-func ReadConfig(network string) (*NetworkConfig, error) {
+func ReadNetworkConfig(network string) (*NetworkConfig, error) {
 	fileName := shared.NetworkDir + network + "/config/network-config.yaml"
 	buf, err := ioutil.ReadFile(fileName)
 	if err != nil {

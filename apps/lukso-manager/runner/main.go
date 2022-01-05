@@ -46,7 +46,7 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 
 	network := body.Network
 
-	oldConfig, oldConfigError := ReadConfig(network)
+	oldConfig, oldConfigError := ReadNetworkConfig(network)
 	if oldConfigError != nil {
 		shared.HandleError(oldConfigError, w)
 		return
@@ -58,7 +58,7 @@ func StartClients(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	config, newConfigError := ReadConfig(network)
+	config, newConfigError := ReadNetworkConfig(network)
 	if newConfigError != nil {
 		shared.HandleError(newConfigError, w)
 		return

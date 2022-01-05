@@ -306,14 +306,12 @@ func DownloadClient(client string, version string) {
 	createDirIfNotExists(clientFolder)
 	createDirIfNotExists(clientFolderWithVersion)
 
-	filePath := clientFolder + version + "/" + client
-	fileUrl := getDownloadUrlFromAsset(client, []Assets{
-		{
-			URL: "",
-		},
-	})
+	availableVersions, err := GetAvailableVersions()
 
-	err := downloadFile(filePath, fileUrl)
+	filePath := clientFolder + version + "/" + client
+	fileUrl := availableVersions["vanguard"].DownloadInfo[version].DownloadURL
+
+	err = downloadFile(filePath, fileUrl)
 	if err != nil {
 		log.Fatal("File " + fileUrl + " could not be downloaded: " + err.Error())
 		return

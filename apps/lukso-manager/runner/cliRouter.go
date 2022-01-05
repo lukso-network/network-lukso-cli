@@ -51,8 +51,7 @@ func HandleCli(cmd string, arg string) {
 
 	err = Prepare()
 
-	networkConfig, err := ReadConfig(shared.PickedNetwork)
-	println(networkConfig.GENESISTIME)
+	networkConfig, err := ReadNetworkConfig(shared.PickedNetwork)
 
 	switch cmd {
 
