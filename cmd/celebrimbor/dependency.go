@@ -73,6 +73,11 @@ func (dependency *ClientDependency) ParseUrl(tagName string) (url string) {
 		return dependency.baseDarwinUrl
 	}
 
+	// Fallback to unix if system is not recognized
+	if sprintOccurrences < 1 {
+		return dependency.baseUnixUrl
+	}
+
 	if currentOs == macos {
 		return fmt.Sprintf(dependency.baseDarwinUrl, tagName)
 	}

@@ -25,6 +25,18 @@ const (
 	windows = "windows"
 )
 
+const (
+	DefaultELNetworkID = 231
+	DefaultELHTTPPort  = 8598
+	DefaultELWSPort    = 8599
+	DefaultELP2PPort   = 30398
+
+	DefaultCLGRPCPort    = 4098
+	DefaultCLP2PTCPPort  = 13098
+	DefaultCLP2PUDPPort  = 13098
+	DefaultValidatorPort = 3598
+)
+
 var (
 	appName               = "celebrimbor"
 	ELTag                 string
@@ -43,6 +55,7 @@ func init() {
 	allFlags = append(allFlags, validatorFlags...)
 	allFlags = append(allFlags, CLFlags...)
 	allFlags = append(allFlags, appFlags...)
+	appFlags = allFlags
 }
 
 func main() {
@@ -94,6 +107,9 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 	// Get os, then download all binaries into datadir matching desired system
 	// After successful download run binary with desired arguments spin and connect them
 	// Orchestrator can be run from-memory
+	CLTag = ctx.String(CLTagFlag)
+	ELTag = ctx.String(ELTagFlag)
+
 	err = downloadGenesis(ctx)
 
 	if nil != err {
@@ -214,7 +230,7 @@ func startEL(ctx *cli.Context) (err error) {
 
 	time.Sleep(time.Second * 3)
 
-	log.WithField("dependencyTag", ELTag).Info("I am running execution engine")
+	log.WithField("dependencyTag", ELTag).Info("Running execution engine")
 	err = clientDependencies[ELDependencyName].Run(
 		ELTag,
 		elDataDir,
@@ -265,25 +281,19 @@ func startCL(ctx *cli.Context) (err error) {
 		return
 	}
 
-	clGrpcEndpoint := ctx.String(CLGrpcEndpoint)
-
-	if "" == clGrpcEndpoint {
-		clGrpcEndpoint = DefaultELRPCEndpoint
-	}
-
 	log.Info("Consensus Layer readiness check")
 	time.Sleep(time.Millisecond * 250)
 	dialOptions := constructDialOptions(0, 100, time.Second)
 	vanClient, err := grpc.DialContext(
 		ctx.Context,
-		clGrpcEndpoint,
+		CLGrpcEndpoint,
 		dialOptions...,
 	)
 
 	if nil != err || nil == vanClient {
 		log.WithField("cause", "Consensus Layer not ready yet").Error(err)
 
-		return fmt.Errorf("consensus Layer not ready yet: %s", err.Error())
+		return fmt.Errorf("consensus layer not ready yet: %s", err.Error())
 	}
 
 	log.Info("Consensus Layer is ready")
