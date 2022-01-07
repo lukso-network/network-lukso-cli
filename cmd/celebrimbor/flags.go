@@ -113,7 +113,7 @@ var (
 		&cli.StringFlag{
 			Name:  ELBootnodesFlag,
 			Usage: "Default value should be ok for test network. Otherwise provide Comma separated enode urls, see at https://geth.ethereum.org/docs/getting-started/private-net.",
-			Value: "enode://cdc22e29686950641376297648eaa2bcf11c9eeb04dd8632feaaed0624f535a3c802e4d4141b68bf91c5243f05734bd7194e49cc62e5585f414d95cd82e4b9a4@192.168.0.164:30302?discport=0,enode://2fa4a4373c60f606a27ce292c0667bb25e4839fe7eb2e9b04d5cca5ae37365e85072a4ce43af150c9f3cd7ed72fa21fec3c5b25833ba2ab9c21ab7973381ae3b@192.168.0.164:30301?discport=0",
+			Value: "enode://cdc22e29686950641376297648eaa2bcf11c9eeb04dd8632feaaed0624f535a3c802e4d4141b68bf91c5243f05734bd7194e49cc62e5585f414d95cd82e4b9a4@192.168.0.164:30302,enode://2fa4a4373c60f606a27ce292c0667bb25e4839fe7eb2e9b04d5cca5ae37365e85072a4ce43af150c9f3cd7ed72fa21fec3c5b25833ba2ab9c21ab7973381ae3b@192.168.0.164:30301",
 		},
 		&cli.StringFlag{
 			Name:  ELNetworkIDFlag,
@@ -488,6 +488,11 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 func prepareELFlags(ctx *cli.Context) (ELArguments []string) {
 	ELArguments = append(ELArguments, "--datadir")
 	ELArguments = append(ELArguments, ctx.String(ELDatadirFlag))
+	ELArguments = append(ELArguments, "--datadir.ancient")
+	ELArguments = append(ELArguments, ctx.String(ELDatadirFlag))
+	ELArguments = append(ELArguments, "--ethash.cachedir")
+	ELArguments = append(ELArguments, ctx.String(ELDatadirFlag))
+
 	rand.Seed(time.Now().Unix())
 	randomBytes := make([]byte, 20)
 	rand.Read(randomBytes)
@@ -504,7 +509,7 @@ func prepareELFlags(ctx *cli.Context) (ELArguments []string) {
 		NodeHash = ethstatsArguments[1]
 	}
 
-	ELArguments = append(ethstatsArguments)
+	ELArguments = append(ELArguments, ethstatsArguments...)
 
 	if len(ctx.String(ELBootnodesFlag)) > 1 {
 		ELArguments = append(ELArguments, "--bootnodes")
@@ -562,6 +567,9 @@ func prepareELFlags(ctx *cli.Context) (ELArguments []string) {
 	// Verbosity
 	ELArguments = append(ELArguments, "--verbosity")
 	ELArguments = append(ELArguments, ctx.String(ELVerbosityFlag))
+
+	fmt.Println("stringArguments")
+	fmt.Println(ELArguments)
 
 	return
 }

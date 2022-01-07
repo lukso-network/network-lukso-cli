@@ -27,8 +27,8 @@ var (
 			name:          ELDependencyName,
 		},
 		ELGenesisDependencyName: {
-			baseUnixUrl:   "https://storage.cloud.google.com/merge-network/configs/templates/genesis.json",
-			baseDarwinUrl: "https://storage.cloud.google.com/merge-network/configs/templates/genesis.json",
+			baseUnixUrl:   "https://storage.googleapis.com/merge-network/configs/templates/genesis.json",
+			baseDarwinUrl: "https://storage.googleapis.com/merge-network/configs/templates/genesis.json",
 			name:          ELGenesisDependencyName,
 		},
 		CLDependencyName: {
@@ -42,13 +42,13 @@ var (
 			name:          validatorDependencyName,
 		},
 		CLGenesisDependencyName: {
-			baseUnixUrl:   "https://storage.cloud.google.com/merge-network/configs/templates/genesis.ssz",
-			baseDarwinUrl: "https://storage.cloud.google.com/merge-network/configs/templates/genesis.ssz",
+			baseUnixUrl:   "https://storage.googleapis.com/merge-network/configs/templates/genesis.ssz",
+			baseDarwinUrl: "https://storage.googleapis.com/merge-network/configs/templates/genesis.ssz",
 			name:          CLGenesisDependencyName,
 		},
 		CLConfigDependencyName: {
-			baseUnixUrl:   "https://storage.cloud.google.com/merge-network/configs/templates/config.yaml",
-			baseDarwinUrl: "https://storage.cloud.google.com/merge-network/configs/templates/config.yaml",
+			baseUnixUrl:   "https://storage.googleapis.com/merge-network/configs/templates/config.yaml",
+			baseDarwinUrl: "https://storage.googleapis.com/merge-network/configs/templates/config.yaml",
 			name:          CLConfigDependencyName,
 		},
 	}

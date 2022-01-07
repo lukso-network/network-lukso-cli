@@ -107,9 +107,6 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 	// Get os, then download all binaries into datadir matching desired system
 	// After successful download run binary with desired arguments spin and connect them
 	// Orchestrator can be run from-memory
-	CLTag = ctx.String(CLTagFlag)
-	ELTag = ctx.String(ELTagFlag)
-
 	err = downloadGenesis(ctx)
 
 	if nil != err {
@@ -243,7 +240,8 @@ func startEL(ctx *cli.Context) (err error) {
 
 	go func() {
 		for {
-			_, currentErr := os.Stat(DefaultELRPCEndpoint)
+			ipcEndpoint := fmt.Sprintf("%s/geth.ipc", elDataDir)
+			_, currentErr := os.Stat(ipcEndpoint)
 			if nil == currentErr {
 				log.Info("Execution Layer up")
 				waitGroup.Done()
@@ -253,7 +251,7 @@ func startEL(ctx *cli.Context) (err error) {
 
 			if os.IsNotExist(currentErr) {
 				time.Sleep(time.Millisecond * 50)
-				log.Info("Execution Layer dead")
+				log.Infof("Execution Layer dead, %s", ipcEndpoint)
 
 				continue
 			}
