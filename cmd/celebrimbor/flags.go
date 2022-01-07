@@ -66,8 +66,27 @@ const (
 )
 
 var (
-	appFlags = cmd.CommonFlagSet
-	ELFlags  = []cli.Flag{
+	AcceptTOUFlag = &cli.BoolFlag{
+		Name:     "accept-terms-of-use",
+		Usage:    "you must accept terms of use",
+		Required: true,
+		Value:    true,
+	}
+	ForceClearDB = &cli.BoolFlag{
+		Name:  "force-clear-db",
+		Usage: "Clear any previously stored data at the data directory",
+	}
+	// LogFileName specifies the log output file name.
+	LogFileName = &cli.StringFlag{
+		Name:  "log-file",
+		Usage: "Specify log file name, relative or absolute",
+	}
+	appFlags = []cli.Flag{
+		AcceptTOUFlag,
+		ForceClearDB,
+		LogFileName,
+	}
+	ELFlags = []cli.Flag{
 		&cli.StringFlag{
 			Name:  ELTagFlag,
 			Usage: "provide a tag of EL you would like to run",
@@ -305,7 +324,7 @@ func setupOperatingSystem() {
 }
 
 func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
-	if !ctx.Bool(cmd.AcceptTOUFlag.Name) {
+	if !ctx.Bool(AcceptTOUFlag.Name) {
 		log.Fatal("you must accept terms of use")
 		ctx.Done()
 
@@ -403,7 +422,7 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 }
 
 func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
-	if !ctx.Bool(cmd.AcceptTOUFlag.Name) {
+	if !ctx.Bool(AcceptTOUFlag.Name) {
 		log.Fatal("you must accept terms of use")
 		ctx.Done()
 
@@ -412,7 +431,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 
 	validatorArguments = append(validatorArguments, "--accept-terms-of-use")
 
-	if ctx.IsSet(cmd.ForceClearDB.Name) {
+	if ctx.IsSet(ForceClearDB.Name) {
 		validatorArguments = append(validatorArguments, "--force-clear-db")
 	}
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/lukso-network/lukso-orchestrator/shared/testutil/assert"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 

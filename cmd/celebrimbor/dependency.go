@@ -9,46 +9,46 @@ import (
 	"strings"
 )
 
-// TODO: consider to move it to common/shared
+// TODO: consider extend it when new clients will be introduced
 const (
-	ELDependencyName        = "el"
+	ELDependencyName        = "geth"
 	ELGenesisDependencyName = "el_private_testnet_genesis.json"
-	CLDependencyName        = "vanguard"
+	CLDependencyName        = "prysm"
 	validatorDependencyName = "validator"
-	CLGenesisDependencyName = "vanguard_private_testnet_genesis.ssz"
+	CLGenesisDependencyName = "cl_private_testnet_genesis.ssz"
 	CLConfigDependencyName  = "config.yml"
 )
 
 var (
 	clientDependencies = map[string]*ClientDependency{
 		ELDependencyName: {
-			baseUnixUrl:   "https://github.com/lukso-network/pandora-execution-engine/releases/download/%s/geth",
-			baseDarwinUrl: "https://github.com/lukso-network/pandora-execution-engine/releases/download/%s/geth-darwin",
+			baseUnixUrl:   "https://github.com/silesiacoin/go-ethereum/releases/download/%s/geth-Linux-x86_64",
+			baseDarwinUrl: "https://github.com/silesiacoin/go-ethereum/releases/download/%s/geth-Darwin-x86_64",
 			name:          ELDependencyName,
 		},
 		ELGenesisDependencyName: {
-			baseUnixUrl:   "https://storage.googleapis.com/l16-common/pandora/pandora_private_testnet_genesis.json",
-			baseDarwinUrl: "https://storage.googleapis.com/l16-common/pandora/pandora_private_testnet_genesis.json",
+			baseUnixUrl:   "https://storage.cloud.google.com/merge-network/configs/templates/genesis.json",
+			baseDarwinUrl: "https://storage.cloud.google.com/merge-network/configs/templates/genesis.json",
 			name:          ELGenesisDependencyName,
 		},
 		CLDependencyName: {
-			baseUnixUrl:   "https://github.com/lukso-network/vanguard-consensus-engine/releases/download/%s/beacon-chain",
-			baseDarwinUrl: "https://github.com/lukso-network/vanguard-consensus-engine/releases/download/%s/beacon-chain-darwin",
+			baseUnixUrl:   "https://github.com/silesiacoin/prysm/releases/download/%s/beacon-chain-Linux-x86_64",
+			baseDarwinUrl: "https://github.com/silesiacoin/prysm/releases/download/%s/beacon-chain-Darwin-x86_64",
 			name:          CLDependencyName,
 		},
 		validatorDependencyName: {
-			baseUnixUrl:   "https://github.com/lukso-network/vanguard-consensus-engine/releases/download/%s/validator",
-			baseDarwinUrl: "https://github.com/lukso-network/vanguard-consensus-engine/releases/download/%s/validator-darwin",
+			baseUnixUrl:   "https://github.com/silesiacoin/prysm/releases/download/%s/validator-Darwin-x86_64",
+			baseDarwinUrl: "https://github.com/silesiacoin/prysm/releases/download/%s/validator-Linux-x86_64",
 			name:          validatorDependencyName,
 		},
 		CLGenesisDependencyName: {
-			baseUnixUrl:   "https://storage.googleapis.com/l16-common/vanguard/vanguard_private_testnet_genesis.ssz",
-			baseDarwinUrl: "https://storage.googleapis.com/l16-common/vanguard/vanguard_private_testnet_genesis.ssz",
+			baseUnixUrl:   "https://storage.cloud.google.com/merge-network/configs/templates/genesis.ssz",
+			baseDarwinUrl: "https://storage.cloud.google.com/merge-network/configs/templates/genesis.ssz",
 			name:          CLGenesisDependencyName,
 		},
 		CLConfigDependencyName: {
-			baseUnixUrl:   "https://storage.googleapis.com/l16-common/vanguard/chain-config.yaml",
-			baseDarwinUrl: "https://storage.googleapis.com/l16-common/vanguard/chain-config.yaml",
+			baseUnixUrl:   "https://storage.cloud.google.com/merge-network/configs/templates/config.yaml",
+			baseDarwinUrl: "https://storage.cloud.google.com/merge-network/configs/templates/config.yaml",
 			name:          CLConfigDependencyName,
 		},
 	}
@@ -122,7 +122,7 @@ func (dependency *ClientDependency) Download(tagName string, destination string)
 	dependencyLocation := dependency.ResolveBinaryPath(tagName, destination)
 
 	if fileExists(dependencyLocation) {
-		log.Warning("I am not downloading el, file already exists")
+		log.Warningf("Not downloading dependency: %s, file already exists", dependencyLocation)
 
 		return
 	}
