@@ -5,6 +5,15 @@ import "github.com/urfave/cli/v2"
 func getStopCommand() *cli.Command {
 	stopSubCommands := []*cli.Command{
 		{
+			Name:    "orchestrator",
+			Aliases: []string{"lukso-orchestrator"},
+			Flags:   getLuksoFlags(),
+			Action: func(c *cli.Context) error {
+				Cmd, Arg = "stop", "lukso-orchestrator"
+				return nil
+			},
+		},
+		{
 			Name:  "pandora",
 			Flags: getLuksoFlags(),
 			Action: func(c *cli.Context) error {
@@ -17,6 +26,15 @@ func getStopCommand() *cli.Command {
 			Flags: getLuksoFlags(),
 			Action: func(c *cli.Context) error {
 				Cmd, Arg = "stop", "vanguard"
+				return nil
+			},
+		},
+		{
+			Name:    "validator",
+			Aliases: []string{"lukso-validator"},
+			Flags:   getLuksoFlags(),
+			Action: func(c *cli.Context) error {
+				Cmd, Arg = "stop", "lukso-validator"
 				return nil
 			},
 		},
