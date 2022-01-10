@@ -49,6 +49,11 @@ func getLuksoFlags() []cli.Flag {
 			Usage:       "Sets pandora coinbase. This is public address for block mining rewards",
 			Destination: &Placeholder.Coinbase,
 		},
+		&cli.BoolFlag{
+			Name:        "validate",
+			Usage:       "Enables validator",
+			Destination: &Placeholder.ValidatorEnabled,
+		},
 		&cli.StringFlag{
 			Name:        "orchestrator",
 			Aliases:     []string{"orchestrator-tag", "orc-tag"},

@@ -309,7 +309,7 @@ func DownloadClient(client string, version string) {
 	availableVersions, err := GetAvailableVersions()
 
 	filePath := clientFolder + version + "/" + client
-	fileUrl := availableVersions["vanguard"].DownloadInfo[version].DownloadURL
+	fileUrl := availableVersions[client].DownloadInfo[version].DownloadURL
 
 	err = downloadFile(filePath, fileUrl)
 	if err != nil {

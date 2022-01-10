@@ -54,9 +54,7 @@ func startPandora(
 		"--ws",
 		"--ws.addr=127.0.0.1",
 		"--ws.port=8546",
-		"--mine",
 		"--miner.notify=ws://127.0.0.1:7878,http://127.0.0.1:7877",
-		"--miner.etherbase=" + settings.Coinbase,
 		"--miner.gaslimit=80000000",
 		"--syncmode=full",
 		"--verbosity=4",
@@ -67,6 +65,11 @@ func startPandora(
 		"--pprof.addr=127.0.0.1",
 		"--ethstats=" + hostname + ":6Tcpc53R5V763Aur9LgD@" + statsPrefix + "stats.pandora.l15.lukso.network",
 		// "2> " + networkDir + "/logs/pandora-" + version + "-" + timestamp + ".log",
+	}
+
+	if settings.ValidatorEnabled {
+		args = append(args, "--mine")
+		args = append(args, "--miner.etherbase="+settings.Coinbase)
 	}
 
 	command := exec.Command("bash", "-c", shared.BinaryDir+client+"/"+version+"/"+client+" --datadir "+dataDir+" init "+networkDir+"/config/pandora-genesis.json &>/dev/null")
