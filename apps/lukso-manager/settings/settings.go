@@ -15,8 +15,8 @@ type Client string
 const (
 	Vanguard     Client = "vanguard"
 	Pandora      Client = "pandora"
-	Orchestrator Client = "orchestrator"
-	Validator    Client = "validator"
+	Orchestrator Client = "lukso-orchestrator"
+	Validator    Client = "lukso-validator"
 )
 
 type Settings struct {
@@ -25,6 +25,9 @@ type Settings struct {
 	ExternalIP       string            `json:"externalIp" yaml:"EXTERNAL_IP"`
 	Versions         map[Client]string `json:"versions" yaml:"VERSIONS"`
 	ValidatorEnabled bool              `json:"validatorEnabled" yaml:"IS_VALIDATOR"`
+	Pandora          struct {
+		Verbosity string `json:"verbosity" yaml:"VERBOSITY"`
+	}
 }
 
 type saveSettingsRequestBody struct {

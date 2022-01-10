@@ -5,6 +5,14 @@ import "github.com/urfave/cli/v2"
 func getStopCommand() *cli.Command {
 	stopSubCommands := []*cli.Command{
 		{
+			Name:  "pandora",
+			Flags: getLuksoFlags(),
+			Action: func(c *cli.Context) error {
+				Cmd, Arg = "stop", "pandora"
+				return nil
+			},
+		},
+		{
 			Name:  "vanguard",
 			Flags: getLuksoFlags(),
 			Action: func(c *cli.Context) error {

@@ -6,9 +6,10 @@ func getStartCommand() *cli.Command {
 	startCommands := []*cli.Command{
 		{
 			Name:  "orchestrator",
+			Aliases: []string{"lukso-orchestrator"},
 			Flags: getLuksoFlags(),
 			Action: func(c *cli.Context) error {
-				Cmd, Arg = "start", "orchestrator"
+				Cmd, Arg = "start", "lukso-orchestrator"
 				return nil
 			},
 		},
@@ -30,9 +31,10 @@ func getStartCommand() *cli.Command {
 		},
 		{
 			Name:  "validator",
+			Aliases: []string{"lukso-validator"},
 			Flags: getLuksoFlags(),
 			Action: func(c *cli.Context) error {
-				Cmd, Arg = "start", "validator"
+				Cmd, Arg = "start", "lukso-validator"
 				return nil
 			},
 		},

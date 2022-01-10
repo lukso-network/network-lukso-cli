@@ -31,9 +31,24 @@ func Prepare() error {
 		log.Fatal(err)
 	}
 
+	if orchestratorVersion := LuksoSettings.Versions[settings.Orchestrator]; !(shared.Contains(downloadedVersions[string(settings.Orchestrator)], orchestratorVersion)) {
+		fmt.Println("Downloading:", "Orchestrator with tag", orchestratorVersion)
+		downloader.DownloadClient(string(settings.Orchestrator), orchestratorVersion)
+	}
+
 	if pandoraVersion := LuksoSettings.Versions[settings.Pandora]; !(shared.Contains(downloadedVersions[string(settings.Pandora)], pandoraVersion)) {
 		fmt.Println("Downloading:", "Pandora with tag", pandoraVersion)
 		downloader.DownloadClient(string(settings.Pandora), pandoraVersion)
+	}
+
+	if vanguardVersion := LuksoSettings.Versions[settings.Vanguard]; !(shared.Contains(downloadedVersions[string(settings.Vanguard)], vanguardVersion)) {
+		fmt.Println("Downloading:", "Vanguard with tag", vanguardVersion)
+		downloader.DownloadClient(string(settings.Vanguard), vanguardVersion)
+	}
+
+	if validatorVersion := LuksoSettings.Versions[settings.Validator]; !(shared.Contains(downloadedVersions[string(settings.Validator)], validatorVersion)) {
+		fmt.Println("Downloading:", "Validator with tag", validatorVersion)
+		downloader.DownloadClient(string(settings.Validator), validatorVersion)
 	}
 
 	return nil
@@ -61,8 +76,14 @@ func HandleCli(cmd string, arg string) {
 
 	case "start":
 		switch arg {
+		case string(settings.Orchestrator):
+			startOrchestrator(luksoSettings.Versions[settings.Orchestrator], shared.PickedNetwork)
 		case string(settings.Pandora):
 			startPandora(luksoSettings.Versions[settings.Pandora], shared.PickedNetwork, *luksoSettings, networkConfig, fmt.Sprint(shared.RunningTime))
+		case string(settings.Vanguard):
+			startVanguard(luksoSettings.Versions[settings.Vanguard], shared.PickedNetwork, networkConfig, fmt.Sprint(shared.RunningTime))
+		case string(settings.Validator):
+			startValidator(luksoSettings.Versions[settings.Validator], shared.PickedNetwork, networkConfig, fmt.Sprint(shared.RunningTime))
 		}
 
 	case "stop":

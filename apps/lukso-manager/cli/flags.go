@@ -12,7 +12,10 @@ var Placeholder struct {
 	GUI        bool
 	ConfigFile string
 	Network    string
+	OrchestratorTag string
 	PandoraTag string
+	VanguardTag string
+	ValidatorTag string
 }
 
 var luksoFlags []cli.Flag
@@ -58,13 +61,31 @@ func getLuksoFlags() []cli.Flag {
 			Name:        "orchestrator",
 			Aliases:     []string{"orchestrator-tag", "orc-tag"},
 			Usage:       "Sets pandora tag version to be used",
-			Destination: &Placeholder.PandoraTag,
+			Destination: &Placeholder.OrchestratorTag,
 		},
 		&cli.StringFlag{
 			Name:        "pandora",
 			Aliases:     []string{"pandora-tag", "pan-tag"},
 			Usage:       "Sets pandora tag version to be used",
 			Destination: &Placeholder.PandoraTag,
+		},
+		&cli.StringFlag{
+			Name:        "pandora-verbosity",
+			Aliases:     []string{"pan-verbosity"},
+			Usage:       "Sets pandora logging level to be used",
+			Destination: &Placeholder.Pandora.Verbosity,
+		},
+		&cli.StringFlag{
+			Name:        "vanguard",
+			Aliases:     []string{"vanguard-tag", "van-tag"},
+			Usage:       "Sets vanguard tag version to be used",
+			Destination: &Placeholder.VanguardTag,
+		},
+		&cli.StringFlag{
+			Name:        "validator",
+			Aliases:     []string{"validator-tag", "val-tag"},
+			Usage:       "Sets validator tag version to be used",
+			Destination: &Placeholder.ValidatorTag,
 		},
 	}
 

@@ -43,6 +43,22 @@ func startPandora(
 		log.Fatal(err)
 	}
 
+	pandoraVerbosity := "4"
+	switch settings.Pandora.Verbosity {
+	case "silent":
+		pandoraVerbosity = "0"
+	case "error":
+		pandoraVerbosity = "1"
+	case "warn":
+		pandoraVerbosity = "2"
+	case "info":
+		pandoraVerbosity = "3"
+	case "debug":
+		pandoraVerbosity = "4"
+	case "detail", "trace":
+		pandoraVerbosity = "5"
+	}
+
 	args := []string{
 		"--datadir=" + dataDir,
 		"--networkid=" + fmt.Sprint(config.NETWORKID),
@@ -57,7 +73,7 @@ func startPandora(
 		"--miner.notify=ws://127.0.0.1:7878,http://127.0.0.1:7877",
 		"--miner.gaslimit=80000000",
 		"--syncmode=full",
-		"--verbosity=4",
+		"--verbosity=" + pandoraVerbosity,
 		"--nat=extip:" + shared.OutboundIP.String(),
 		"--metrics",
 		"--metrics.expensive",
@@ -107,7 +123,7 @@ func startPandora(
 }
 
 func stopPandora() error {
-	if err := CommandsByClient.orchestrator.Process.Kill(); err != nil {
+	if err := CommandsByClient.pandora.Process.Kill(); err != nil {
 		return err
 	}
 	return nil

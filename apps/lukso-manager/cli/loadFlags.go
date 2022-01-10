@@ -23,8 +23,8 @@ func LoadFlags(c *cli.Context) {
 
 	networksNum := 0
 
-	if c.String("network") != "" {
-		shared.PickedNetwork = c.String("network")
+	if flag := c.String("network"); flag != "" {
+		shared.PickedNetwork = flag
 		networksNum++
 	}
 
@@ -61,32 +61,36 @@ func LoadFlags(c *cli.Context) {
 		log.Fatal(err0)
 	}
 
-	if c.String("config") != "" {
-		config.LoadNodeConfig(LuksoSettings, c.String("config"))
+	if flag := c.String("config"); flag != "" {
+		config.LoadNodeConfig(LuksoSettings, flag)
 	}
 
-	if c.String("coinbase") != "" {
-		LuksoSettings.Coinbase = c.String("coinbase")
+	if flag := c.String("coinbase"); flag != "" {
+		LuksoSettings.Coinbase = flag
 	}
 
-	if c.Bool("validate") {
-		LuksoSettings.ValidatorEnabled = true
+	if flag := c.Bool("validate"); flag {
+		LuksoSettings.ValidatorEnabled = flag
 	}
 
-	if c.String("orchestrator") != "" {
-		LuksoSettings.Versions[settings.Pandora] = c.String("orchestrator")
+	if flag := c.String("orchestrator"); flag != "" {
+		LuksoSettings.Versions[settings.Orchestrator] = flag
 	}
 
-	if c.String("pandora") != "" {
-		LuksoSettings.Versions[settings.Pandora] = c.String("pandora")
+	if flag := c.String("pandora"); flag != "" {
+		LuksoSettings.Versions[settings.Pandora] = flag
 	}
 
-	if c.String("vanguard") != "" {
-		LuksoSettings.Versions[settings.Vanguard] = c.String("vanguard")
+	if flag := c.String("pandora-verbosity"); flag != "" {
+		LuksoSettings.Pandora.Verbosity = flag
 	}
 
-	if c.String("validator") != "" {
-		LuksoSettings.Versions[settings.Vanguard] = c.String("validator")
+	if flag := c.String("vanguard"); flag != "" {
+		LuksoSettings.Versions[settings.Vanguard] = flag
+	}
+
+	if flag := c.String("validator"); flag != "" {
+		LuksoSettings.Versions[settings.Validator] = flag
 	}
 
 	err2 := settings.SaveSettings(shared.SettingsDB, LuksoSettings, shared.PickedNetwork)
