@@ -5,9 +5,9 @@ import "github.com/urfave/cli/v2"
 func getStartCommand() *cli.Command {
 	startCommands := []*cli.Command{
 		{
-			Name:  "orchestrator",
+			Name:    "orchestrator",
 			Aliases: []string{"lukso-orchestrator"},
-			Flags: getLuksoFlags(),
+			Flags:   getLuksoFlags(),
 			Action: func(c *cli.Context) error {
 				Cmd, Arg = "start", "lukso-orchestrator"
 				return nil
@@ -30,11 +30,19 @@ func getStartCommand() *cli.Command {
 			},
 		},
 		{
-			Name:  "validator",
+			Name:    "validator",
 			Aliases: []string{"lukso-validator"},
-			Flags: getLuksoFlags(),
+			Flags:   getLuksoFlags(),
 			Action: func(c *cli.Context) error {
 				Cmd, Arg = "start", "lukso-validator"
+				return nil
+			},
+		},
+		{
+			Name:  "all",
+			Flags: getLuksoFlags(),
+			Action: func(c *cli.Context) error {
+				Cmd, Arg = "start", "all"
 				return nil
 			},
 		},

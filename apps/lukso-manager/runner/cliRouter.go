@@ -84,6 +84,13 @@ func HandleCli(cmd string, arg string) {
 			startVanguard(luksoSettings.Versions[settings.Vanguard], shared.PickedNetwork, networkConfig, fmt.Sprint(shared.RunningTime))
 		case string(settings.Validator):
 			startValidator(luksoSettings.Versions[settings.Validator], shared.PickedNetwork, networkConfig, fmt.Sprint(shared.RunningTime))
+		case "all":
+			startOrchestrator(luksoSettings.Versions[settings.Orchestrator], shared.PickedNetwork)
+			startPandora(luksoSettings.Versions[settings.Pandora], shared.PickedNetwork, *luksoSettings, networkConfig, fmt.Sprint(shared.RunningTime))
+			startVanguard(luksoSettings.Versions[settings.Vanguard], shared.PickedNetwork, networkConfig, fmt.Sprint(shared.RunningTime))
+			if luksoSettings.ValidatorEnabled {
+				startValidator(luksoSettings.Versions[settings.Validator], shared.PickedNetwork, networkConfig, fmt.Sprint(shared.RunningTime))
+			}
 		}
 
 	case "stop":
