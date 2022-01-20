@@ -90,10 +90,10 @@ download_network_config l15-dev;
 sudo rm -rf /opt/lukso/tmp;
 
 sudo lukso bind-binaries \
---pandora v0.2.0-rc.2 \
---vanguard v0.2.0-rc.2 \
---validator v0.2.0-rc.2 \
---deposit v1.2.6-lukso \
+--geth v1.0.0 \
+--vanguard v1.0.0 \
+--validator v1.0.0 \
+--deposit v1.0.0 \
 --eth2stats v0.2.0-rc.1 \
 --lukso-status v0.0.1-alpha.9;
 

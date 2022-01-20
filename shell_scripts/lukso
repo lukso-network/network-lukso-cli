@@ -11,6 +11,7 @@ VALIDATOR_LOOPS=5
 ##### network info
 CHAIN_ID=""
 NETWORK_ID=""
+FORK_VERSION="0x60000069"
 #####
 
 ##### default client values
@@ -178,20 +179,20 @@ download_binary() {
 
   case $CLIENT in
 
-  pandora)
-    REPO="pandora-execution-engine"
+  geth)
+    REPO="go-ethereum"
     ;;
 
-  vanguard)
-    REPO="vanguard-consensus-engine"
+  beacon)
+    REPO="prysm"
     ;;
 
-  lukso-validator)
-    REPO="vanguard-consensus-engine"
+  network-validator-tools)
+    REPO="network-validator-tools"
     ;;
 
-  lukso-deposit-cli)
-    REPO="network-deposit-cli"
+  validator)
+    REPO="prysm"
     ;;
 
   eth2stats-client)
@@ -229,11 +230,27 @@ generate_keys() {
   read -p "How many validators? (Cost for 1 validator = 32 LYXt): " VALIDATORS_NUMBER
   echo "Running lukso-deposit-cli..."
 
-  lukso-deposit-cli new-mnemonic \
-    --chain $NETWORK \
-    --mnemonic_language english \
-    --folder $KEYS_DIR \
-    --num_validators $VALIDATORS_NUMBER
+  VALIDATOR_MNEMONIC=$(eth2-val-tools mnemonic)
+  read -p "Enter Validator mnemonic file location. Keep blank to generate atutomatically" INPUT
+  if [[ -n "$INPUT" ]]; then
+    VALIDATOR_MNEMONIC=`cat $INPUT`
+  fi
+  echo "SAVE THIS VALIDATOR MNEMONIC FOR FUTURE USAGE: ${VALIDATOR_MNEMONIC}"
+
+  WITHDRAWAL_MNEMONIC=$(eth2-val-tools mnemonic)
+  read -p "Enter Validator mnemonic file location. Keep blank to generate atutomatically" INPUT
+  if [[ -n "$INPUT" ]]; then
+    WITHDRAWAL_MNEMONIC=`cat $INPUT`
+  fi
+  echo "SAVE THIS WITHDRAWAL MNEMONIC FOR FUTURE USAGE: ${WITHDRAWAL_MNEMONIC}"
+
+
+  network-validator-tools deposit-data \
+    --fork-version=${FORK_VERSION} \
+    --source-min=0 \
+    --source-max=${VALIDATORS_NUMBER} \
+    --validators-mnemonic=${VALIDATOR_MNEMONIC} \
+    --withdrawals-mnemonic=${WITHDRAWAL_MNEMONIC} > "$KEYS_DIR/deposit-data.json"
 }
 
 import_accounts() {
@@ -1107,11 +1124,11 @@ help() {
 
 logs() {
   case "$1" in
-  pandora)
-    CLIENT="pandora"
+  geth)
+    CLIENT="geth"
     ;;
-  vanguard)
-    CLIENT="vanguard"
+  beacon)
+    CLIENT="beacon"
     ;;
   validator)
     CLIENT="validator"
@@ -1152,28 +1169,28 @@ while getopts "$optspec" optchar; do
   -)
     case "${OPTARG}" in
 
-    pandora)
+    geth)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      bind_binary pandora $val
+      bind_binary geth $val
       ;;
 
-    vanguard)
+    beacon)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      bind_binary vanguard $val
+      bind_binary beacon $val
       ;;
 
     validator)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      bind_binary lukso-validator $val
+      bind_binary validator $val
       ;;
 
     deposit)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      bind_binary lukso-deposit-cli $val
+      bind_binary network-validator-tools $val
       ;;
 
     eth2stats)
