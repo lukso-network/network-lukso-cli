@@ -14,16 +14,40 @@ NETWORK_ID=""
 #####
 
 ##### default client values
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  PLATFORM="Linux"
-fi
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  PLATFORM="Darwin"
-fi
-
+# for Apple M1s
+if [ "$(uname -s)" == "Darwin" ] && [ "$(uname -m)" == "arm64" ]
+then
+ARCHITECTURE="amd64"
+else
 ARCHITECTURE=$(uname -m)
-LUKSO_SCRIPT_VERSION="v1.7.9"
+ARCHITECTURE=${ARCHITECTURE/x86_64/amd64}
+ARCHITECTURE=${ARCHITECTURE/aarch64/arm64}
+fi
+readonly os_arch_suffix="$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCHITECTURE"
+
+PLATFORM=""
+case "$OSTYPE" in
+darwin*) PLATFORM="darwin" ;;
+linux*) PLATFORM="linux" ;;
+msys*) PLATFORM="windows" ;;
+cygwin*) PLATFORM="windows" ;;
+*) exit 1 ;;
+esac
+readonly PLATFORM
+
+if [ "$PLATFORM" == "windows" ]; then
+    ARCHITECTURE="amd64.exe"
+elif [[ "$os_arch_suffix" == *"arm64"* ]]; then
+    ARCHITECTURE="arm64"
+fi
+
+if [[ "$ARCHITECTURE" == "armv7l" ]]; then
+    color "31" "32-bit ARM is not supported. Please install a 64-bit operating system."
+    exit 1
+fi
+
+LUKSO_SCRIPT_VERSION="v1.7.10"
 
 RUN_DATE=$(date '+%Y-%m-%d__%H-%M-%S')
 NETWORK="l15-prod"
@@ -33,11 +57,11 @@ PAN_ETHSTATS="S2qDE8rYtFVVGZ@stats.pandora.l15.lukso.network"
 VAN_ETHSTATS="34.141.156.125:9090"
 COINBASE=""
 
-if [[ "$PLATFORM" == "Linux" ]]; then
+if [[ "$PLATFORM" == "linux" ]]; then
   LUKSO_HOME="$HOME/.lukso"
 fi
 
-if [[ "$PLATFORM" == "Darwin" ]]; then
+if [[ "$PLATFORM" == "darwin" ]]; then
   LUKSO_HOME="$HOME/Library/LUKSO"
 fi
 
@@ -130,7 +154,7 @@ parse_config() {
 download() {
   URL="$1"
   LOCATION="$2"
-  if [[ $PLATFORM == "Linux" ]]; then
+  if [[ $PLATFORM == "linux" ]]; then
     if ! wget -q --spider "$URL"; then
       echo "File not found, check URL: $URL"
       exit
@@ -138,7 +162,7 @@ download() {
     sudo wget -O $LOCATION $URL
   fi
 
-  if [[ $PLATFORM == "Darwin" ]]; then
+  if [[ $PLATFORM == "darwin" ]]; then
     STATUS_CODE=$(curl -L -s -o /dev/null -I -w "%{http_code}" $URL)
     if [[ $STATUS_CODE != "200" ]]; then
       echo "File not found, check URL: $URL"

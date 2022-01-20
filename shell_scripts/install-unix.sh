@@ -62,8 +62,8 @@ download() {
 download_network_config() {
   NETWORK=$1
   CDN="https://storage.googleapis.com/l15-cdn/networks/$NETWORK"
-  sudo mkdir -p /opt/beacon/networks/$NETWORK/config
-  TARGET=/opt/beacon/networks/$NETWORK/config
+  sudo mkdir -p /opt/lukso/networks/$NETWORK/config
+  TARGET=/opt/lukso/networks/$NETWORK/config
   download $CDN/network-config.yaml?ignoreCache=1 $TARGET/network-config.yaml
   download $CDN/pandora-genesis.json?ignoreCache=1 $TARGET/pandora-genesis.json
   download $CDN/vanguard-genesis.ssz?ignoreCache=1 $TARGET/vanguard-genesis.ssz
@@ -72,29 +72,29 @@ download_network_config() {
 }
 
 sudo mkdir \
-/opt/beacon \
-/opt/beacon/tmp \
-/opt/beacon/binaries \
-/opt/beacon/networks ;
+/opt/lukso \
+/opt/lukso/tmp \
+/opt/lukso/binaries \
+/opt/lukso/networks ;
 
 # TODO: CHANGE THIS LOCATION LATER. IT IS FOR TEST PURPOSE ONLY.
-download https://raw.githubusercontent.com/beacon-network/network-beacon-cli/main/shell_scripts/beacon /opt/beacon/beacon;
+download https://raw.githubusercontent.com/lukso-network/network-lukso-cli/feature/lukso-cli-with-kintsugi/shell_scripts/lukso /opt/lukso/lukso;
 
-sudo chmod +x /opt/beacon/beacon;
-sudo ln -sfn /opt/beacon/beacon /usr/local/bin/beacon;
+sudo chmod +x /opt/lukso/lukso;
+sudo ln -sfn /opt/lukso/lukso /usr/local/bin/lukso;
 
 download_network_config l15-prod;
 download_network_config l15-staging;
 download_network_config l15-dev;
 
-sudo rm -rf /opt/beacon/tmp;
+sudo rm -rf /opt/lukso/tmp;
 
-sudo beacon bind-binaries \
+sudo lukso bind-binaries \
 --pandora v0.2.0-rc.2 \
 --vanguard v0.2.0-rc.2 \
 --validator v0.2.0-rc.2 \
---deposit v1.2.6-beacon \
+--deposit v1.2.6-lukso \
 --eth2stats v0.2.0-rc.1 \
---beacon-status v0.0.1-alpha.9;
+--lukso-status v0.0.1-alpha.9;
 
-echo "Ready! type beacon to start the node!";
+echo "Ready! type lukso to start the node!";
