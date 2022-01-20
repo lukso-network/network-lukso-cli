@@ -183,7 +183,7 @@ download_binary() {
     REPO="go-ethereum"
     ;;
 
-  beacon)
+  beacon-chain)
     REPO="prysm"
     ;;
 
@@ -230,14 +230,14 @@ generate_keys() {
   read -p "How many validators? (Cost for 1 validator = 32 LYXt): " VALIDATORS_NUMBER
   echo "Running lukso-deposit-cli..."
 
-  VALIDATOR_MNEMONIC=$(eth2-val-tools mnemonic)
+  VALIDATOR_MNEMONIC=$(network-validator-tools mnemonic)
   read -p "Enter Validator mnemonic file location. Keep blank to generate atutomatically" INPUT
   if [[ -n "$INPUT" ]]; then
     VALIDATOR_MNEMONIC=`cat $INPUT`
   fi
   echo "SAVE THIS VALIDATOR MNEMONIC FOR FUTURE USAGE: ${VALIDATOR_MNEMONIC}"
 
-  WITHDRAWAL_MNEMONIC=$(eth2-val-tools mnemonic)
+  WITHDRAWAL_MNEMONIC=$(network-validator-tools mnemonic)
   read -p "Enter Validator mnemonic file location. Keep blank to generate atutomatically" INPUT
   if [[ -n "$INPUT" ]]; then
     WITHDRAWAL_MNEMONIC=`cat $INPUT`
@@ -249,8 +249,8 @@ generate_keys() {
     --fork-version=${FORK_VERSION} \
     --source-min=0 \
     --source-max=${VALIDATORS_NUMBER} \
-    --validators-mnemonic=${VALIDATOR_MNEMONIC} \
-    --withdrawals-mnemonic=${WITHDRAWAL_MNEMONIC} > "$KEYS_DIR/deposit-data.json"
+    --validators-mnemonic="${VALIDATOR_MNEMONIC}" \
+    --withdrawals-mnemonic="${WITHDRAWAL_MNEMONIC}" > "$KEYS_DIR/deposit-data.json"
 }
 
 import_accounts() {
@@ -283,21 +283,19 @@ import_accounts() {
       fi
   fi
 
-  ARGUMENTS=(
-    "--keys-dir=$KEYS_DIR"
-    "--wallet-dir=$WALLET_DIR"
-  )
-
-  if [[ -n $KEYS_PASSWORD_FILE ]]; then
-    ARGUMENTS=("${ARGUMENTS[@]}" "--account-password-file=$KEYS_PASSWORD_FILE")
+  read -p -s "Enter your keystore password: " KEYSTORE_PASSWORD
+  if [[ -z $KEYSTORE_PASSWORD ]]; then
+    echo "Enter a valid keystore password"
+    exit 1
   fi
 
-  if [[ -n $VALIDATOR_PASSWORD_FILE ]]; then
-    ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$VALIDATOR_PASSWORD_FILE")
-  fi
-
-  lukso-validator accounts import \
-  "${ARGUMENTS[@]}"
+  network-validator-tools keystores
+    --insecure \
+    --prysm-pass=${KEYSTORE_PASSWORD} \
+    --source-min=0 \
+    --source-max=${VALIDATORS_NUMBER} \
+    --source-mnemonic=${VALIDATOR_MNEMONIC} \
+    --out-loc=${WALLET_DIR}
 }
 
 parse_config_field() {

@@ -94,7 +94,7 @@ sudo lukso bind-binaries \
 --beacon v1.0.0 \
 --validator v1.0.0 \
 --deposit v1.0.0 \
---eth2stats v0.2.0-rc.1 \
+--eth2stats v0.1.0-rc.1 \
 --lukso-status v0.0.1-alpha.9;
 
 echo "Ready! type lukso to start the node!";
