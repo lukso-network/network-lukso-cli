@@ -3,28 +3,40 @@
 
 NETWORK="l15"
 PLATFORM="unknown";
-ARCHITECTURE=$(uname -m);
 
-ORCHESTRATOR_TAG="";
-PANDORA_TAG="";
-VANGUARD_TAG="";
+# for Apple M1s
+if [ "$(uname -s)" == "Darwin" ] && [ "$(uname -m)" == "arm64" ]
+then
+ARCHITECTURE="amd64"
+else
+ARCHITECTURE=$(uname -m)
+ARCHITECTURE=${ARCHITECTURE/x86_64/amd64}
+ARCHITECTURE=${ARCHITECTURE/aarch64/arm64}
+fi
+readonly os_arch_suffix="$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCHITECTURE"
 
-if [[ "$OSTYPE" = "linux-gnu" ]]; then
-  PLATFORM="Linux";
-elif [[ "$OSTYPE" = "darwin"* ]]; then
-  PLATFORM="Darwin"
-elif [[ "$OSTYPE" = "cygwin" ]]; then
-  PLATFORM="Linux"
-elif [[ "$OSTYPE" = "freebsd" ]]; then
-  PLATFORM="Linux"
+PLATFORM=""
+case "$OSTYPE" in
+darwin*) PLATFORM="darwin" ;;
+linux*) PLATFORM="linux" ;;
+msys*) PLATFORM="windows" ;;
+cygwin*) PLATFORM="windows" ;;
+*) exit 1 ;;
+esac
+readonly PLATFORM
+
+if [ "$PLATFORM" == "windows" ]; then
+    ARCHITECTURE="amd64.exe"
+elif [[ "$os_arch_suffix" == *"arm64"* ]]; then
+    ARCHITECTURE="arm64"
 fi
 
-if [[ "$PLATFORM" = "unknown" ]]; then
-  echo "Platform not supported.";
-  exit;
+if [[ "$ARCHITECTURE" == "armv7l" ]]; then
+    color "31" "32-bit ARM is not supported. Please install a 64-bit operating system."
+    exit 1
 fi
 
-if [[ $PLATFORM == "Linux" ]]; then
+if [[ $PLATFORM == "linux" ]]; then
   sudo apt-get update;
   sudo apt-get install curl \
   wget \
@@ -38,11 +50,11 @@ fi
 download() {
   URL="$1";
   LOCATION="$2";
-  if [[ $PLATFORM == "Linux" ]]; then
+  if [[ $PLATFORM == "linux" ]]; then
     sudo wget -O $LOCATION $URL;
   fi
 
-  if [[ $PLATFORM == "Darwin" ]]; then
+  if [[ $PLATFORM == "darwin" ]]; then
     sudo curl -o $LOCATION -Lk $URL;
   fi
 }
@@ -50,8 +62,8 @@ download() {
 download_network_config() {
   NETWORK=$1
   CDN="https://storage.googleapis.com/l15-cdn/networks/$NETWORK"
-  sudo mkdir -p /opt/lukso/networks/$NETWORK/config
-  TARGET=/opt/lukso/networks/$NETWORK/config
+  sudo mkdir -p /opt/beacon/networks/$NETWORK/config
+  TARGET=/opt/beacon/networks/$NETWORK/config
   download $CDN/network-config.yaml?ignoreCache=1 $TARGET/network-config.yaml
   download $CDN/pandora-genesis.json?ignoreCache=1 $TARGET/pandora-genesis.json
   download $CDN/vanguard-genesis.ssz?ignoreCache=1 $TARGET/vanguard-genesis.ssz
@@ -60,30 +72,29 @@ download_network_config() {
 }
 
 sudo mkdir \
-/opt/lukso \
-/opt/lukso/tmp \
-/opt/lukso/binaries \
-/opt/lukso/networks \
-/opt/lukso/networks/"$NETWORK" \
-/opt/lukso/networks/"$NETWORK"/config;
+/opt/beacon \
+/opt/beacon/tmp \
+/opt/beacon/binaries \
+/opt/beacon/networks ;
 
-download https://raw.githubusercontent.com/lukso-network/network-lukso-cli/main/shell_scripts/lukso /opt/lukso/lukso;
+# TODO: CHANGE THIS LOCATION LATER. IT IS FOR TEST PURPOSE ONLY.
+download https://raw.githubusercontent.com/beacon-network/network-beacon-cli/main/shell_scripts/beacon /opt/beacon/beacon;
 
-sudo chmod +x /opt/lukso/lukso;
-sudo ln -sfn /opt/lukso/lukso /usr/local/bin/lukso;
+sudo chmod +x /opt/beacon/beacon;
+sudo ln -sfn /opt/beacon/beacon /usr/local/bin/beacon;
 
 download_network_config l15-prod;
 download_network_config l15-staging;
 download_network_config l15-dev;
 
-sudo rm -rf /opt/lukso/tmp;
+sudo rm -rf /opt/beacon/tmp;
 
-sudo lukso bind-binaries \
+sudo beacon bind-binaries \
 --pandora v0.2.0-rc.2 \
 --vanguard v0.2.0-rc.2 \
 --validator v0.2.0-rc.2 \
---deposit v1.2.6-LUKSO \
+--deposit v1.2.6-beacon \
 --eth2stats v0.2.0-rc.1 \
---lukso-status v0.0.1-alpha.9;
+--beacon-status v0.0.1-alpha.9;
 
-echo "Ready! type lukso to start the node!";
+echo "Ready! type beacon to start the node!";
