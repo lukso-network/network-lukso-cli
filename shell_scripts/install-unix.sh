@@ -91,7 +91,7 @@ sudo rm -rf /opt/lukso/tmp;
 
 sudo lukso bind-binaries \
 --geth v1.0.0 \
---vanguard v1.0.0 \
+--beacon v1.0.0 \
 --validator v1.0.0 \
 --deposit v1.0.0 \
 --eth2stats v0.2.0-rc.1 \
