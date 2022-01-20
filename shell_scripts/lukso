@@ -1178,7 +1178,7 @@ while getopts "$optspec" optchar; do
     beacon)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      bind_binary beacon $val
+      bind_binary beacon-chain $val
       ;;
 
     validator)
