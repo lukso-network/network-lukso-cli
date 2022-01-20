@@ -202,7 +202,7 @@ download_binary() {
   esac
 
   mkdir -p /opt/lukso/binaries/$CLIENT/$TAG
-  download https://github.com/lukso-network/"$REPO"/releases/download/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
+  download https://github.com/lukso-network/"$REPO"/releases/download/$TAG/$CLIENT-$TAG-$PLATFORM-$ARCHITECTURE /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
   sudo chmod +x /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
 }
 
