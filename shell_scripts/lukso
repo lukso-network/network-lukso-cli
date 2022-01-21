@@ -652,17 +652,6 @@ start_eth2stats_client() {
   disown
 }
 
-start_lukso_status() {
-  mkdir -p "$LOGSDIR"/lukso-status
-  echo -n $RUN_DATE >|"$LOGSDIR"/lukso-status/current.tmp
-
-  ARGUMENTS=()
-  nohup lukso-status \
-    "${ARGUMENTS[@]}" \
-    >|$LOGSDIR/lukso-status/lukso-status"$RUN_DATE".log 2>&1 &
-  disown
-}
-
 start_all() {
   if [[ "$IS_VALIDATOR" == true ]]; then
     check_validator_requirements
@@ -685,13 +674,6 @@ start_all() {
   if [[ -n $VAN_ETHSTATS ]]; then
     echo "################# Starting eth2stats_client #######################"
     start_eth2stats_client
-    sleep 2
-  fi
-
-  if [[ "$RUN_LUKSO_STATUS" == true ]]; then
-    echo "################# Starting lukso status #######################"
-    sleep 10
-    start_lukso_status
     sleep 2
   fi
 }
@@ -722,10 +704,6 @@ start() {
   eth2stats)
     echo "eth2stats client"
     start_eth2stats_client
-    ;;
-  lukso-status)
-    echo "lukso-status client"
-    start_lukso_status
     ;;
   *)
     echo "ALL clients"
@@ -795,25 +773,11 @@ stop_eth2stats_client() {
   fi
 }
 
-stop_lukso_status() {
-  echo -n "Stopping lukso-status ... "
-  if [[ "$FORCE" == true ]]; then
-    echo "[FORCE]"
-    sudo pkill -9 "lukso-status*"
-    sleep 1
-  else
-    echo
-    sudo pkill "lukso-status*"
-    sleep 1
-  fi
-}
-
 stop_all() {
   stop_validator &
   stop_beacon &
   stop_geth &
-  stop_eth2stats_client &
-  stop_lukso_status
+  stop_eth2stats_client
 }
 
 stop() {
@@ -843,9 +807,6 @@ stop() {
     ;;
   eth2stats)
     stop_eth2stats_client
-    ;;
-  lukso-status)
-    stop_lukso_status
     ;;
   *)
     stop_all
@@ -912,10 +873,10 @@ help() {
   echo
   echo "Available commands with arguments:"
   echo "start         Starts up all or specific client(s)"
-  echo "               [geth, beacon, validator, eth2stats-client, lukso-status, all]"
+  echo "               [geth, beacon, validator, eth2stats-client, all]"
   echo
   echo "stop          Stops all or specific client(s)"
-  echo "               [geth, beacon, validator, eth2stats-client, lukso-status, all]"
+  echo "               [geth, beacon, validator, eth2stats-client, all]"
   echo
   echo "reset         Clears client(s) datadirs (this also removes chain-data) 	"
   echo "               [geth, beacon, validator, all, none]"
@@ -927,7 +888,7 @@ help() {
   echo "keystore        generates merge keystore"
   echo
   echo "logs          Shows logs"
-  echo "               [geth, beacon, validator, eth2stats-client, lukso-status]"
+  echo "               [geth, beacon, validator, eth2stats-client]"
   echo
   echo "attach        Attaches to geth console via IPC socket (use with --datadir if not default). You cannot reach remote HTTP or WS via this command"
   echo
@@ -972,9 +933,6 @@ help() {
   echo "                       [Tag name ex. v0.2.0-rc.1]"
   echo
   echo "--eth2stats            Sets eth2stats tag to be used"
-  echo "                       [Tag name ex. v0.2.0-rc.1]"
-  echo
-  echo "--lukso-status         Sets lukso-status tag to be used"
   echo "                       [Tag name ex. v0.2.0-rc.1]"
   echo
   echo "--pandora              Sets pandora tag to be used"
@@ -1123,9 +1081,6 @@ logs() {
   eth2stats)
     CLIENT="eth2stats"
     ;;
-  lukso-status)
-    CLIENT="lukso-status"
-    ;;
   *)
     echo "SELECT one of the clients ex. geth"
     exit
@@ -1184,27 +1139,6 @@ while getopts "$optspec" optchar; do
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       bind_binary eth2stats-client $val
-      ;;
-
-    lukso-status)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-
-      mkdir -p /opt/lukso/binaries/lukso-status/$val
-
-      if [[ $PLATFORM == "Linux" ]]; then
-        download https://github.com/rryter/node-status/releases/download/$val/lukso-status-$val-linux-amd64.tar.gz /opt/lukso/binaries/lukso-status/$val/lukso-status-$val-linux-amd64.tar.gz
-        tar -xf /opt/lukso/binaries/lukso-status/$val/lukso-status-$val-linux-amd64.tar.gz -C /opt/lukso/binaries/lukso-status/$val/
-      fi
-
-      if [[ $PLATFORM == "Darwin" ]]; then
-        download https://github.com/rryter/node-status/releases/download/$val/lukso-status-$val-darwin-amd64.tar.gz /opt/lukso/binaries/lukso-status/$val/lukso-status-$val-darwin-amd64.tar.gz
-        tar -xf /opt/lukso/binaries/lukso-status/$val/lukso-status-$val-darwin-amd64.tar.gz -C /opt/lukso/binaries/lukso-status/$val/
-      fi
-
-      chmod +x /opt/lukso/binaries/lukso-status/$val/lukso-status
-      ln -sf /opt/lukso/binaries/lukso-status/$val/lukso-status /usr/local/bin/lukso-status
-
       ;;
 
     network)
