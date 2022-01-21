@@ -335,14 +335,15 @@ setup_config() {
 
 download_network_config() {
   NETWORK=$1
+  # TODO: CHANGE DOWNLOAD ADDRESS
   CDN="https://storage.googleapis.com/l15-cdn/networks/$NETWORK"
   sudo mkdir -p /opt/lukso/networks/$NETWORK/config
   TARGET=/opt/lukso/networks/$NETWORK/config
   download $CDN/network-config.yaml?ignoreCache=1 $TARGET/network-config.yaml
-  download $CDN/pandora-genesis.json?ignoreCache=1 $TARGET/pandora-genesis.json
-  download $CDN/vanguard-genesis.ssz?ignoreCache=1 $TARGET/vanguard-genesis.ssz
-  download $CDN/vanguard-config.yaml?ignoreCache=1 $TARGET/vanguard-config.yaml
-  download $CDN/pandora-nodes.json?ignoreCache=1 $TARGET/pandora-nodes.json
+  download $CDN/pandora-genesis.json?ignoreCache=1 $TARGET/geth-genesis.json
+  download $CDN/vanguard-genesis.ssz?ignoreCache=1 $TARGET/beacon-genesis.ssz
+  download $CDN/vanguard-config.yaml?ignoreCache=1 $TARGET/beacon-config.yaml
+  download $CDN/pandora-nodes.json?ignoreCache=1 $TARGET/geth-nodes.json
 }
 
 pick_network() {
@@ -362,7 +363,7 @@ check_validator_requirements() {
   fi
 
   if [[ $COMMAND_ARG == "validator" ]] && [[ ! -n $COINBASE ]]; then
-    if [[ ! $(pandora attach $DATADIR/pandora/geth.ipc --exec "eth.coinbase") =~ ^\"0x[a-fA-F0-9]{40}\"$ ]]; then
+    if [[ ! $(geth attach $DATADIR/geth/geth.ipc --exec "eth.coinbase") =~ ^\"0x[a-fA-F0-9]{40}\"$ ]]; then
       echo "ERROR: Coinbase is not set on already running pandora. Please provide it using:"
       echo "--coinbase 0x<ETH1_ADDRESS>"
       CAN_VALIDATE=false
@@ -371,7 +372,7 @@ check_validator_requirements() {
 
   if [[ ! -d $WALLET_DIR ]]; then
     echo "Cannot validate, wallet not found. Your wallet directory is: $WALLET_DIR"
-    echo "Create new wallet using \"lukso wallet\" "
+    echo "Create new wallet using \"lukso keystore\" "
     CAN_VALIDATE=false
     exit
   fi
@@ -392,7 +393,7 @@ check_validator_requirements() {
       echo
       TEMPPASSFILE=$(mktemp)
       echo -n $INPUT > $TEMPPASSFILE
-      lukso-validator accounts list --wallet-dir=$WALLET_DIR --wallet-password-file=$TEMPPASSFILE &> /dev/null
+      validator accounts list --wallet-dir="$WALLET_DIR/prysm" --wallet-password-file=$TEMPPASSFILE &> /dev/null
       PASSWORD_CHECK=$?
       if [[ $PASSWORD_CHECK != 0 ]]; then
         echo "WRONG PASSWORD for wallet in $WALLET_DIR"
@@ -528,7 +529,7 @@ start_geth() {
   disown
 }
 
-start_vanguard() {
+start_beacon() {
   mkdir -p "$LOGSDIR"/beacon-chain
   echo -n $RUN_DATE >|"$LOGSDIR"/beacon-chain/current.tmp
   VANGUARD_BOOTNODES=(${VANGUARD_BOOTNODES//,/ })
@@ -574,7 +575,7 @@ start_vanguard() {
 
   nohup beacon-chain \
     "${ARGUMENTS[@]}" \
-    >|$LOGSDIR/vanguard/vanguard_"$RUN_DATE".log 2>&1 &
+    >|$LOGSDIR/beacon-chain/beacon-chain_"$RUN_DATE".log 2>&1 &
   disown
 }
 
@@ -605,7 +606,7 @@ start_validator() {
     ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$TEMPPASSFILE")
   fi
 
-  nohup lukso-validator \
+  nohup validator \
     "${ARGUMENTS[@]}" \
     >|$LOGSDIR/validator/validator_"$RUN_DATE".log 2>&1 &
   disown
@@ -619,7 +620,7 @@ start_validator() {
       TRIES=$((TRIES+1))
     done
 
-    if [[ ! $(pgrep -x "lukso-validator") ]]; then
+    if [[ ! $(pgrep -x "validator") ]]; then
       echo "ERROR: Cannot start validator"
       exit
     fi
@@ -672,7 +673,7 @@ start_all() {
   sleep 2
 
   echo "################# Starting vanguard #######################"
-  start_vanguard
+  start_beacon
   sleep 2
 
   if [[ "$IS_VALIDATOR" == true ]]; then
@@ -711,7 +712,7 @@ start() {
     ;;
   beacon)
     echo "beacon-chain client"
-    start_vanguard
+    start_beacon
     ;;
   validator)
     echo "validator client"
@@ -733,8 +734,8 @@ start() {
   esac
 }
 
-stop_pandora() {
-  echo -n "Stopping pandora client... "
+stop_geth() {
+  echo -n "Stopping geth client... "
   if [[ "$FORCE" == true ]]; then
     echo "[FORCE]"
     sudo kill -9 $(sudo lsof -t -i:30405) &>/dev/null
@@ -746,8 +747,8 @@ stop_pandora() {
   fi
 }
 
-stop_vanguard() {
-  echo -n "Stopping vanguard client... "
+stop_beacon() {
+  echo -n "Stopping beacon-chain client... "
 
   if [[ "$FORCE" == true ]]; then
     echo "[FORCE]"
@@ -809,8 +810,8 @@ stop_lukso_status() {
 
 stop_all() {
   stop_validator &
-  stop_vanguard &
-  stop_pandora &
+  stop_beacon &
+  stop_geth &
   stop_eth2stats_client &
   stop_lukso_status
 }
@@ -831,11 +832,11 @@ stop() {
     fi
   fi
   case "$ARGUMENT" in
-  pandora)
-    stop_pandora
+  geth)
+    stop_geth
     ;;
-  vanguard)
-    stop_vanguard
+  beacon)
+    stop_beacon
     ;;
   validator)
     stop_validator
@@ -852,12 +853,12 @@ stop() {
   esac
 }
 
-reset_pandora() {
-  rm -rf $DATADIR/pandora
+reset_geth() {
+  rm -rf $DATADIR/geth
 }
 
-reset_vanguard() {
-  rm -rf $DATADIR/vanguard
+reset_beacon() {
+  rm -rf $DATADIR/beacon-chain
 }
 
 reset_validator() {
@@ -869,8 +870,8 @@ reset_eth2stats_client() {
 }
 
 reset_all() {
-  reset_pandora
-  reset_vanguard
+  reset_geth
+  reset_beacon
   reset_validator
   reset_eth2stats_client
 }
@@ -884,11 +885,11 @@ reset() {
   fi
 
   case "$ARGUMENT" in
-  pandora)
-    reset_pandora
+  geth)
+    reset_geth
     ;;
-  vanguard)
-    reset_vanguard
+  beacon)
+    reset_beacon
     ;;
   validator)
     reset_validator
@@ -900,7 +901,7 @@ reset() {
     reset_all
     ;;
   *)
-    echo "Choose a client: [pandora, vanguard, validator, all] "
+    echo "Choose a client: [geth, beacon, validator, all] "
     ;;
   esac
 }
@@ -911,13 +912,13 @@ help() {
   echo
   echo "Available commands with arguments:"
   echo "start         Starts up all or specific client(s)"
-  echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status, all]"
+  echo "               [geth, beacon, validator, eth2stats-client, lukso-status, all]"
   echo
   echo "stop          Stops all or specific client(s)"
-  echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status, all]"
+  echo "               [geth, beacon, validator, eth2stats-client, lukso-status, all]"
   echo
   echo "reset         Clears client(s) datadirs (this also removes chain-data) 	"
-  echo "               [pandora, vanguard, validator, all, none]"
+  echo "               [geth, beacon, validator, all, none]"
   echo
   echo "config        Interactive tool for creating config file"
   echo
@@ -926,11 +927,11 @@ help() {
   echo "keystore        generates merge keystore"
   echo
   echo "logs          Shows logs"
-  echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status]"
+  echo "               [geth, beacon, validator, eth2stats-client, lukso-status]"
   echo
-  echo "attach        Attaches to pandora console via IPC socket (use with --datadir if not default). You cannot reach remote HTTP or WS via this command"
+  echo "attach        Attaches to geth console via IPC socket (use with --datadir if not default). You cannot reach remote HTTP or WS via this command"
   echo
-  echo "bind-binaries sets client(s) to desired version, use with flags for setting tag: --pandora v0.2.0-rc.1, --vanguard v0.2.0-rc.1, --validator v0.2.0-rc.1"
+  echo "bind-binaries sets client(s) to desired version, use with flags for setting tag: --geth v0.2.0-rc.1, --beacon v0.2.0-rc.1, --validator v0.2.0-rc.1"
   echo
   echo
   echo "Available commands without arguments:"
@@ -1114,7 +1115,7 @@ logs() {
     CLIENT="geth"
     ;;
   beacon)
-    CLIENT="beacon"
+    CLIENT="beacon-chain"
     ;;
   validator)
     CLIENT="validator"
@@ -1126,7 +1127,7 @@ logs() {
     CLIENT="lukso-status"
     ;;
   *)
-    echo "SELECT one of the clients ex. pandora"
+    echo "SELECT one of the clients ex. geth"
     exit
     ;;
   esac
@@ -1851,7 +1852,7 @@ version)
   echo "$LUKSO_SCRIPT_VERSION"
   ;;
 attach)
-  pandora attach $DATADIR/pandora/geth.ipc
+  geth attach $DATADIR/geth/geth.ipc
   ;;
 bind-binaries) ;;
 
