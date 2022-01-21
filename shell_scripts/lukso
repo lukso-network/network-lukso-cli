@@ -220,7 +220,7 @@ bind_binaries() {
   echo
 }
 
-generate_keys() {
+generate_deposit_data() {
   read -p "Where to store deposit keys? Default: [$KEYS_DIR] " INPUT
   if [[ -n "$INPUT" ]]; then
     KEYS_DIR=$INPUT
@@ -253,30 +253,15 @@ generate_keys() {
     --withdrawals-mnemonic="${WITHDRAWAL_MNEMONIC}" > "$KEYS_DIR/deposit-data.json"
 }
 
-import_accounts() {
+generate_keystore() {
 
   if [[ ! -d $WALLET_DIR ]]; then
-    echo "Creating new wallet"
+    echo "Creating new keystore"
     mkdir -p $WALLET_DIR
-  fi
-
-  if [[ -z $OVERRIDE_KEYS_DIR ]]; then
-    KEYS_DIR="$KEYS_DIR/validator_keys"
-    read -p "Where do you have deposit keys? Default: [$KEYS_DIR] " INPUT
-    eval INPUT="$INPUT"
-      if [[ -n "$INPUT" ]]; then
-        KEYS_DIR=$INPUT
-      fi
-  fi
-
-  if [[ ! -d $KEYS_DIR ]]; then
-    echo "Keys directory not found. Make sure to run \"lukso keygen\" first"
-    mkdir -p $WALLET_DIR
-    exit
   fi
 
   if [[ -z $OVERRIDE_WALLET_DIR ]]; then
-    read -p "Where to store wallet? Default: [$WALLET_DIR] " INPUT
+    read -p "Enter keystore location? Default: [$WALLET_DIR] " INPUT
     eval INPUT="$INPUT"
       if [[ -n "$INPUT" ]]; then
         WALLET_DIR=$INPUT
@@ -288,6 +273,15 @@ import_accounts() {
     echo "Enter a valid keystore password"
     exit 1
   fi
+
+  read -p "How many validators? (Cost for 1 validator = 32 LYXt): " VALIDATORS_NUMBER
+
+  VALIDATOR_MNEMONIC=$(network-validator-tools mnemonic)
+  read -p "Enter Validator mnemonic file location. Keep blank to generate atutomatically" INPUT
+  if [[ -n "$INPUT" ]]; then
+    VALIDATOR_MNEMONIC=`cat $INPUT`
+  fi
+  echo "SAVE THIS VALIDATOR MNEMONIC FOR FUTURE USAGE: ${VALIDATOR_MNEMONIC}"
 
   network-validator-tools keystores
     --insecure \
@@ -409,7 +403,7 @@ check_validator_requirements() {
 }
 
 
-start_pandora() {
+start_geth() {
 
   case $PANDORA_VERBOSITY in
   silent)
@@ -432,22 +426,22 @@ start_pandora() {
     ;;
   esac
 
-  mkdir -p "$LOGSDIR"/pandora
-  echo -n $RUN_DATE >|"$LOGSDIR"/pandora/current.tmp
-  if [[ ! -d "$DATADIR/pandora" ]]; then
-    mkdir -p "$DATADIR/pandora"
+  mkdir -p "$LOGSDIR"/geth
+  echo -n $RUN_DATE >|"$LOGSDIR"/geth/current.tmp
+  if [[ ! -d "$DATADIR/geth" ]]; then
+    mkdir -p "$DATADIR/geth"
   fi
 
-  pandora --datadir $DATADIR/pandora init /opt/lukso/networks/$NETWORK/config/pandora-genesis.json &>/dev/null
-  cp /opt/lukso/networks/"$NETWORK"/config/pandora-nodes.json $DATADIR/pandora/geth/static-nodes.json
+  geth --datadir $DATADIR/geth init /opt/lukso/networks/$NETWORK/config/geth-genesis.json &>/dev/null
+  cp /opt/lukso/networks/"$NETWORK"/config/geth-nodes.json $DATADIR/geth/geth/static-nodes.json
 
   ARGUMENTS=(
-    "--datadir=$DATADIR/pandora"
+    "--datadir=$DATADIR/geth"
     "--networkid=$NETWORK_ID"
     "--port=$PANDORA_PORT"
+    "--catalyst"
     "--bootnodes=$PANDORA_BOOTNODES"
     "--miner.gaslimit=80000000"
-    "--syncmode=full"
     "--verbosity=$PANDORA_VERBOSITY"
     "--http"
     "--http.addr=$PANDORA_HTTP_ADDR"
@@ -528,15 +522,15 @@ start_pandora() {
     ARGUMENTS=("${ARGUMENTS[@]}" "${ETHSTATS_FLAG[@]}")
   fi
 
-  nohup pandora \
+  nohup geth \
     "${ARGUMENTS[@]}" \
-    >|$LOGSDIR/pandora/pandora_"$RUN_DATE".log 2>&1 &
+    >|$LOGSDIR/geth/geth_"$RUN_DATE".log 2>&1 &
   disown
 }
 
 start_vanguard() {
-  mkdir -p "$LOGSDIR"/vanguard
-  echo -n $RUN_DATE >|"$LOGSDIR"/vanguard/current.tmp
+  mkdir -p "$LOGSDIR"/beacon-chain
+  echo -n $RUN_DATE >|"$LOGSDIR"/beacon-chain/current.tmp
   VANGUARD_BOOTNODES=(${VANGUARD_BOOTNODES//,/ })
   BOOTNODES_ARGS=()
   for n in "${VANGUARD_BOOTNODES[@]}"; do
@@ -544,11 +538,10 @@ start_vanguard() {
   done
   ARGUMENTS=(
     "--accept-terms-of-use"
-    "--chain-id=$CHAIN_ID"
-    "--network-id=$NETWORK_ID"
-    "--genesis-state=/opt/lukso/networks/$NETWORK/config/vanguard-genesis.ssz"
-    "--datadir=$DATADIR/vanguard/"
-    "--chain-config-file=/opt/lukso/networks/$NETWORK/config/vanguard-config.yaml"
+    "--kintsugi-testnet"
+    "--genesis-state=/opt/lukso/networks/$NETWORK/config/beacon-genesis.ssz"
+    "--datadir=$DATADIR/beacon-chain/"
+    "--chain-config-file=/opt/lukso/networks/$NETWORK/config/beacon-config.yaml"
     "${BOOTNODES_ARGS[@]}"
     "--deposit-contract=0x000000000000000000000000000000000000cafe"
     "--contract-deployment-block=0"
@@ -559,7 +552,6 @@ start_vanguard() {
     "--p2p-tcp-port=$VANGUARD_TCP_PORT"
     "--grpc-gateway-port=$VANGUARD_GRPC_GATEWAY_PORT"
     "--update-head-timely"
-    "--lukso-network"
     "--rpc-host=$VANGUARD_RPC_HOST"
     "--rpc-port=$VANGUARD_RPC_PORT"
     "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
@@ -580,7 +572,7 @@ start_vanguard() {
     ARGUMENTS=("${ARGUMENTS[@]}" "--p2p-host-ip=$EXTERNAL_IP")
   fi
 
-  nohup vanguard \
+  nohup beacon-chain \
     "${ARGUMENTS[@]}" \
     >|$LOGSDIR/vanguard/vanguard_"$RUN_DATE".log 2>&1 &
   disown
@@ -589,8 +581,8 @@ start_vanguard() {
 start_validator() {
 
   if [[ $COMMAND_ARG == "validator" ]] && [[ $COINBASE ]]; then
-    pandora attach $DATADIR/pandora/geth.ipc --exec "miner.setEtherbase(\"$COINBASE\")" > /dev/null
-    pandora attach $DATADIR/pandora/geth.ipc --exec "miner.start()" > /dev/null
+    geth attach $DATADIR/geth/geth.ipc --exec "miner.setEtherbase(\"$COINBASE\")" > /dev/null
+    geth attach $DATADIR/geth/geth.ipc --exec "miner.start()" > /dev/null
   fi
 
   mkdir -p "$LOGSDIR"/validator
@@ -599,14 +591,10 @@ start_validator() {
   ARGUMENTS=(
     "--datadir=$DATADIR/validator/"
     "--accept-terms-of-use"
-    "--chain-config-file=/opt/lukso/networks/$NETWORK/config/vanguard-config.yaml"
+    "--chain-config-file=/opt/lukso/networks/$NETWORK/config/beacon-config.yaml"
     "--verbosity=$VALIDATOR_VERBOSITY"
-    "--wallet-dir=$WALLET_DIR"
+    "--wallet-dir=$WALLET_DIR/prysm"
     "--log-file=$LOGSDIR/validator/validator_$RUN_DATE.log"
-    "--lukso-network"
-    "--rpc"
-    "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
-    "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
   )
 
   if [[ -n $VALIDATOR_PASSWORD_FILE ]]; then
@@ -680,7 +668,7 @@ start_all() {
   fi
 
   echo "################# Starting pandora #######################"
-  start_pandora
+  start_geth
   sleep 2
 
   echo "################# Starting vanguard #######################"
@@ -717,12 +705,12 @@ start() {
 
   echo -n "Starting: "
   case $ARGUMENT in
-  pandora)
-    echo "pandora client"
-    start_pandora
+  geth)
+    echo "geth client"
+    start_geth
     ;;
-  vanguard)
-    echo "vanguard client"
+  beacon)
+    echo "beacon-chain client"
     start_vanguard
     ;;
   validator)
@@ -933,9 +921,9 @@ help() {
   echo
   echo "config        Interactive tool for creating config file"
   echo
-  echo "keygen        Runs lukso-deposit-cli"
+  echo "gen-deposit-data        generates deposit-data.json"
   echo
-  echo "wallet        Imports lukso-deposit-cli keys"
+  echo "keystore        generates merge keystore"
   echo
   echo "logs          Shows logs"
   echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status]"
@@ -1850,11 +1838,11 @@ reset)
 config)
   setup_config
   ;;
-keygen)
-  generate_keys
+gen-deposit-data)
+  generate_deposit_data
   ;;
-wallet)
-  import_accounts
+keystore)
+  generate_keystore
   ;;
 logs)
   logs "$COMMAND_ARG"

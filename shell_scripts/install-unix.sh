@@ -64,11 +64,12 @@ download_network_config() {
   CDN="https://storage.googleapis.com/l15-cdn/networks/$NETWORK"
   sudo mkdir -p /opt/lukso/networks/$NETWORK/config
   TARGET=/opt/lukso/networks/$NETWORK/config
+  # TODO: WE NEED TO CHANGE THIS URL PATH FOR KINTSUGI.
   download $CDN/network-config.yaml?ignoreCache=1 $TARGET/network-config.yaml
-  download $CDN/pandora-genesis.json?ignoreCache=1 $TARGET/pandora-genesis.json
-  download $CDN/vanguard-genesis.ssz?ignoreCache=1 $TARGET/vanguard-genesis.ssz
-  download $CDN/vanguard-config.yaml?ignoreCache=1 $TARGET/vanguard-config.yaml
-  download $CDN/pandora-nodes.json?ignoreCache=1 $TARGET/pandora-nodes.json
+  download $CDN/pandora-genesis.json?ignoreCache=1 $TARGET/geth-genesis.json
+  download $CDN/vanguard-genesis.ssz?ignoreCache=1 $TARGET/beacon-genesis.ssz
+  download $CDN/vanguard-config.yaml?ignoreCache=1 $TARGET/beacon-config.yaml
+  download $CDN/pandora-nodes.json?ignoreCache=1 $TARGET/geth-nodes.json
 }
 
 sudo mkdir \
