@@ -5,7 +5,9 @@ COMMIT  ?= $(shell git rev-parse --short HEAD 2>/dev/null)
 BRANCH  ?= $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null)
 
 test: build
-	@./lukso version
+	./lukso --help
+	./lukso version
+	./lukso cluster sync
 
 build:
 	@CGO_ENABLED=0 go build \

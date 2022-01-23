@@ -7,7 +7,8 @@ import (
 
 const (
 	// DefaultLogLevel represents the default log level.
-	DefaultLogLevel = "info"
+	DefaultLogLevel   = "info"
+	DefaultConfigFile = ".lukso.yaml"
 )
 
 // DefaultLogFile represents the default K9s log file.
@@ -15,26 +16,16 @@ var DefaultLogFile = filepath.Join(os.TempDir(), "lukso.log")
 
 // Flags represents K9s configuration flags.
 type Flags struct {
-	LogLevel *string
-	LogFile  *string
+	LogLevel   string
+	LogFile    string
+	ConfigFile string
 }
 
 // NewFlags returns new configuration flags.
 func NewFlags() *Flags {
 	return &Flags{
-		LogLevel: strPtr(DefaultLogLevel),
-		LogFile:  strPtr(DefaultLogFile),
+		LogLevel:   DefaultLogLevel,
+		LogFile:    DefaultLogFile,
+		ConfigFile: DefaultConfigFile,
 	}
-}
-
-func boolPtr(b bool) *bool {
-	return &b
-}
-
-func intPtr(i int) *int {
-	return &i
-}
-
-func strPtr(s string) *string {
-	return &s
 }

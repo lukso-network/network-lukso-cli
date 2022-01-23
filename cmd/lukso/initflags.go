@@ -7,16 +7,22 @@ import (
 func initFlags() {
 	flags = config.NewFlags()
 
-	rootCmd.Flags().StringVarP(
-		flags.LogLevel,
+	rootCmd.PersistentFlags().StringVarP(
+		&flags.LogLevel,
 		"logLevel", "l",
 		config.DefaultLogLevel,
 		"Specify a log level (info, warn, debug, trace, error)",
 	)
-	rootCmd.Flags().StringVarP(
-		flags.LogFile,
+	rootCmd.PersistentFlags().StringVarP(
+		&flags.LogFile,
 		"logFile", "",
 		config.DefaultLogFile,
 		"Specify the log file",
+	)
+	rootCmd.PersistentFlags().StringVarP(
+		&flags.ConfigFile,
+		"config", "c",
+		config.DefaultConfigFile,
+		"Specify the config file",
 	)
 }

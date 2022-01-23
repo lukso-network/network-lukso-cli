@@ -1,0 +1,181 @@
+imagePullPolicy: Always
+container:
+  image:
+    tag: debian
+service:
+  type: ClusterIP
+
+ports:
+  geth-tcp:
+    port: 30303
+    targetPort: 30303
+    protocol: TCP
+  prysm-tcp:
+    port: 13000
+    targetPort: 13000
+    protocol: TCP
+
+# TODO storage class
+persistentVolumes:
+  geth-db:
+    size: 10Gi
+    storageClass: lukso-standard
+  beacon-db:
+    size: 10Gi
+    storageClass: lukso-standard
+filestore:
+  shared:
+    size: 1T
+    volumeName: filestore-slow
+    path: /slow
+volumes:
+  eth1:
+    emptyDir: {}
+initContainers:
+  geth-init:
+    image:
+      repository: europe-docker.pkg.dev/lks-lz-artifacts/docker-geth/geth
+    volumeMounts:
+      geth-db:
+        mountPath: /database
+      shared:
+        mountPath: /shared
+        readOnly: true
+    command:
+      - geth
+      - --datadir
+      - /database
+      - init
+      - /shared/$(SHARED_CONFIG_PATH)/genesis.json
+containers:
+  geth:
+    ports:
+      geth-tcp:
+        port: 30303
+        protocol: TCP
+      geth-rpc:
+        port: 8545
+        protocol: TCP
+    image:
+      repository: europe-docker.pkg.dev/lks-lz-artifacts/docker-geth/geth
+    # https://geth.ethereum.org/docs/interface/command-line-options
+    volumeMounts:
+      geth-db:
+        mountPath: /database
+      shared:
+        mountPath: /shared
+        readOnly: true
+      eth1:
+        mountPath: /root/.ethereum
+    command:
+      - bash
+      - -c
+      - --
+      - geth
+      - --catalyst
+      - --allow-insecure-unlock
+      - --verbosity
+      - "6"
+      - --datadir
+      - /database
+      - --port
+      - "30303"
+      - --nat
+      - "extip:$(INGRESS_IP)"
+      - --ethstats
+      #- $(POD_NAME):@dev.stats.pandora.l15.lukso.network:80
+      - $(POD_NAME):@ethstats.ethstats.svc.cluster.local:80
+      - --networkid
+      - $(NETWORKID)
+      - --http
+      - --http.api
+      - engine,net,eth
+      - --http.port
+      - "8545"
+      - --http.addr
+      - localhost
+      - --ws
+      - --ws.api
+      - engine,net,eth,admin,debug,miner
+      - --ipcpath
+      - geth.ipc
+
+  # https://docs.prylabs.network/docs/prysm-usage/parameters/
+  prysm-beacon:
+    ports:
+      prysm-tcp:
+        port: 13000
+        protocol: TCP
+    image:
+      repository: europe-docker.pkg.dev/lks-lz-artifacts/docker-prysm/beacon
+      tag: old
+    # https://docs.prylabs.network/docs/prysm-usage/parameters/
+    volumeMounts:
+      beacon-db:
+        mountPath: /consensus-data
+      shared:
+        mountPath: /shared
+        readOnly: true
+      eth1:
+        mountPath: /eth1
+    # https://pkg.go.dev/github.com/prysmaticlabs/prysm@v1.0.0-alpha.15/tools/enr-calculator#section-readme
+    command:
+      - bash
+      - -c
+      - --
+      - >
+        beacon-chain 
+        --accept-terms-of-use
+        --kintsugi-testnet
+        $(BOOTNODES)
+        --genesis-state
+        /shared/$(SHARED_CONFIG_PATH)/genesis.ssz
+        --datadir
+        /consensus-data
+        --http-web3provider=/eth1/geth.ipc
+        --chain-config-file
+        /shared/$(SHARED_CONFIG_PATH)/config.yaml
+        --monitoring-host
+        "0.0.0.0"
+        --grpc-gateway-host
+        "0.0.0.0"
+        --rpc-host
+        "0.0.0.0"
+        --p2p-host-ip
+        "$(INGRESS_IP)"
+        --p2p-tcp-port
+        "13000"
+        --p2p-local-ip
+        "0.0.0.0"
+        --p2p-priv-key
+        /bootnode-key/bootnode.key
+        --min-sync-peers
+        "0"
+
+# not for boot nodes, validator nodes only
+# - name: prysm-validator
+#   image:
+#     repository: europe-docker.pkg.dev/lks-lz-artifacts/docker-prysm/validator
+#    volumes:
+#      - /consensus_validator_wallet/prysm -> https://github.com/lukso-network/network-local-setup/tree/full-local-node-setup/network-configs/l16/local-setup/wallet/prysm
+#      - /consensus_validator_wallet/password.txt https://github.com/lukso-network/network-local-setup/blob/full-local-node-setup/network-configs/l16/local-setup/password.txt
+#      - /consensus_validator_data
+#      - /custom_config_data -> https://github.com/lukso-network/network-local-setup/tree/full-local-node-setup/network-configs/l16/local-setup
+#   command:
+#     - --accept-terms-of-use
+#     - --datadir
+#     - /consensus_validator_data
+#     - --wallet-dir
+#     - /consensus_validator_wallet/prysm
+#     - --wallet-password-file
+#     - /consensus_validator_wallet/password.txt
+#     - --chain-config-file
+#     - /custom_config_data/config.yaml
+#     - --monitoring-host
+#     - "0.0.0.0"
+#     - --grpc-gateway-host
+#     - "0.0.0.0"
+#     - --rpc-host
+#     - "0.0.0.0"
+#     - --p2p-host-ip
+#     - $INGRESS_IP_ADDRESS

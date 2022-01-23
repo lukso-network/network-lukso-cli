@@ -1,0 +1,24 @@
+labels:
+  lukso-node: bootnode
+
+containers:
+  geth:
+    volumeMounts:
+      bootnode-key:
+        mountPath: /bootnode-key
+        readOnly: true
+    args:
+      - --nodekey
+      - /bootnode-key/bootnode.key
+      - --bootnodes
+      - $(BOOTNODES)
+  prysm-beacon:
+    volumeMounts:
+      bootnode-key:
+        mountPath: /bootnode-key
+        readOnly: true
+    # args:
+    #   - --p2p-priv-key
+    #   - /bootnode-key/bootnode.key
+    #   - --min-sync-peers
+    #   - "0"

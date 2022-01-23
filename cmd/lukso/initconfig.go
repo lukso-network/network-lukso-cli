@@ -11,21 +11,32 @@ import (
 func initConfig() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
-	// Find home directory.
-	home, err := os.UserHomeDir()
-	if err != nil {
-		log.Error().Err(err).Msg("error finding home directory")
-	} else {
-		// Search config in home directory with name ".cobra" (without extension).
-		viper.AddConfigPath(home)
-	}
-
-	viper.SetConfigType("yaml")
-	viper.SetConfigName(".lukso")
+	viper.SetConfigFile(flags.ConfigFile)
 
 	viper.AutomaticEnv()
 
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.SetGlobalLevel(parseLevel(flags.LogLevel))
+
 	if err := viper.ReadInConfig(); err == nil {
 		log.Info().Str("config-file", viper.ConfigFileUsed()).Msg("config file loaded")
+	}
+
+}
+
+func parseLevel(level string) zerolog.Level {
+	switch level {
+	case "trace":
+		return zerolog.TraceLevel
+	case "debug":
+		return zerolog.DebugLevel
+	case "warn":
+		return zerolog.WarnLevel
+	case "error":
+		return zerolog.ErrorLevel
+	case "fatal":
+		return zerolog.FatalLevel
+	default:
+		return zerolog.InfoLevel
 	}
 }

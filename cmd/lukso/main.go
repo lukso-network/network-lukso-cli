@@ -5,6 +5,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/lukso-network/network-lukso-cli/internal/cmd/cluster"
 	"github.com/lukso-network/network-lukso-cli/internal/config"
 	"github.com/spf13/cobra"
 )
@@ -34,14 +35,14 @@ var (
 )
 
 func init() {
-	rootCmd.AddCommand(versionCmd())
+	cobra.OnInitialize(initConfig)
 	initFlags()
+	rootCmd.AddCommand(versionCmd())
+	rootCmd.AddCommand(cluster.NewClusterCommand())
 }
 
 func main() {
 	exitCode := EXIT_CODE_SUCCESS
-
-	cobra.OnInitialize(initConfig)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Error().Err(err).Msg("Error while executing commands")

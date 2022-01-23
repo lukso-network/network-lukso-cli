@@ -1,0 +1,15 @@
+environment: d
+region: europe-west4
+bootnodes:
+  - name: bootnode
+    suffix: a
+    zone: a
+    ip: 34.90.140.144
+  - name: bootnode
+    suffix: b
+    zone: b
+    ip: 34.91.134.173
+  - name: bootnode
+    suffix: c
+    zone: c
+    ip: 34.90.11.109

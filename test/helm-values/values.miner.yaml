@@ -1,0 +1,8 @@
+containers:
+  geth:
+    args:
+      - --miner.etherbase
+      - $(ETHERBASE)
+      - --mine
+      - --miner.threads
+      - $(MINER_THREADS)
