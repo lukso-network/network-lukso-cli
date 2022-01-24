@@ -23,9 +23,7 @@ const (
 	ubuntu  = "linux"
 	macos   = "darwin"
 	windows = "windows"
-)
 
-const (
 	DefaultELNetworkID = 231
 	DefaultELHTTPPort  = 8598
 	DefaultELWSPort    = 8599
@@ -35,6 +33,8 @@ const (
 	DefaultCLP2PTCPPort  = 13098
 	DefaultCLP2PUDPPort  = 13098
 	DefaultValidatorPort = 3598
+
+	PidFilename = "pid"
 )
 
 var (
@@ -59,13 +59,7 @@ func init() {
 }
 
 func main() {
-	app := cli.App{}
-	app.Name = appName
-	app.Usage = "Spins all merge ecosystem components"
-	app.Flags = appFlags
-	app.Action = downloadAndRunBinaries
-
-	app.Before = func(ctx *cli.Context) error {
+	beforeFunc := func(ctx *cli.Context) error {
 		formatter := new(prefixed.TextFormatter)
 		formatter.TimestampFormat = "2006-01-02 15:04:05"
 		formatter.FullTimestamp = true
@@ -89,6 +83,24 @@ func main() {
 		return nil
 	}
 
+	app := &cli.App{
+		Name: "lukso-cli",
+		Commands: []*cli.Command{
+			{
+				Name:   "start",
+				Usage:  "Spins all merge ecosystem components",
+				Action: downloadAndRunBinaries,
+			},
+			{
+				Name:   "stop",
+				Usage:  "Stops all merge ecosystem components",
+				Action: stopAllBinaries,
+			},
+		},
+		Flags:  appFlags,
+		Before: beforeFunc,
+	}
+
 	defer func() {
 		if x := recover(); x != nil {
 			log.Errorf("Runtime panic: %v\n%v", x, string(runtimeDebug.Stack()))
@@ -97,9 +109,8 @@ func main() {
 	}()
 
 	err := app.Run(os.Args)
-
 	if nil != err {
-		log.Error(err.Error())
+		log.Fatal(err)
 	}
 }
 
@@ -154,6 +165,12 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 	time.Sleep(time.Second * 3)
 
 	return startValidator(ctx)
+}
+
+func stopAllBinaries(ctx *cli.Context) (err error) {
+	err = stopEL(ctx)
+
+	return
 }
 
 func downloadEL(ctx *cli.Context) (err error) {
@@ -214,26 +231,30 @@ func startEL(ctx *cli.Context) (err error) {
 		elDataDir,
 	}
 
-	err = clientDependencies[ELDependencyName].Run(
+	pid, err := clientDependencies[ELDependencyName].Run(
 		ELTag,
 		elDataDir,
 		elGenesisArguments,
 		ctx.Bool(ELOutputFlag),
 	)
-
 	if nil != err {
 		return
 	}
 
+	log.WithField("dependencyTag", ELTag).WithField("pid", pid).Info("Running execution engine init command")
+
 	time.Sleep(time.Second * 3)
 
-	log.WithField("dependencyTag", ELTag).Info("Running execution engine")
-	err = clientDependencies[ELDependencyName].Run(
+	log.WithField("dependencyTag", ELTag).Info("Starting execution engine")
+	pid, err = clientDependencies[ELDependencyName].Run(
 		ELTag,
 		elDataDir,
 		ELRuntimeFlags,
 		ctx.Bool(ELOutputFlag),
 	)
+	if nil != err {
+		return
+	}
 
 	waitGroup := &sync.WaitGroup{}
 	waitGroup.Add(1)
@@ -243,7 +264,7 @@ func startEL(ctx *cli.Context) (err error) {
 			ipcEndpoint := fmt.Sprintf("%s/geth.ipc", elDataDir)
 			_, currentErr := os.Stat(ipcEndpoint)
 			if nil == currentErr {
-				log.Info("Execution Layer up")
+				log.WithField("pid", pid).Info("Execution Layer up")
 				waitGroup.Done()
 
 				return
@@ -265,16 +286,29 @@ func startEL(ctx *cli.Context) (err error) {
 	return
 }
 
+func stopEL(ctx *cli.Context) (err error) {
+	log.Info("Stopping geth")
+	elDataDir := ctx.String(ELDatadirFlag)
+
+	err = clientDependencies[ELDependencyName].Stop(
+		elDataDir,
+	)
+	if nil != err {
+		return
+	}
+
+	return
+}
+
 func startCL(ctx *cli.Context) (err error) {
-	log.WithField("dependencyTag", CLTag).Info("Running Consensus Layer")
+	log.WithField("dependencyTag", CLTag).Info("Starting Consensus Layer")
 	CLDataDir := ctx.String(CLDatadirFlag)
-	err = clientDependencies[CLDependencyName].Run(
+	pid, err := clientDependencies[CLDependencyName].Run(
 		CLTag,
 		CLDataDir,
 		CLRuntimeFlags,
 		ctx.Bool(CLOutputFlag),
 	)
-
 	if nil != err {
 		return
 	}
@@ -294,21 +328,26 @@ func startCL(ctx *cli.Context) (err error) {
 		return fmt.Errorf("consensus layer not ready yet: %s", err.Error())
 	}
 
-	log.Info("Consensus Layer is ready")
+	log.WithField("pid", pid).Info("Consensus Layer is ready")
 
 	return vanClient.Close()
 }
 
 func startValidator(ctx *cli.Context) (err error) {
 	// First command should be to create wallet or prompt to do this by your own. This is one-time
-	log.WithField("dependencyTag", validatorTag).Info("Running Consensus Layer")
+	log.WithField("dependencyTag", validatorTag).Info("Starting Consensus Layer Validator")
 	validatorDataDir := ctx.String(CLDatadirFlag)
-	err = clientDependencies[validatorDependencyName].Run(
+	pid, err := clientDependencies[validatorDependencyName].Run(
 		validatorTag,
 		validatorDataDir,
 		validatorRuntimeFlags,
 		false,
 	)
+	if nil != err {
+		return
+	}
+
+	log.WithField("pid", pid).Info("Consensus Layer Validator is ready")
 
 	return
 }

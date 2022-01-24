@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"math/big"
 	"net/http"
 	"os"
 	"os/exec"
@@ -102,7 +103,7 @@ func (dependency *ClientDependency) Run(
 	destination string,
 	arguments []string,
 	attachStdInAndErr bool,
-) (err error) {
+) (pid int, err error) {
 	binaryPath := dependency.ResolveBinaryPath(tagName, destination)
 	command := exec.Command(binaryPath, arguments...)
 
@@ -112,6 +113,38 @@ func (dependency *ClientDependency) Run(
 	}
 
 	err = command.Start()
+	if err != nil {
+		return 0, err
+	}
+
+	err = writePidToFile(destination, command.Process.Pid)
+	if err != nil {
+		return 0, err
+	}
+
+	return command.Process.Pid, nil
+}
+
+func (dependency *ClientDependency) Stop(destination string) (err error) {
+	pid, err := getPidFromFile(destination)
+	if err != nil {
+		return
+	}
+
+	process, err := os.FindProcess(pid)
+	if err != nil {
+		return
+	}
+
+	err = process.Kill()
+	if err != nil {
+		return
+	}
+
+	err = removePidFile(destination)
+	if err != nil {
+		return
+	}
 
 	return
 }
@@ -168,6 +201,43 @@ func (dependency *ClientDependency) Download(tagName string, destination string)
 	}
 
 	err = os.Chmod(dependencyLocation, os.ModePerm)
+
+	return
+}
+
+func writePidToFile(path string, pid int) (err error) {
+	fullFilepath := path + "/" + PidFilename
+	s := big.NewInt(int64(pid))
+	b := s.Bytes()
+	err = os.WriteFile(fullFilepath, b, 0644)
+	if err != nil {
+		return
+	}
+
+	log.WithField("filepath", fullFilepath).Info("PID file written successfully")
+
+	return
+}
+
+func getPidFromFile(path string) (pid int, err error) {
+	fullFilepath := path + "/" + PidFilename
+	b, err := os.ReadFile(fullFilepath)
+	if err != nil {
+		return 0, err
+	}
+
+	r := big.NewInt(0).SetBytes(b) // bytes to big Int
+	pid = int(r.Int64())
+
+	return pid, nil
+}
+
+func removePidFile(path string) (err error) {
+	fullFilepath := path + "/" + PidFilename
+	err = os.Remove(fullFilepath)
+	if err != nil {
+		return
+	}
 
 	return
 }

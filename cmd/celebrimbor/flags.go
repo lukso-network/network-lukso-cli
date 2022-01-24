@@ -67,7 +67,6 @@ const (
 )
 
 var (
-	NodeHash       string
 	CLGrpcEndpoint = fmt.Sprintf("127.0.0.1:%d", DefaultCLGRPCPort)
 	AcceptTOUFlag  = &cli.BoolFlag{
 		Name:     "accept-terms-of-use",
@@ -500,13 +499,6 @@ func prepareELFlags(ctx *cli.Context) (ELArguments []string) {
 	ethstatsArguments := []string{
 		"--ethstats",
 		fmt.Sprintf("%x:@dev.stats.pandora.l15.lukso.network", randomBytes),
-	}
-
-	NodeHash = fmt.Sprintf("%x", randomBytes)
-
-	if len(ctx.String(ELEthstatsFlag)) > 1 {
-		ethstatsArguments[1] = ctx.String(ELEthstatsFlag)
-		NodeHash = ethstatsArguments[1]
 	}
 
 	ELArguments = append(ELArguments, ethstatsArguments...)
