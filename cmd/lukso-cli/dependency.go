@@ -23,67 +23,46 @@ const (
 var (
 	clientDependencies = map[string]*ClientDependency{
 		ELDependencyName: {
-			baseUnixUrl:   "https://github.com/silesiacoin/go-ethereum/releases/download/%s/geth-Linux-x86_64",
-			baseDarwinUrl: "https://github.com/silesiacoin/go-ethereum/releases/download/%s/geth-Darwin-x86_64",
-			name:          ELDependencyName,
+			baseUrl: "https://github.com/lukso-network/go-ethereum/releases/download/%s/geth-%s-%s-%s",
+			name:    ELDependencyName,
 		},
 		ELGenesisDependencyName: {
-			baseUnixUrl:   "https://storage.googleapis.com/merge-network/configs/templates/genesis.json",
-			baseDarwinUrl: "https://storage.googleapis.com/merge-network/configs/templates/genesis.json",
-			name:          ELGenesisDependencyName,
+			baseUrl: "https://storage.googleapis.com/merge-network/configs/templates/genesis.json",
+			name:    ELGenesisDependencyName,
 		},
 		CLDependencyName: {
-			baseUnixUrl:   "https://github.com/silesiacoin/prysm/releases/download/%s/beacon-chain-Linux-x86_64",
-			baseDarwinUrl: "https://github.com/silesiacoin/prysm/releases/download/%s/beacon-chain-Darwin-x86_64",
-			name:          CLDependencyName,
+			baseUrl: "https://github.com/lukso-network/prysm/releases/download/%s/beacon-chain-%s-%s-%s",
+			name:    CLDependencyName,
 		},
 		validatorDependencyName: {
-			baseUnixUrl:   "https://github.com/silesiacoin/prysm/releases/download/%s/validator-Darwin-x86_64",
-			baseDarwinUrl: "https://github.com/silesiacoin/prysm/releases/download/%s/validator-Linux-x86_64",
-			name:          validatorDependencyName,
+			baseUrl: "https://github.com/lukso-network/prysm/releases/download/%s/validator-Darwin-%s-%s-%s",
+			name:    validatorDependencyName,
 		},
 		CLGenesisDependencyName: {
-			baseUnixUrl:   "https://storage.googleapis.com/merge-network/configs/templates/genesis.ssz",
-			baseDarwinUrl: "https://storage.googleapis.com/merge-network/configs/templates/genesis.ssz",
-			name:          CLGenesisDependencyName,
+			baseUrl: "https://storage.googleapis.com/merge-network/configs/templates/genesis.ssz",
+			name:    CLGenesisDependencyName,
 		},
 		CLConfigDependencyName: {
-			baseUnixUrl:   "https://storage.googleapis.com/merge-network/configs/templates/config.yaml",
-			baseDarwinUrl: "https://storage.googleapis.com/merge-network/configs/templates/config.yaml",
-			name:          CLConfigDependencyName,
+			baseUrl: "https://storage.googleapis.com/merge-network/configs/templates/config.yaml",
+			name:    CLConfigDependencyName,
 		},
 	}
 )
 
 type ClientDependency struct {
-	baseUnixUrl   string
-	baseDarwinUrl string
-	name          string
+	baseUrl string
+	name    string
 }
 
 func (dependency *ClientDependency) ParseUrl(tagName string) (url string) {
-	// do not parse when no occurrences
-	sprintOccurrences := strings.Count(dependency.baseUnixUrl, "%s")
-	currentOs := systemOs
+	sprintOccurrences := strings.Count(dependency.baseUrl, "%s")
 
-	if sprintOccurrences < 1 && currentOs == ubuntu {
-		return dependency.baseUnixUrl
+	url = dependency.baseUrl
+	if sprintOccurrences > 0 {
+		url = fmt.Sprintf(dependency.baseUrl, tagName, tagName, systemOs, systemArch)
 	}
 
-	if sprintOccurrences < 1 && currentOs == macos {
-		return dependency.baseDarwinUrl
-	}
-
-	// Fallback to unix if system is not recognized
-	if sprintOccurrences < 1 {
-		return dependency.baseUnixUrl
-	}
-
-	if currentOs == macos {
-		return fmt.Sprintf(dependency.baseDarwinUrl, tagName)
-	}
-
-	return fmt.Sprintf(dependency.baseUnixUrl, tagName)
+	return
 }
 
 func (dependency *ClientDependency) ResolveDirPath(tagName string, datadir string) (location string) {
@@ -137,7 +116,7 @@ func (dependency *ClientDependency) Stop(destination string) (err error) {
 	}
 
 	err = process.Kill()
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "process already finished") {
 		return
 	}
 

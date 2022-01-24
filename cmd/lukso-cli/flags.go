@@ -92,7 +92,7 @@ var (
 		&cli.StringFlag{
 			Name:  ELTagFlag,
 			Usage: "provide a tag of EL you would like to run",
-			Value: "v3.0.0-kintsugi",
+			Value: "v1.0.0",
 		},
 		&cli.StringFlag{
 			Name:  ELDatadirFlag,
@@ -180,7 +180,7 @@ var (
 		&cli.StringFlag{
 			Name:  validatorTagFlag,
 			Usage: "provide tag for validator binary. Release must be present in lukso namespace on github",
-			Value: "v3.0.0-kintsugi",
+			Value: "v1.0.0",
 		},
 		&cli.StringFlag{
 			Name:  validatorCLRpcProviderFlag,
@@ -191,7 +191,7 @@ var (
 			Name:  CLChainConfigFlag,
 			Usage: "path to chain config of CL and validator",
 			// TODO: Parse it automatically
-			Value: fmt.Sprintf("./CL/v3.0.0-kintsugi/%s", CLConfigDependencyName),
+			Value: fmt.Sprintf("./CL/v1.0.0/%s", CLConfigDependencyName),
 		},
 		&cli.BoolFlag{
 			Name:  CLOutputFlag,
@@ -229,13 +229,13 @@ var (
 		&cli.StringFlag{
 			Name:  CLTagFlag,
 			Usage: "provide tag for CL",
-			Value: "v3.0.0-kintsugi",
+			Value: "v1.0.0",
 		},
 		&cli.StringFlag{
 			Name: CLGenesisStateFlag,
 			// TODO: see if it is possible to do this via url
 			Usage: "provide genesis.ssz file",
-			Value: fmt.Sprintf("./CL/v3.0.0-kintsugi/%s", CLGenesisDependencyName),
+			Value: fmt.Sprintf("./CL/v1.0.0/%s", CLGenesisDependencyName),
 		},
 		&cli.StringFlag{
 			Name:  CLDatadirFlag,
@@ -323,6 +323,7 @@ var (
 // setupOperatingSystem will parse flags and use it to deduce which system dependencies are required
 func setupOperatingSystem() {
 	systemOs = runtime.GOOS
+	systemArch = runtime.GOARCH
 }
 
 func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {

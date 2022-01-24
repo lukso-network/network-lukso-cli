@@ -17,7 +17,6 @@ import (
 // This binary will also support only some of the possible networks.
 // Make a pull request to attach your network.
 // We are also very open to any improvements. Please make some issue or hackmd proposal to make it better.
-// Join our silesiacoin discord https://discord.gg/RX6GsNr to ask some questions
 
 const (
 	ubuntu  = "linux"
@@ -44,6 +43,7 @@ var (
 	CLTag                 string
 	log                   = logrus.WithField("prefix", appName)
 	systemOs              string
+	systemArch            string
 	ELRuntimeFlags        []string
 	validatorRuntimeFlags []string
 	CLRuntimeFlags        []string
@@ -59,6 +59,8 @@ func init() {
 }
 
 func main() {
+	setupOperatingSystem()
+
 	beforeFunc := func(ctx *cli.Context) error {
 		formatter := new(prefixed.TextFormatter)
 		formatter.TimestampFormat = "2006-01-02 15:04:05"
@@ -118,11 +120,11 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 	// Get os, then download all binaries into datadir matching desired system
 	// After successful download run binary with desired arguments spin and connect them
 	// Orchestrator can be run from-memory
-	err = downloadGenesis(ctx)
-
-	if nil != err {
-		return
-	}
+	//err = downloadGenesis(ctx)
+	//
+	//if nil != err {
+	//	return
+	//}
 
 	err = downloadEL(ctx)
 
@@ -130,17 +132,17 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 		return
 	}
 
-	err = downloadValidator(ctx)
-
-	if nil != err {
-		return
-	}
-
-	err = downloadCL(ctx)
-
-	if nil != err {
-		return
-	}
+	//err = downloadValidator(ctx)
+	//
+	//if nil != err {
+	//	return
+	//}
+	//
+	//err = downloadCL(ctx)
+	//
+	//if nil != err {
+	//	return
+	//}
 
 	err = downloadConfig(ctx)
 
@@ -154,17 +156,19 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 		return
 	}
 
-	time.Sleep(time.Second * 6)
+	//time.Sleep(time.Second * 6)
+	//
+	//err = startCL(ctx)
+	//
+	//if nil != err {
+	//	return
+	//}
+	//
+	//time.Sleep(time.Second * 3)
+	//
+	//return startValidator(ctx)
 
-	err = startCL(ctx)
-
-	if nil != err {
-		return
-	}
-
-	time.Sleep(time.Second * 3)
-
-	return startValidator(ctx)
+	return
 }
 
 func stopAllBinaries(ctx *cli.Context) (err error) {
