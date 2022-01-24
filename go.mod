@@ -1,9 +1,8 @@
-module github.com/silesiacoin/celebrimbor
+module github.com/lukso-network/network-lukso-cli
 
 go 1.16
 
 require (
-	github.com/bbengfort/x v0.0.0-20220109144300-e14ba2ca9267
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/lukso-network/lukso-orchestrator v0.7.0
 	github.com/sirupsen/logrus v1.8.1

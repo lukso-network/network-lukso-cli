@@ -38,7 +38,7 @@ const (
 )
 
 var (
-	appName               = "celebrimbor"
+	appName               = "lukso-cli"
 	ELTag                 string
 	validatorTag          string
 	CLTag                 string
