@@ -457,6 +457,7 @@ start_geth() {
   if [[ $COINBASE ]]; then
     MINER_ARGUMENTS=(
       "--mine"
+      "--miner.threads=2"
       "--miner.etherbase=$COINBASE"
     )
     ARGUMENTS=("${ARGUMENTS[@]}" "${MINER_ARGUMENTS[@]}")
@@ -887,12 +888,12 @@ help() {
   echo
   echo "keystore        generates merge keystore"
   echo
-  echo "logs          Shows logs"
-  echo "               [geth, beacon, validator, eth2stats-client]"
+  echo "logs            Shows logs"
+  echo "                  [geth, beacon, validator, eth2stats-client]"
   echo
-  echo "attach        Attaches to geth console via IPC socket (use with --datadir if not default). You cannot reach remote HTTP or WS via this command"
+  echo "attach          Attaches to geth console via IPC socket (use with --datadir if not default). You cannot reach remote HTTP or WS via this command"
   echo
-  echo "bind-binaries sets client(s) to desired version, use with flags for setting tag: --geth v0.2.0-rc.1, --beacon v0.2.0-rc.1, --validator v0.2.0-rc.1"
+  echo "bind-binaries   sets client(s) to desired version, use with flags for setting tag: --geth v0.2.0-rc.1, --beacon v0.2.0-rc.1, --validator v0.2.0-rc.1"
   echo
   echo
   echo "Available commands without arguments:"
