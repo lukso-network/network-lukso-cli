@@ -196,7 +196,7 @@ download_binary() {
     ;;
 
   eth2stats-client)
-    REPO="network-vanguard-stats-client"
+    REPO="network-consensus-stats-client"
     ;;
 
   esac
