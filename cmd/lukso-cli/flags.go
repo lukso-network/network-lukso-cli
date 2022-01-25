@@ -36,7 +36,6 @@ const (
 	validatorTagFlag                = "validator-tag"
 	validatorCLRpcProviderFlag      = "validator-CL-rpc"
 	validatorVerbosityFlag          = "validator-verbosity"
-	validatorTrustedELFlag          = "validator-trusted-EL"
 	validatorWalletPasswordFileFlag = "validator-wallet-password-file"
 	validatorDatadirFlag            = "validator-datadir"
 	validatorWalletDatadirFlag      = "validator-wallet-datadir"
@@ -478,6 +477,11 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--wallet-dir=%s",
 		ctx.String(validatorWalletDatadirFlag),
+	))
+
+	validatorArguments = append(validatorArguments, fmt.Sprintf(
+		"--beacon-rpc-provider=%s",
+		ctx.String(validatorCLRpcProviderFlag),
 	))
 
 	return
