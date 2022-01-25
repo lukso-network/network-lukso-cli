@@ -60,6 +60,7 @@ const (
 	CLP2PUDPPort                  = "cl-p2p-port-udp"
 	CLETHApiPort                  = "cl-eth-api-port"
 	CLGRPCGatewayPort             = "cl-grpc-gateway-port"
+	CLRPCPort                     = "cl-rpc-port"
 	CLDisableSyncFlag             = "cl-disable-sync"
 	CLOutputFileFlag              = "cl-output-file"
 
@@ -184,8 +185,8 @@ var (
 		},
 		&cli.StringFlag{
 			Name:  validatorCLRpcProviderFlag,
-			Usage: fmt.Sprintf("provide url without prefix, example: localhost:%d", DefaultCLGRPCPort),
-			Value: fmt.Sprintf("localhost:%d", DefaultCLGRPCPort),
+			Usage: fmt.Sprintf("provide url without prefix, example: 127.0.0.1:%d", DefaultCLGRPCPort),
+			Value: fmt.Sprintf("127.0.0.1:%d", DefaultCLGRPCPort),
 		},
 		&cli.StringFlag{
 			Name:  CLChainConfigFlag,
@@ -304,6 +305,11 @@ var (
 		},
 		&cli.StringFlag{
 			Name:  CLGRPCGatewayPort,
+			Usage: fmt.Sprintf("provide p2p port for udp, default: %d", DefaultCLGRPCGatewayPort),
+			Value: fmt.Sprintf("%d", DefaultCLGRPCGatewayPort),
+		},
+		&cli.StringFlag{
+			Name:  CLRPCPort,
 			Usage: fmt.Sprintf("provide p2p port for udp, default: %d", DefaultCLGRPCPort),
 			Value: fmt.Sprintf("%d", DefaultCLGRPCPort),
 		},
@@ -372,17 +378,6 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 		"--http-web3provider=%s",
 		ctx.String(CLWeb3ProviderFlag),
 	))
-	// TODO: check if needed
-	//CLArguments = append(CLArguments, fmt.Sprintf(
-	//	"--deposit-contract=%s",
-	//	ctx.String(CLDepositContractFlag),
-	//))
-	//CLArguments = append(CLArguments, fmt.Sprintf(
-	//	"--contract-deployment-block=%s",
-	//	ctx.String(CLContractDeploymentBlockFlag),
-	//))
-	CLArguments = append(CLArguments, "--rpc-host=0.0.0.0")
-	CLArguments = append(CLArguments, "--monitoring-host=0.0.0.0")
 	CLArguments = append(CLArguments, "--verbosity")
 	CLArguments = append(CLArguments, ctx.String(CLVerbosityFlag))
 	CLArguments = append(CLArguments, fmt.Sprintf(
@@ -434,8 +429,11 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 
 	CLArguments = append(CLArguments, "--grpc-gateway-port")
 	CLArguments = append(CLArguments, ctx.String(CLGRPCGatewayPort))
-	// Localhost setup support only
-	CLGrpcEndpoint = fmt.Sprintf("127.0.0.1:%s", ctx.String(CLGRPCGatewayPort))
+
+	CLArguments = append(CLArguments, fmt.Sprintf(
+		"--rpc-port=%s",
+		ctx.String(CLRPCPort),
+	))
 
 	return
 }
@@ -471,7 +469,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 	))
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--datadir=%s",
-		ctx.String(CLDatadirFlag),
+		ctx.String(validatorDatadirFlag),
 	))
 
 	validatorArguments = append(validatorArguments, fmt.Sprintf(

@@ -28,10 +28,10 @@ const (
 	DefaultELWSPort    = 8599
 	DefaultELP2PPort   = 30398
 
-	DefaultCLGRPCPort    = 4098
-	DefaultCLP2PTCPPort  = 13098
-	DefaultCLP2PUDPPort  = 13098
-	DefaultValidatorPort = 3598
+	DefaultCLGRPCPort        = 4098
+	DefaultCLGRPCGatewayPort = 3598
+	DefaultCLP2PTCPPort      = 13098
+	DefaultCLP2PUDPPort      = 13098
 
 	PidFilename = "pid"
 )
