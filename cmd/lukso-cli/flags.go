@@ -69,13 +69,7 @@ const (
 
 var (
 	CLGrpcEndpoint = fmt.Sprintf("127.0.0.1:%d", DefaultCLGRPCPort)
-	AcceptTOUFlag  = &cli.BoolFlag{
-		Name:     "accept-terms-of-use",
-		Usage:    "you must accept terms of use",
-		Required: true,
-		Value:    true,
-	}
-	ForceClearDB = &cli.BoolFlag{
+	ForceClearDB   = &cli.BoolFlag{
 		Name:  "force-clear-db",
 		Usage: "Clear any previously stored data at the data directory",
 	}
@@ -85,7 +79,6 @@ var (
 		Usage: "Specify log file name, relative or absolute",
 	}
 	appFlags = []cli.Flag{
-		AcceptTOUFlag,
 		ForceClearDB,
 		LogFileName,
 	}
@@ -333,13 +326,6 @@ func setupOperatingSystem() {
 }
 
 func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
-	if !ctx.Bool(AcceptTOUFlag.Name) {
-		log.Fatal("you must accept terms of use")
-		ctx.Done()
-
-		return
-	}
-
 	CLArguments = append(CLArguments, "--accept-terms-of-use")
 
 	if ctx.IsSet(cmd.ForceClearDB.Name) {
@@ -439,13 +425,6 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 }
 
 func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
-	if !ctx.Bool(AcceptTOUFlag.Name) {
-		log.Fatal("you must accept terms of use")
-		ctx.Done()
-
-		return
-	}
-
 	validatorArguments = append(validatorArguments, "--accept-terms-of-use")
 
 	if ctx.IsSet(ForceClearDB.Name) {
