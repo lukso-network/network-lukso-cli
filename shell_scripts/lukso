@@ -116,7 +116,7 @@ VAN_ETHSTATS_METRICS="http://$VANGUARD_MONITORING_HOST:$VANGUARD_MONITORING_PORT
 
 ###### Validator
 KEYS_DIR="$LUKSO_HOME/$NETWORK"
-WALLET_DIR="$LUKSO_HOME/$NETWORK/vanguard_wallet"
+WALLET_DIR="$LUKSO_HOME/$NETWORK/beacon_wallet"
 VALIDATOR_PASSWORD_FILE=""
 VALIDATOR_VERBOSITY=info
 VALIDATOR_BEACON_RPC_PROVIDER=$VANGUARD_RPC
@@ -268,13 +268,15 @@ generate_keystore() {
       fi
   fi
 
-  read -p -s "Enter your keystore password: " KEYSTORE_PASSWORD
+  read -p "Enter your keystore password: " KEYSTORE_PASSWORD
   if [[ -z $KEYSTORE_PASSWORD ]]; then
     echo "Enter a valid keystore password"
     exit 1
   fi
 
   read -p "How many validators? (Cost for 1 validator = 32 LYXt): " VALIDATORS_NUMBER
+
+  rm -rf $WALLET_DIR
 
   VALIDATOR_MNEMONIC=$(network-validator-tools mnemonic)
   read -p "Enter Validator mnemonic file location. Keep blank to generate atutomatically" INPUT
@@ -283,12 +285,12 @@ generate_keystore() {
   fi
   echo "SAVE THIS VALIDATOR MNEMONIC FOR FUTURE USAGE: ${VALIDATOR_MNEMONIC}"
 
-  network-validator-tools keystores
+  network-validator-tools keystores \
     --insecure \
     --prysm-pass=${KEYSTORE_PASSWORD} \
     --source-min=0 \
     --source-max=${VALIDATORS_NUMBER} \
-    --source-mnemonic=${VALIDATOR_MNEMONIC} \
+    --source-mnemonic="${VALIDATOR_MNEMONIC}" \
     --out-loc=${WALLET_DIR}
 }
 
@@ -324,7 +326,7 @@ setup_config() {
   fi
 
   parse_config_field "COINBASE" "Enter your coinbase:" "0x616e6f6e796d6f75730000000000000000000000"
-  parse_config_field "WALLET_DIR" "Type wallet location:" "$LUKSO_HOME/$NETWORK/vanguard_wallet"
+  parse_config_field "WALLET_DIR" "Type wallet location:" "$LUKSO_HOME/$NETWORK/beacon_wallet"
   parse_config_field "DATADIR" "Type data directory (chain will be stored there) location:" "$LUKSO_HOME/$NETWORK/datadirs"
   parse_config_field "LOGSDIR" "Type logs location:" "$LUKSO_HOME/$NETWORK/logs"
   parse_config_field "NODE_NAME" "Type name of the node:" "$NETWORK-$NODE_NAME"
@@ -661,7 +663,7 @@ start_all() {
     check_validator_requirements
   fi
 
-  echo "################# Starting pandora #######################"
+  echo "################# Starting geth #######################"
   start_geth
   sleep 2
 
