@@ -170,12 +170,20 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 }
 
 func stopAllBinaries(ctx *cli.Context) (err error) {
-	err = stopEL(ctx)
+	err = stopValidator(ctx)
 	if err != nil {
 		return
 	}
 
 	err = stopCL(ctx)
+	if err != nil {
+		return
+	}
+
+	err = stopEL(ctx)
+	if err != nil {
+		return
+	}
 
 	return
 }
