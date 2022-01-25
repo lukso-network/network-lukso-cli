@@ -410,7 +410,7 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 
 	CLArguments = append(CLArguments, fmt.Sprintf(
 		"--log-file=%s",
-		ctx.String(CLOutputFileFlag),
+		fmt.Sprintf("%s%s", ctx.String(CLOutputFileFlag), time.Now().Format(time.RFC3339)),
 	))
 
 	CLArguments = append(CLArguments, fmt.Sprintf(
@@ -463,7 +463,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--log-file=%s",
-		ctx.String(validatorOutputFileFlag),
+		fmt.Sprintf("%s%s", ctx.String(validatorOutputFileFlag), time.Now().Format(time.RFC3339)),
 	))
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--wallet-password-file=%s",
