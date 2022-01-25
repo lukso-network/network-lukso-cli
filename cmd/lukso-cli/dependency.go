@@ -8,15 +8,16 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 )
 
 // TODO: consider extend it when new clients will be introduced
 const (
 	ELDependencyName        = "geth"
-	ELGenesisDependencyName = "el_private_testnet_genesis.json"
+	ELGenesisDependencyName = "genesis.json"
 	CLDependencyName        = "prysm"
 	validatorDependencyName = "validator"
-	CLGenesisDependencyName = "cl_private_testnet_genesis.ssz"
+	CLGenesisDependencyName = "genesis.ssz"
 	CLConfigDependencyName  = "config.yml"
 )
 
@@ -115,7 +116,7 @@ func (dependency *ClientDependency) Stop(destination string) (err error) {
 		return
 	}
 
-	err = process.Kill()
+	err = process.Signal(syscall.SIGINT)
 	if err != nil && !strings.Contains(err.Error(), "process already finished") {
 		return
 	}
