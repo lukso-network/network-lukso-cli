@@ -120,11 +120,11 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 	// Get os, then download all binaries into datadir matching desired system
 	// After successful download run binary with desired arguments spin and connect them
 	// Orchestrator can be run from-memory
-	//err = downloadGenesis(ctx)
-	//
-	//if nil != err {
-	//	return
-	//}
+	err = downloadGenesis(ctx)
+
+	if nil != err {
+		return
+	}
 
 	err = downloadEL(ctx)
 
@@ -132,17 +132,17 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 		return
 	}
 
-	//err = downloadValidator(ctx)
-	//
-	//if nil != err {
-	//	return
-	//}
-	//
-	//err = downloadCL(ctx)
-	//
-	//if nil != err {
-	//	return
-	//}
+	err = downloadValidator(ctx)
+
+	if nil != err {
+		return
+	}
+
+	err = downloadCL(ctx)
+
+	if nil != err {
+		return
+	}
 
 	err = downloadConfig(ctx)
 
@@ -156,23 +156,26 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 		return
 	}
 
-	//time.Sleep(time.Second * 6)
-	//
-	//err = startCL(ctx)
-	//
-	//if nil != err {
-	//	return
-	//}
-	//
-	//time.Sleep(time.Second * 3)
-	//
-	//return startValidator(ctx)
+	time.Sleep(time.Second * 6)
 
-	return
+	err = startCL(ctx)
+
+	if nil != err {
+		return
+	}
+
+	time.Sleep(time.Second * 3)
+
+	return startValidator(ctx)
 }
 
 func stopAllBinaries(ctx *cli.Context) (err error) {
 	err = stopEL(ctx)
+	if err != nil {
+		return
+	}
+
+	err = stopCL(ctx)
 
 	return
 }
@@ -291,11 +294,11 @@ func startEL(ctx *cli.Context) (err error) {
 }
 
 func stopEL(ctx *cli.Context) (err error) {
-	log.Info("Stopping geth")
-	elDataDir := ctx.String(ELDatadirFlag)
+	log.Info("Stopping Execution")
+	dataDir := ctx.String(ELDatadirFlag)
 
 	err = clientDependencies[ELDependencyName].Stop(
-		elDataDir,
+		dataDir,
 	)
 	if nil != err {
 		return
@@ -337,6 +340,20 @@ func startCL(ctx *cli.Context) (err error) {
 	return vanClient.Close()
 }
 
+func stopCL(ctx *cli.Context) (err error) {
+	log.Info("Stopping Consensus")
+	dataDir := ctx.String(CLDatadirFlag)
+
+	err = clientDependencies[CLDependencyName].Stop(
+		dataDir,
+	)
+	if nil != err {
+		return
+	}
+
+	return
+}
+
 func startValidator(ctx *cli.Context) (err error) {
 	// First command should be to create wallet or prompt to do this by your own. This is one-time
 	log.WithField("dependencyTag", validatorTag).Info("Starting Consensus Layer Validator")
@@ -352,6 +369,20 @@ func startValidator(ctx *cli.Context) (err error) {
 	}
 
 	log.WithField("pid", pid).Info("Consensus Layer Validator is ready")
+
+	return
+}
+
+func stopValidator(ctx *cli.Context) (err error) {
+	log.Info("Stopping Validator")
+	dataDir := ctx.String(validatorDatadirFlag)
+
+	err = clientDependencies[validatorDependencyName].Stop(
+		dataDir,
+	)
+	if nil != err {
+		return
+	}
 
 	return
 }

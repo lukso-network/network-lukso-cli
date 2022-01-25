@@ -7,34 +7,34 @@ import (
 
 func TestClientDependency_ParseUrl(t *testing.T) {
 	dependencyWithSprintf := &ClientDependency{
-		baseUnixUrl:   "https://something.com/%s",
-		baseDarwinUrl: "https://something.com/%s-darwin",
-		name:          "dummy",
+		baseUrl: "https://something.com/%s/dummy-%s-%s-%s",
+		name:    "dummy",
 	}
 	dependencyWithOutSprintf := &ClientDependency{
-		baseUnixUrl:   "https://something.com/",
-		baseDarwinUrl: "https://something.com/darwin",
-		name:          "dummy",
+		baseUrl: "https://something.com/",
+		name:    "dummy",
 	}
-	tagName := "v6.6.6-dummy"
+	tagName := "v1.0.0"
 	t.Run("should parse macos flag", func(t *testing.T) {
 		systemOs = macos
+		systemArch = "amd64"
 		assert.Equal(
 			t,
-			"https://something.com/v6.6.6-dummy-darwin",
+			"https://something.com/v1.0.0/dummy-v1.0.0-darwin-amd64",
 			dependencyWithSprintf.ParseUrl(tagName),
 		)
 		assert.Equal(
 			t,
-			"https://something.com/darwin",
+			"https://something.com/",
 			dependencyWithOutSprintf.ParseUrl(tagName),
 		)
 	})
 	t.Run("should work without flag flag", func(t *testing.T) {
 		systemOs = ubuntu
+		systemArch = "amd64"
 		assert.Equal(
 			t,
-			"https://something.com/v6.6.6-dummy",
+			"https://something.com/v1.0.0/dummy-v1.0.0-linux-amd64",
 			dependencyWithSprintf.ParseUrl(tagName),
 		)
 		assert.Equal(

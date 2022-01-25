@@ -29,7 +29,7 @@ const (
 	ELHttpOriginFlag = "el-http-origin"
 	ELNatFlag        = "el-nat"
 
-	// Common for CL client(s)
+	// CLChainConfigFlag Common for CL client(s)
 	CLChainConfigFlag = "cl-chain-config"
 
 	// Validator related flag names
@@ -41,7 +41,7 @@ const (
 	validatorDatadirFlag            = "validator-datadir"
 	validatorOutputFileFlag         = "validator-output-file"
 
-	// CL related flag names
+	// CLTagFlag CL related flag names
 	CLTagFlag                     = "cl-tag"
 	CLGenesisStateFlag            = "cl-genesis-state"
 	CLDatadirFlag                 = "cl-datadir"
@@ -515,7 +515,6 @@ func prepareELFlags(ctx *cli.Context) (ELArguments []string) {
 	ELArguments = append(ELArguments, ctx.String(ELPortFlag))
 
 	// Http api
-	// TODO: change to new --http, because -rpc is deprecated in EL
 	ELArguments = append(ELArguments, "--http")
 	ELArguments = append(ELArguments, "--http.addr")
 	ELArguments = append(ELArguments, "0.0.0.0")
