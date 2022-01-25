@@ -222,8 +222,8 @@ func downloadCL(ctx *cli.Context) (err error) {
 
 func downloadValidator(ctx *cli.Context) (err error) {
 	log.WithField("dependencyTag", validatorTag).Info("Downloading validator")
-	validatorDataDir := ctx.String(CLDatadirFlag)
-	err = clientDependencies[validatorDependencyName].Download(CLTag, validatorDataDir)
+	validatorDataDir := ctx.String(validatorDatadirFlag)
+	err = clientDependencies[validatorDependencyName].Download(validatorTag, validatorDataDir)
 
 	return
 }
@@ -357,12 +357,12 @@ func stopCL(ctx *cli.Context) (err error) {
 func startValidator(ctx *cli.Context) (err error) {
 	// First command should be to create wallet or prompt to do this by your own. This is one-time
 	log.WithField("dependencyTag", validatorTag).Info("Starting Consensus Layer Validator")
-	validatorDataDir := ctx.String(CLDatadirFlag)
+	validatorDataDir := ctx.String(validatorDatadirFlag)
 	pid, err := clientDependencies[validatorDependencyName].Run(
 		validatorTag,
 		validatorDataDir,
 		validatorRuntimeFlags,
-		false,
+		true,
 	)
 	if nil != err {
 		return

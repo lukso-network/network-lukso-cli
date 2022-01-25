@@ -35,7 +35,7 @@ var (
 			name:    CLDependencyName,
 		},
 		validatorDependencyName: {
-			baseUrl: "https://github.com/lukso-network/prysm/releases/download/%s/validator-Darwin-%s-%s-%s",
+			baseUrl: "https://github.com/lukso-network/prysm/releases/download/%s/validator-%s-%s-%s",
 			name:    validatorDependencyName,
 		},
 		CLGenesisDependencyName: {

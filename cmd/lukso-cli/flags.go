@@ -39,6 +39,7 @@ const (
 	validatorTrustedELFlag          = "validator-trusted-EL"
 	validatorWalletPasswordFileFlag = "validator-wallet-password-file"
 	validatorDatadirFlag            = "validator-datadir"
+	validatorWalletDatadirFlag      = "validator-wallet-datadir"
 	validatorOutputFileFlag         = "validator-output-file"
 
 	// CLTagFlag CL related flag names
@@ -63,7 +64,7 @@ const (
 	CLDisableSyncFlag             = "cl-disable-sync"
 	CLOutputFileFlag              = "cl-output-file"
 
-	DefaultELRPCEndpoint = "./EL/geth.ipc"
+	DefaultELRPCEndpoint = "http://127.0.0.1:8598"
 )
 
 var (
@@ -117,12 +118,12 @@ var (
 		&cli.StringFlag{
 			Name:  ELNetworkIDFlag,
 			Usage: "provide network id if must be different than default",
-			Value: "231",
+			Value: "1337222",
 		},
 		&cli.StringFlag{
 			Name:  ELChainIDFlag,
 			Usage: "provide chain id if must be different than default",
-			Value: "231",
+			Value: "1337222",
 		},
 		&cli.StringFlag{
 			Name:  ELPortFlag,
@@ -205,11 +206,6 @@ var (
 			Value: "debug",
 		},
 		&cli.StringFlag{
-			Name:  validatorTrustedELFlag,
-			Usage: "provide host:port for trusted EL, default: http://127.0.0.1:8598",
-			Value: "http://127.0.0.1:8598",
-		},
-		&cli.StringFlag{
 			Name:  validatorWalletPasswordFileFlag,
 			Usage: "location of file password that you used for generation keys from deposit-cli",
 			Value: "./password.txt",
@@ -217,12 +213,17 @@ var (
 		&cli.StringFlag{
 			Name:  validatorDatadirFlag,
 			Usage: "location of keys from deposit-cli",
-			Value: "",
+			Value: "./CL-Validator",
+		},
+		&cli.StringFlag{
+			Name:  validatorWalletDatadirFlag,
+			Usage: "location of keys from deposit-cli",
+			Value: "./CL-Validator-wallet",
 		},
 		&cli.StringFlag{
 			Name:  validatorOutputFileFlag,
 			Usage: "provide output destination of CL",
-			Value: "./validator.log",
+			Value: "./CL-Validator.log",
 		},
 	}
 	CLFlags = []cli.Flag{
@@ -430,6 +431,8 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 
 	CLArguments = append(CLArguments, "--enable-debug-rpc-endpoints")
 
+	CLArguments = append(CLArguments, "--kintsugi-testnet")
+
 	CLArguments = append(CLArguments, "--grpc-gateway-port")
 	CLArguments = append(CLArguments, ctx.String(CLGRPCGatewayPort))
 	// Localhost setup support only
@@ -458,10 +461,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 	))
 	validatorArguments = append(validatorArguments, "--verbosity")
 	validatorArguments = append(validatorArguments, ctx.String(validatorVerbosityFlag))
-	validatorArguments = append(validatorArguments, fmt.Sprintf(
-		"--EL-http-provider=%s",
-		ctx.String(validatorTrustedELFlag),
-	))
+
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--log-file=%s",
 		ctx.String(validatorOutputFileFlag),
@@ -475,12 +475,10 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 		ctx.String(CLDatadirFlag),
 	))
 
-	if "" != ctx.String(validatorDatadirFlag) {
-		validatorArguments = append(validatorArguments, fmt.Sprintf(
-			"--wallet-dir=%s",
-			ctx.String(validatorDatadirFlag),
-		))
-	}
+	validatorArguments = append(validatorArguments, fmt.Sprintf(
+		"--wallet-dir=%s",
+		ctx.String(validatorWalletDatadirFlag),
+	))
 
 	return
 }
