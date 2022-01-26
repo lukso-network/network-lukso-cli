@@ -68,7 +68,6 @@ download_network_config() {
   CDN="https://github.com/lukso-network/network-configs/tree/l16-dev/${NETWORK_NAME}/${NETWORK_MODE}/${NETWORK_VERSION}"
   sudo mkdir -p /opt/lukso/networks/$NETWORK/config
   TARGET=/opt/lukso/networks/$NETWORK/config
-  download $CDN/network-config.yaml?ignoreCache=1 $TARGET/network-config.yaml
   download $CDN/genesis.json?ignoreCache=1 $TARGET/geth-genesis.json
   download $CDN/genesis.ssz?ignoreCache=1 $TARGET/beacon-genesis.ssz
   download $CDN/config.yaml?ignoreCache=1 $TARGET/beacon-config.yaml
