@@ -12,6 +12,13 @@
 `lukso-cli` is default name of `cli` binary
 
 ## Running
+
+### Archive node
+1. Build `go build ./cmd/lukso-cli`
+
+2. Run `./lukso-cli start arch` to start a validator node
+
+### Validator node
 1. Build `go build ./cmd/lukso-cli`
 
 2. Create `CL-Validator-wallet` directory in project root
@@ -27,7 +34,7 @@
 
 4. Create `password.txt` text file in project root and fill with proper `prysm` wallet password. Default password is: `Test1234`
 
-5. Run `./lukso-cli start` to start a validator node
+5. Run `./lukso-cli start all` to start a validator node
 
 ## Stopping
 
