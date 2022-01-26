@@ -8,6 +8,7 @@
 ## Glossary
 
 `validator node` - it's a setup of `geth`, `beacon-chain` and `validator` binaries
+
 `lukso-cli` is default name of `cli` binary
 
 ## Running
