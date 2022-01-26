@@ -43,6 +43,20 @@ func TestClientDependency_ParseUrl(t *testing.T) {
 			dependencyWithOutSprintf.ParseUrl(tagName),
 		)
 	})
+	t.Run("should work without flag flag", func(t *testing.T) {
+		systemOs = windows
+		systemArch = "amd64"
+		assert.Equal(
+			t,
+			"https://something.com/v1.0.0/dummy-v1.0.0-windows-amd64",
+			dependencyWithSprintf.ParseUrl(tagName),
+		)
+		assert.Equal(
+			t,
+			"https://something.com/",
+			dependencyWithOutSprintf.ParseUrl(tagName),
+		)
+	})
 	t.Run("should parse ubuntu as a fallback with no parse", func(t *testing.T) {
 		systemOs = ""
 		assert.Equal(

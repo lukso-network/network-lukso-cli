@@ -33,7 +33,8 @@ const (
 	DefaultCLP2PTCPPort      = 13098
 	DefaultCLP2PUDPPort      = 13098
 
-	PidFilename = "pid"
+	PidFilename     = "pid"
+	ArchNodeCmdName = "arch"
 )
 
 var (
@@ -49,6 +50,7 @@ var (
 	validatorRuntimeFlags     []string
 	CLRuntimeFlags            []string
 	CLStatsClientRuntimeFlags []string
+	archiveNode               bool
 )
 
 func init() {
@@ -92,17 +94,39 @@ func main() {
 		return nil
 	}
 
+	archBeforeFunc := func(ctx *cli.Context) (err error) {
+		if ctx.Command.Name == ArchNodeCmdName {
+			archiveNode = true
+		}
+
+		return
+	}
+
 	app := &cli.App{
 		Name: "lukso-cli",
 		Commands: []*cli.Command{
 			{
-				Name:   "start",
-				Usage:  "Spins all merge ecosystem components",
-				Action: downloadAndRunBinaries,
+				Name:  "start",
+				Usage: "starts ecosystem components",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "all",
+						Usage:  "starts all components",
+						Before: archBeforeFunc,
+						Action: downloadAndRunBinaries,
+					},
+					{
+						Name:   ArchNodeCmdName,
+						Usage:  "starts bootnode setup only (archive node)",
+						Before: archBeforeFunc,
+						Action: downloadAndRunBinaries,
+					},
+				},
 			},
 			{
 				Name:   "stop",
 				Usage:  "Stops all merge ecosystem components",
+				Before: archBeforeFunc,
 				Action: stopAllBinaries,
 			},
 		},
@@ -128,37 +152,26 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 	// After successful download run binary with desired arguments spin and connect them
 	// Orchestrator can be run from-memory
 	err = downloadGenesis(ctx)
-
 	if nil != err {
 		return
 	}
 
 	err = downloadEL(ctx)
-
-	if nil != err {
-		return
-	}
-
-	err = downloadValidator(ctx)
-
-	if nil != err {
-		return
-	}
-
-	err = downloadCL(ctx)
-
 	if nil != err {
 		return
 	}
 
 	err = downloadConfig(ctx)
+	if nil != err {
+		return
+	}
 
+	err = downloadCL(ctx)
 	if nil != err {
 		return
 	}
 
 	err = startEL(ctx)
-
 	if nil != err {
 		return
 	}
@@ -166,16 +179,22 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 	time.Sleep(time.Second * 5)
 
 	err = startCL(ctx)
-
 	if nil != err {
 		return
 	}
 
 	time.Sleep(time.Second * 5)
 
-	err = startValidator(ctx)
-	if err != nil {
-		return
+	if !archiveNode {
+		err = downloadValidator(ctx)
+		if nil != err {
+			return
+		}
+
+		err = startValidator(ctx)
+		if err != nil {
+			return
+		}
 	}
 
 	err = startCLStatsClient(ctx)
@@ -189,9 +208,11 @@ func stopAllBinaries(ctx *cli.Context) (err error) {
 		return
 	}
 
-	err = stopValidator(ctx)
-	if err != nil {
-		return
+	if !archiveNode {
+		err = stopValidator(ctx)
+		if err != nil {
+			return
+		}
 	}
 
 	err = stopCL(ctx)
