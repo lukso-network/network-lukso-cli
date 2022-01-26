@@ -13,12 +13,13 @@ import (
 
 // TODO: consider extend it when new clients will be introduced
 const (
-	ELDependencyName        = "geth"
-	ELGenesisDependencyName = "genesis.json"
-	CLDependencyName        = "prysm"
-	validatorDependencyName = "validator"
-	CLGenesisDependencyName = "genesis.ssz"
-	CLConfigDependencyName  = "config.yml"
+	ELDependencyName            = "geth"
+	ELGenesisDependencyName     = "genesis.json"
+	CLDependencyName            = "prysm"
+	validatorDependencyName     = "validator"
+	CLGenesisDependencyName     = "genesis.ssz"
+	CLConfigDependencyName      = "config.yml"
+	CLStatsClientDependencyName = "eth2stats-client"
 )
 
 var (
@@ -46,6 +47,10 @@ var (
 		CLConfigDependencyName: {
 			baseUrl: "https://storage.googleapis.com/merge-network/configs/templates/config.yaml",
 			name:    CLConfigDependencyName,
+		},
+		CLStatsClientDependencyName: {
+			baseUrl: "https://github.com/lukso-network/network-consensus-stats-client/releases/download/%s/eth2stats-client-%s-%s-%s",
+			name:    CLStatsClientDependencyName,
 		},
 	}
 )

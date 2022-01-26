@@ -6,6 +6,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"math/rand"
 	"runtime"
+	"strconv"
 	"time"
 )
 
@@ -39,7 +40,8 @@ const (
 	validatorWalletPasswordFileFlag = "validator-wallet-password-file"
 	validatorDatadirFlag            = "validator-datadir"
 	validatorWalletDatadirFlag      = "validator-wallet-datadir"
-	validatorOutputFileFlag         = "validator-output-file"
+	validatorLogFileFlag            = "validator-log-file"
+	validatorOutputFlag             = "validator-output"
 
 	// CLTagFlag CL related flag names
 	CLTagFlag                     = "cl-tag"
@@ -58,11 +60,15 @@ const (
 	CLP2pLocalFlag                = "cl-p2p-local"
 	CLP2PTCPPort                  = "cl-p2p-port-tcp"
 	CLP2PUDPPort                  = "cl-p2p-port-udp"
-	CLETHApiPort                  = "cl-eth-api-port"
 	CLGRPCGatewayPort             = "cl-grpc-gateway-port"
 	CLRPCPort                     = "cl-rpc-port"
 	CLDisableSyncFlag             = "cl-disable-sync"
-	CLOutputFileFlag              = "cl-output-file"
+	CLLogFileFlag                 = "cl-log-file"
+
+	// CL Stats Client related flag names
+	CLStatsClientFlag        = "cl-stats-tag"
+	clStatsClientDatadirFlag = "cl-stats-datadir"
+	clStatsOutputFlag        = "cl-stats-output"
 
 	DefaultELRPCEndpoint = "http://127.0.0.1:8598"
 )
@@ -111,17 +117,17 @@ var (
 		&cli.StringFlag{
 			Name:  ELNetworkIDFlag,
 			Usage: "provide network id if must be different than default",
-			Value: "1337222",
+			Value: strconv.Itoa(DefaultELNetworkID),
 		},
 		&cli.StringFlag{
 			Name:  ELChainIDFlag,
 			Usage: "provide chain id if must be different than default",
-			Value: "1337222",
+			Value: strconv.Itoa(DefaultELNetworkID),
 		},
 		&cli.StringFlag{
 			Name:  ELPortFlag,
 			Usage: "provide port for EL",
-			Value: "30398",
+			Value: strconv.Itoa(DefaultELP2PPort),
 		},
 		&cli.StringFlag{
 			Name:  ELHttpApiFlag,
@@ -131,7 +137,7 @@ var (
 		&cli.StringFlag{
 			Name:  ELHttpPortFlag,
 			Usage: "port used in EL http communication",
-			Value: "8598",
+			Value: strconv.Itoa(DefaultELHTTPPort),
 		},
 		&cli.StringFlag{
 			Name:  ELWSApiFlag,
@@ -141,7 +147,7 @@ var (
 		&cli.StringFlag{
 			Name:  ELWSPortFlag,
 			Usage: "port for EL api",
-			Value: "8599",
+			Value: strconv.Itoa(DefaultELWSPort),
 		},
 		&cli.StringFlag{
 			Name:  ELEtherbaseFlag,
@@ -188,9 +194,8 @@ var (
 			Value: fmt.Sprintf("./CL/v1.0.0/%s", CLConfigDependencyName),
 		},
 		&cli.BoolFlag{
-			Name:  CLOutputFlag,
-			Usage: "path to chain config of CL and validator",
-			// TODO: Parse it automatically
+			Name:  validatorOutputFlag,
+			Usage: "do you want to have output attached to your combined output",
 			Value: false,
 		},
 		&cli.StringFlag{
@@ -205,16 +210,16 @@ var (
 		},
 		&cli.StringFlag{
 			Name:  validatorDatadirFlag,
-			Usage: "location of keys from deposit-cli",
+			Usage: "location of CL Validator database files",
 			Value: "./CL-Validator",
 		},
 		&cli.StringFlag{
 			Name:  validatorWalletDatadirFlag,
-			Usage: "location of keys from deposit-cli",
+			Usage: "location of keys from deposit-cli - validator wallet dir",
 			Value: "./CL-Validator-wallet",
 		},
 		&cli.StringFlag{
-			Name:  validatorOutputFileFlag,
+			Name:  validatorLogFileFlag,
 			Usage: "provide output destination of CL",
 			Value: "./CL-Validator.log",
 		},
@@ -312,9 +317,31 @@ var (
 			Value: false,
 		},
 		&cli.StringFlag{
-			Name:  CLOutputFileFlag,
+			Name:  CLLogFileFlag,
 			Usage: "provide output destination of CL",
 			Value: "./CL.log",
+		},
+		&cli.BoolFlag{
+			Name:  CLOutputFlag,
+			Usage: "do you want to have output attached to your combined output",
+			Value: false,
+		},
+	}
+	CLStatsClientFlags = []cli.Flag{
+		&cli.StringFlag{
+			Name:  CLStatsClientFlag,
+			Usage: "provide tag for CL Stats Client",
+			Value: "v1.0.0",
+		},
+		&cli.StringFlag{
+			Name:  clStatsClientDatadirFlag,
+			Usage: "location of CL Stats Client",
+			Value: "./CL-Stats-Client",
+		},
+		&cli.BoolFlag{
+			Name:  clStatsOutputFlag,
+			Usage: "do you want to have output attached to your combined output",
+			Value: false,
 		},
 	}
 )
@@ -391,7 +418,7 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 
 	CLArguments = append(CLArguments, fmt.Sprintf(
 		"--log-file=%s",
-		fmt.Sprintf("%s%s", ctx.String(CLOutputFileFlag), time.Now().Format(time.RFC3339)),
+		fmt.Sprintf("%s%s", ctx.String(CLLogFileFlag), time.Now().Format(time.RFC3339)),
 	))
 
 	CLArguments = append(CLArguments, fmt.Sprintf(
@@ -440,7 +467,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--log-file=%s",
-		fmt.Sprintf("%s%s", ctx.String(validatorOutputFileFlag), time.Now().Format(time.RFC3339)),
+		fmt.Sprintf("%s%s", ctx.String(validatorLogFileFlag), time.Now().Format(time.RFC3339)),
 	))
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--wallet-password-file=%s",
@@ -460,6 +487,18 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 		"--beacon-rpc-provider=%s",
 		ctx.String(validatorCLRpcProviderFlag),
 	))
+
+	return
+}
+
+func prepareCLStatsClientFlags(ctx *cli.Context) (clStatsClientArguments []string) {
+	clStatsClientArguments = append(clStatsClientArguments, "run")
+	clStatsClientArguments = append(clStatsClientArguments, "--beacon.type=prysm")
+	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.node-name=test-node")
+	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.addr=34.147.116.58:9090")
+	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.tls=false")
+	clStatsClientArguments = append(clStatsClientArguments, "--beacon.metrics-addr=http://127.0.0.1:8080/metrics")
+	clStatsClientArguments = append(clStatsClientArguments, fmt.Sprintf("--beacon.addr=127.0.0.1:%d", DefaultCLGRPCPort))
 
 	return
 }

@@ -23,7 +23,7 @@ const (
 	macos   = "darwin"
 	windows = "windows"
 
-	DefaultELNetworkID = 231
+	DefaultELNetworkID = 1337222
 	DefaultELHTTPPort  = 8598
 	DefaultELWSPort    = 8599
 	DefaultELP2PPort   = 30398
@@ -37,16 +37,18 @@ const (
 )
 
 var (
-	appName               = "lukso-cli"
-	ELTag                 string
-	validatorTag          string
-	CLTag                 string
-	log                   = logrus.WithField("prefix", appName)
-	systemOs              string
-	systemArch            string
-	ELRuntimeFlags        []string
-	validatorRuntimeFlags []string
-	CLRuntimeFlags        []string
+	appName                   = "lukso-cli"
+	ELTag                     string
+	validatorTag              string
+	CLTag                     string
+	CLStatsClientTag          string
+	log                       = logrus.WithField("prefix", appName)
+	systemOs                  string
+	systemArch                string
+	ELRuntimeFlags            []string
+	validatorRuntimeFlags     []string
+	CLRuntimeFlags            []string
+	CLStatsClientRuntimeFlags []string
 )
 
 func init() {
@@ -54,6 +56,7 @@ func init() {
 	allFlags = append(allFlags, ELFlags...)
 	allFlags = append(allFlags, validatorFlags...)
 	allFlags = append(allFlags, CLFlags...)
+	allFlags = append(allFlags, CLStatsClientFlags...)
 	allFlags = append(allFlags, appFlags...)
 	appFlags = allFlags
 }
@@ -77,6 +80,10 @@ func main() {
 		// Validator related parsing
 		validatorTag = ctx.String(validatorTagFlag)
 		validatorRuntimeFlags = prepareValidatorFlags(ctx)
+
+		// CL Stats Client related parsing
+		CLStatsClientTag = ctx.String(CLStatsClientFlag)
+		CLStatsClientRuntimeFlags = prepareCLStatsClientFlags(ctx)
 
 		// CL related parsing
 		CLTag = ctx.String(CLTagFlag)
@@ -156,7 +163,7 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 		return
 	}
 
-	time.Sleep(time.Second * 6)
+	time.Sleep(time.Second * 5)
 
 	err = startCL(ctx)
 
@@ -164,12 +171,24 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 		return
 	}
 
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 5)
 
-	return startValidator(ctx)
+	err = startValidator(ctx)
+	if err != nil {
+		return
+	}
+
+	err = startCLStatsClient(ctx)
+
+	return
 }
 
 func stopAllBinaries(ctx *cli.Context) (err error) {
+	err = stopCLStatsClient(ctx)
+	if err != nil {
+		return
+	}
+
 	err = stopValidator(ctx)
 	if err != nil {
 		return
@@ -232,6 +251,14 @@ func downloadValidator(ctx *cli.Context) (err error) {
 	log.WithField("dependencyTag", validatorTag).Info("Downloading validator")
 	validatorDataDir := ctx.String(validatorDatadirFlag)
 	err = clientDependencies[validatorDependencyName].Download(validatorTag, validatorDataDir)
+
+	return
+}
+
+func downloadCLStatsClient(ctx *cli.Context) (err error) {
+	log.WithField("dependencyTag", CLStatsClientTag).Info("Downloading CL Stats Client")
+	dataDir := ctx.String(clStatsClientDatadirFlag)
+	err = clientDependencies[CLStatsClientDependencyName].Download(CLStatsClientTag, dataDir)
 
 	return
 }
@@ -370,7 +397,7 @@ func startValidator(ctx *cli.Context) (err error) {
 		validatorTag,
 		validatorDataDir,
 		validatorRuntimeFlags,
-		true,
+		ctx.Bool(validatorOutputFlag),
 	)
 	if nil != err {
 		return
@@ -386,6 +413,38 @@ func stopValidator(ctx *cli.Context) (err error) {
 	dataDir := ctx.String(validatorDatadirFlag)
 
 	err = clientDependencies[validatorDependencyName].Stop(
+		dataDir,
+	)
+	if nil != err {
+		return
+	}
+
+	return
+}
+
+func startCLStatsClient(ctx *cli.Context) (err error) {
+	log.WithField("dependencyTag", CLStatsClientTag).Info("Starting CL Stats Client")
+	dataDir := ctx.String(clStatsClientDatadirFlag)
+	pid, err := clientDependencies[CLStatsClientDependencyName].Run(
+		CLStatsClientTag,
+		dataDir,
+		CLStatsClientRuntimeFlags,
+		ctx.Bool(clStatsOutputFlag),
+	)
+	if nil != err {
+		return
+	}
+
+	log.WithField("pid", pid).Info("CL Stats Client is ready")
+
+	return
+}
+
+func stopCLStatsClient(ctx *cli.Context) (err error) {
+	log.Info("Stopping CL Stats Client")
+	dataDir := ctx.String(clStatsClientDatadirFlag)
+
+	err = clientDependencies[CLStatsClientDependencyName].Stop(
 		dataDir,
 	)
 	if nil != err {
