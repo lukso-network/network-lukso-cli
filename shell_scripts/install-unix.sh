@@ -65,7 +65,7 @@ download_network_config() {
   NETWORK_NAME="$(cut -d'-' -f1 <<<"$NETWORK")"
   NETWORK_MODE="$(cut -d'-' -f2 <<<"$NETWORK")"
 
-  CDN="https://github.com/lukso-network/network-configs/tree/l16-dev/${NETWORK_NAME}/${NETWORK_MODE}/${NETWORK_VERSION}"
+  CDN="https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/${NETWORK_NAME}/${NETWORK_MODE}/${NETWORK_VERSION}"
   sudo mkdir -p /opt/lukso/networks/$NETWORK/config
   TARGET=/opt/lukso/networks/$NETWORK/config
   download $CDN/genesis.json?ignoreCache=1 $TARGET/geth-genesis.json
