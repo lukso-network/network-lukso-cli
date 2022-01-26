@@ -458,7 +458,6 @@ start_geth() {
     "--port=$PANDORA_PORT"
     "--catalyst"
     "--bootnodes=$PANDORA_BOOTNODES"
-    "--miner.gaslimit=80000000"
     "--verbosity=$PANDORA_VERBOSITY"
     "--http"
     "--http.addr=$PANDORA_HTTP_ADDR"
@@ -466,7 +465,6 @@ start_geth() {
     "--ws"
     "--ws.addr=$PANDORA_WS_ADDR"
     "--ws.port=$PANDORA_WS_PORT"
-    "--miner.notify=$PAN_WS_MINER_NOTIFY,$PAN_HTTP_MINER_NOTIFY"
   )
 
 
