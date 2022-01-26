@@ -52,7 +52,7 @@ fi
 LUKSO_SCRIPT_VERSION="v1.7.10"
 
 RUN_DATE=$(date '+%Y-%m-%d__%H-%M-%S')
-NETWORK="l15-dev"
+NETWORK="l16-dev"
 NETWORK_VERSION=""
 IS_VALIDATOR=false
 RUN_LUKSO_STATUS=false

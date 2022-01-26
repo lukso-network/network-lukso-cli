@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-NETWORK="l15-dev"
+NETWORK="l16-dev"
 PLATFORM="unknown";
 NETWORK_VERSION="3"
 
@@ -66,6 +66,7 @@ download_network_config() {
   NETWORK_MODE="$(cut -d'-' -f2 <<<"$NETWORK")"
 
   CDN="https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/${NETWORK_NAME}/${NETWORK_MODE}/${NETWORK_VERSION}"
+  echo $CDN
   sudo mkdir -p /opt/lukso/networks/$NETWORK/config
   TARGET=/opt/lukso/networks/$NETWORK/config
   download $CDN/genesis.json?ignoreCache=1 $TARGET/geth-genesis.json
@@ -87,9 +88,9 @@ download https://raw.githubusercontent.com/lukso-network/network-lukso-cli/featu
 sudo chmod +x /opt/lukso/lukso;
 sudo ln -sfn /opt/lukso/lukso /usr/local/bin/lukso;
 
-download_network_config l15-prod;
-download_network_config l15-staging;
-download_network_config l15-dev;
+download_network_config l16-prod;
+download_network_config l16-staging;
+download_network_config l16-dev;
 
 sudo rm -rf /opt/lukso/tmp;
 
