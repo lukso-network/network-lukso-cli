@@ -221,7 +221,7 @@ var (
 		&cli.StringFlag{
 			Name:  validatorLogFileFlag,
 			Usage: "provide output destination of CL",
-			Value: "./CL-Validator.log",
+			Value: "./logs/CL-Validator.log",
 		},
 	}
 	CLFlags = []cli.Flag{
@@ -319,7 +319,7 @@ var (
 		&cli.StringFlag{
 			Name:  CLLogFileFlag,
 			Usage: "provide output destination of CL",
-			Value: "./CL.log",
+			Value: "./logs/CL.log",
 		},
 		&cli.BoolFlag{
 			Name:  CLOutputFlag,

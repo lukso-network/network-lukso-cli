@@ -19,6 +19,8 @@ import (
 // We are also very open to any improvements. Please make some issue or hackmd proposal to make it better.
 
 const (
+	cliVersion = "v1.0.0"
+
 	ubuntu  = "linux"
 	macos   = "darwin"
 	windows = "windows"
@@ -66,6 +68,7 @@ func init() {
 func main() {
 	setupOperatingSystem()
 
+	// Before func to prepare formatter and all flags
 	beforeFunc := func(ctx *cli.Context) error {
 		formatter := new(prefixed.TextFormatter)
 		formatter.TimestampFormat = "2006-01-02 15:04:05"
@@ -94,6 +97,7 @@ func main() {
 		return nil
 	}
 
+	// Determinate if program is running validator or an archive node
 	archBeforeFunc := func(ctx *cli.Context) (err error) {
 		if ctx.Command.Name == ArchNodeCmdName {
 			archiveNode = true
@@ -103,7 +107,8 @@ func main() {
 	}
 
 	app := &cli.App{
-		Name: "lukso-cli",
+		Name:    "lukso-cli",
+		Version: cliVersion,
 		Commands: []*cli.Command{
 			{
 				Name:  "start",
@@ -125,8 +130,7 @@ func main() {
 			},
 			{
 				Name:   "stop",
-				Usage:  "Stops all merge ecosystem components",
-				Before: archBeforeFunc,
+				Usage:  "Stops all ecosystem components",
 				Action: stopAllBinaries,
 			},
 		},
@@ -208,11 +212,9 @@ func stopAllBinaries(ctx *cli.Context) (err error) {
 		return
 	}
 
-	if !archiveNode {
-		err = stopValidator(ctx)
-		if err != nil {
-			return
-		}
+	err = stopValidator(ctx)
+	if err != nil {
+		return
 	}
 
 	err = stopCL(ctx)

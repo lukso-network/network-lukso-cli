@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"syscall"
 )
@@ -112,8 +113,12 @@ func (dependency *ClientDependency) Run(
 
 func (dependency *ClientDependency) Stop(destination string) (err error) {
 	pid, err := getPidFromFile(destination)
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "no such file or directory") {
 		return
+	}
+
+	if pid == 0 {
+		return nil
 	}
 
 	process, err := os.FindProcess(pid)
@@ -191,7 +196,7 @@ func (dependency *ClientDependency) Download(tagName string, destination string)
 }
 
 func writePidToFile(path string, pid int) (err error) {
-	fullFilepath := path + "/" + PidFilename
+	fullFilepath := filepath.Join(path, PidFilename)
 	s := big.NewInt(int64(pid))
 	b := s.Bytes()
 	err = os.WriteFile(fullFilepath, b, 0644)
@@ -205,7 +210,7 @@ func writePidToFile(path string, pid int) (err error) {
 }
 
 func getPidFromFile(path string) (pid int, err error) {
-	fullFilepath := path + "/" + PidFilename
+	fullFilepath := filepath.Join(path, PidFilename)
 	b, err := os.ReadFile(fullFilepath)
 	if err != nil {
 		return 0, err
@@ -218,7 +223,7 @@ func getPidFromFile(path string) (pid int, err error) {
 }
 
 func removePidFile(path string) (err error) {
-	fullFilepath := path + "/" + PidFilename
+	fullFilepath := filepath.Join(path, PidFilename)
 	err = os.Remove(fullFilepath)
 	if err != nil {
 		return
