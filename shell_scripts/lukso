@@ -52,6 +52,7 @@ LUKSO_SCRIPT_VERSION="v1.7.10"
 
 RUN_DATE=$(date '+%Y-%m-%d__%H-%M-%S')
 NETWORK="l15-prod"
+NETWORK_VERSION="3"
 IS_VALIDATOR=false
 RUN_LUKSO_STATUS=false
 PAN_ETHSTATS="S2qDE8rYtFVVGZ@stats.pandora.l15.lukso.network"
@@ -337,9 +338,10 @@ setup_config() {
 
 download_network_config() {
   NETWORK=$1
-  # TODO: CHANGE DOWNLOAD ADDRESS
+  NETWORK_NAME="$(cut -d'-' -f1 <<<"$NETWORK")"
+  NETWORK_MODE="$(cut -d'-' -f2 <<<"$NETWORK")"
 
-  CDN="https://storage.googleapis.com/merge-network/configs/templates"
+  CDN="https://github.com/lukso-network/network-configs/tree/l16-dev/${NETWORK_NAME}/${NETWORK_MODE}/${NETWORK_VERSION}"
   sudo mkdir -p /opt/lukso/networks/$NETWORK/config
   TARGET=/opt/lukso/networks/$NETWORK/config
   download $CDN/network-config.yaml?ignoreCache=1 $TARGET/network-config.yaml
@@ -911,6 +913,8 @@ help() {
   echo
   echo "--l15-prod             Alias for --network l15-prod"
   echo
+  echo "--network-version      Picup the network version for which configs will be downloaded (default: 3)"
+  echo
   echo "--l15-staging          Alias for --network l15-staging"
   echo
   echo "--l15-dev              Alias for --network l15-dev"
@@ -1190,6 +1194,12 @@ while getopts "$optspec" optchar; do
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       eval OVERRIDE_LOGSDIR=$val
+      ;;
+
+    network-version)
+      val="${!OPTIND}"
+      OPTIND=$(($OPTIND + 1))
+      eval OVERRIDE_NETWORK_VERSION=$val
       ;;
 
     l15-prod)
@@ -1567,6 +1577,11 @@ fi
 if [[ -n $OVERRIDE_PANDORA_VERBOSITY ]]; then
   PANDORA_VERBOSITY=$OVERRIDE_PANDORA_VERBOSITY
 fi
+
+if [[ -n $OVERRIDE_NETWORK_VERSION ]]; then
+  NETWORK_VERSION=$OVERRIDE_NETWORK_VERSION
+fi
+
 
 if [[ -n $OVERRIDE_VANGUARD_BOOTNODES ]]; then
   VANGUARD_BOOTNODES=$OVERRIDE_VANGUARD_BOOTNODES
