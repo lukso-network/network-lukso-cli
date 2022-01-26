@@ -175,6 +175,11 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 		return
 	}
 
+	err = downloadCLStatsClient(ctx)
+	if nil != err {
+		return
+	}
+
 	err = startEL(ctx)
 	if nil != err {
 		return
