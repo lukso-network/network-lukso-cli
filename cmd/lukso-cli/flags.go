@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/lukso-network/lukso-orchestrator/shared/cmd"
 	"github.com/urfave/cli/v2"
-	"math/rand"
 	"runtime"
 	"strconv"
 	"time"
@@ -74,8 +73,9 @@ const (
 )
 
 var (
-	CLGrpcEndpoint = fmt.Sprintf("127.0.0.1:%d", DefaultCLGRPCPort)
-	ForceClearDB   = &cli.BoolFlag{
+	DefaultNodeName = fmt.Sprintf("local-node-%s", time.Now())
+	CLGrpcEndpoint  = fmt.Sprintf("127.0.0.1:%d", DefaultCLGRPCPort)
+	ForceClearDB    = &cli.BoolFlag{
 		Name:  "force-clear-db",
 		Usage: "Clear any previously stored data at the data directory",
 	}
@@ -112,7 +112,7 @@ var (
 		&cli.StringFlag{
 			Name:  ELBootnodesFlag,
 			Usage: "Default value should be ok for test network. Otherwise provide Comma separated enode urls, see at https://geth.ethereum.org/docs/getting-started/private-net.",
-			Value: "enode://267c4525064472ccbe34602698d6bae9d90460391ba8d5170c76cd029e3707a823ac5323d8b03a6753649f8f3977656ca9b2ea367a12800f1c58d98b3fd1f857@34.141.166.62:30303,enode://1f92cd45d8577cdc58e6a4f3cc79be3a2277342a372d18d40c499186e83d9bf826dc801c671e27bb9feb6ad3c9e8ab78960237e89df1bd50028939c7a6127e4a@10.0.2.31:44740,enode://ca4f047d5ed08a3a16de52ac88e628b8dbd027e5ddb2f050cd5a64ac6ba3c2d6cb16a34a5d67c278982ef411e6ec59c50935273907ec6e7161ef7ca6159300fd@34.141.234.255:30303,enode://925ee0afa854d3a17fac408baeff94ea18f6001a8950ab33e464d65a9ce876233e2fed16263ae1cb1561eeeb52d533fdecd82d60ba5db30c991b3ec43cc83c74@34.91.134.173:30303,enode://5e0a071f4e09acc4f47361d4bb50dfaf86ddf8880e4c2418ee4b34217efc558d523454ae5f6d849819f0c10f09c8e60b670b67995784d41d1eb396b9489b0870@34.90.11.109:30303",
+			Value: "enode://267c4525064472ccbe34602698d6bae9d90460391ba8d5170c76cd029e3707a823ac5323d8b03a6753649f8f3977656ca9b2ea367a12800f1c58d98b3fd1f857@34.141.166.62:30303,enode://1f92cd45d8577cdc58e6a4f3cc79be3a2277342a372d18d40c499186e83d9bf826dc801c671e27bb9feb6ad3c9e8ab78960237e89df1bd50028939c7a6127e4a@10.0.2.31:44740,enode://5e0a071f4e09acc4f47361d4bb50dfaf86ddf8880e4c2418ee4b34217efc558d523454ae5f6d849819f0c10f09c8e60b670b67995784d41d1eb396b9489b0870@34.90.11.109:30303,enode://925ee0afa854d3a17fac408baeff94ea18f6001a8950ab33e464d65a9ce876233e2fed16263ae1cb1561eeeb52d533fdecd82d60ba5db30c991b3ec43cc83c74@34.91.134.173:30303,enode://ca4f047d5ed08a3a16de52ac88e628b8dbd027e5ddb2f050cd5a64ac6ba3c2d6cb16a34a5d67c278982ef411e6ec59c50935273907ec6e7161ef7ca6159300fd@34.141.234.255:30303",
 		},
 		&cli.StringFlag{
 			Name:  ELNetworkIDFlag,
@@ -373,15 +373,15 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 	))
 	CLArguments = append(CLArguments, fmt.Sprintf(
 		"--bootstrap-node=%s",
-		"enr:-MK4QCHz26GgDR58dn-JvCq-4EvxoC_wGlXrZTaASr17nioaVmvB_B31cZbZxgM5d4h3gYqHS9rpuFVLptQFqR1MV7qGAX6WHalBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__________gmlkgnY0gmlwhCJajJCJc2VjcDI1NmsxoQOloxJG29I8UZ1HTATcMdBI-8dgmbvpb9LiyetaJhi7IYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
+		"enr:-MK4QDs0N4zvh6zIw_OFyVEZgMrV7eOFiNUDM6GQl-8HcudaMvd6sNbW_XdLhgtMDmk8G-z7DanwGR0EbyoBC5Z6NTKGAX6bjzRCh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC4LMihYQAAcAEAAAAAAAAAgmlkgnY0gmlwhCJajJCJc2VjcDI1NmsxoQOloxJG29I8UZ1HTATcMdBI-8dgmbvpb9LiyetaJhi7IYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
 	))
 	CLArguments = append(CLArguments, fmt.Sprintf(
 		"--bootstrap-node=%s",
-		"enr:-MK4QBCEHkSo9zkJnNdrUzvFTnKA7ABcHzy5MuMWxoZlcGwra8TDzw_ICFYoFRiRFTfBF6QS4CUtKGo_DkKPhfehB7uGAX6WHQ9ph2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__________gmlkgnY0gmlwhCJbhq2Jc2VjcDI1NmsxoQKSXuCvqFTToX-sQIuu_5TqGPYAGolQqzPkZNZanOh2I4hzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
+		"enr:-MK4QHgZWEZsMnhC7e6ij9PyUrZMnkdSLikJvTqJUJmGEErRM4PML2oKwpbcsB4BPxwLuy7qWiu8RpwYZGS_KxqwwwOGAX6bj8Jmh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC4LMihYQAAcAEAAAAAAAAAgmlkgnY0gmlwhCJbhq2Jc2VjcDI1NmsxoQKSXuCvqFTToX-sQIuu_5TqGPYAGolQqzPkZNZanOh2I4hzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
 	))
 	CLArguments = append(CLArguments, fmt.Sprintf(
 		"--bootstrap-node=%s",
-		"enr:-MK4QHQg2CScpVdexpREtdsBbPhiN7TsTR3_RdUR7-9H4e_6J5EFXre19_YJFfeC7EQ0hFNMvEilS4twbbn_bDlyuxKGAX6WHWrLh2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__________gmlkgnY0gmlwhCJaC22Jc2VjcDI1NmsxoQJeCgcfTgmsxPRzYdS7UN-vht34iA5MJBjuSzQhfvxVjYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
+		"enr:-MK4QMPby9ViWwqoEkaEooY6LR9wrGAE62NV4wSTfoH40uLCHvtBl8jE8epWOMHODIbs3LEcYhnxHQomH2OYl7KoN6eGAX6bjxqoh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC4LMihYQAAcAEAAAAAAAAAgmlkgnY0gmlwhCJaC22Jc2VjcDI1NmsxoQJeCgcfTgmsxPRzYdS7UN-vht34iA5MJBjuSzQhfvxVjYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
 	))
 
 	if "" != ctx.String(CLPeerFlag) {
@@ -505,7 +505,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 func prepareCLStatsClientFlags(ctx *cli.Context) (clStatsClientArguments []string) {
 	clStatsClientArguments = append(clStatsClientArguments, "run")
 	clStatsClientArguments = append(clStatsClientArguments, "--beacon.type=prysm")
-	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.node-name=test-node")
+	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.node-name=matt-test-node")
 	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.addr=34.147.116.58:9090")
 	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.tls=false")
 	clStatsClientArguments = append(clStatsClientArguments, "--beacon.metrics-addr=http://127.0.0.1:8080/metrics")
@@ -522,13 +522,9 @@ func prepareELFlags(ctx *cli.Context) (ELArguments []string) {
 	ELArguments = append(ELArguments, "--ethash.cachedir")
 	ELArguments = append(ELArguments, ctx.String(ELDatadirFlag))
 
-	rand.Seed(time.Now().Unix())
-	randomBytes := make([]byte, 20)
-	rand.Read(randomBytes)
-
 	ethstatsArguments := []string{
 		"--ethstats",
-		fmt.Sprintf("%x:@dev.stats.pandora.l15.lukso.network", randomBytes),
+		fmt.Sprintf("%s:@dev.stats.pandora.l15.lukso.network", DefaultNodeName),
 	}
 
 	ELArguments = append(ELArguments, ethstatsArguments...)

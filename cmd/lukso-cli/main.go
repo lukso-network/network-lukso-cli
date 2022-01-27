@@ -19,7 +19,7 @@ import (
 // We are also very open to any improvements. Please make some issue or hackmd proposal to make it better.
 
 const (
-	cliVersion = "v1.0.0"
+	cliVersion = "v1.0.1"
 
 	ubuntu  = "linux"
 	macos   = "darwin"
@@ -32,8 +32,8 @@ const (
 
 	DefaultCLGRPCPort        = 4098
 	DefaultCLGRPCGatewayPort = 3598
-	DefaultCLP2PTCPPort      = 13098
-	DefaultCLP2PUDPPort      = 13098
+	DefaultCLP2PTCPPort      = 13000
+	DefaultCLP2PUDPPort      = 12000
 
 	PidFilename     = "pid"
 	ArchNodeCmdName = "arch"
