@@ -6,6 +6,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -46,7 +47,7 @@ const (
 	CLTagFlag                     = "cl-tag"
 	CLGenesisStateFlag            = "cl-genesis-state"
 	CLDatadirFlag                 = "cl-datadir"
-	CLBootnodesFlag               = "cl-bootnode"
+	CLBootnodesFlag               = "cl-bootnodes"
 	CLPeerFlag                    = "cl-peer"
 	CLOutputFlag                  = "cl-output"
 	CLWeb3ProviderFlag            = "cl-web3provider"
@@ -243,8 +244,8 @@ var (
 		},
 		&cli.StringFlag{
 			Name:  CLBootnodesFlag,
-			Usage: `provide coma separated bootnode enr, default: "enr:-Ku4QANldTRLCRUrY9K4OAmk_ATOAyS_sxdTAaGeSh54AuDJXxOYij1fbgh4KOjD4tb2g3T-oJmMjuJyzonLYW9OmRQBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD1pf1CAAAAAP__________gmlkgnY0gmlwhAoABweJc2VjcDI1NmsxoQKWfbT1atCho149MGMvpgBWUymiOv9QyXYhgYEBZvPBW4N1ZHCCD6A"`,
-			Value: "enr:-Iq4QKuNB_wHmWon7hv5HntHiSsyE1a6cUTK1aT7xDSU_hNTLW3R4mowUboCsqYoh1kN9v3ZoSu_WuvW9Aw0tQ0Dxv6GAXxQ7Nv5gmlkgnY0gmlwhLKAlv6Jc2VjcDI1NmsxoQK6S-Cii_KmfFdUJL2TANL3ksaKUnNXvTCv1tLwXs0QgIN1ZHCCIyk",
+			Usage: `provide coma separated bootnode enr, default: "enr:-Ku4QANldTRLCRUrY9..."`,
+			Value: "enr:-MK4QGgKma0ZlRoYY-Mdfp6OF9q0JT5M5fjcQeh4VahN4rLOTTQO8V1iOzor7jApikcHHFmaV6yGSal4si4YxKHoXkmGAX6b9mBGh2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__________gmlkgnY0gmlwhCJajJCJc2VjcDI1NmsxoQOloxJG29I8UZ1HTATcMdBI-8dgmbvpb9LiyetaJhi7IYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A,enr:-MK4QOFXnJLeMJXH_NkVNZB2Sbq4bEVhpFuDvpGSO5YpCC1kMWCAXeREeCdUy3_Bob_JDPjML9PySkhxhM8p6W6yLt6GAX6b9mIth2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__________gmlkgnY0gmlwhCJbhq2Jc2VjcDI1NmsxoQKSXuCvqFTToX-sQIuu_5TqGPYAGolQqzPkZNZanOh2I4hzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A,enr:-MK4QLeQsiv_gUv3WGnS1QyM-YKkH7-sGKP1k0cfhF3_74q4c6U60kBFCLr93hTnQ7QmgNWBypY3rqlCK9Qkrq9AVniGAX6b9mPWh2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__________gmlkgnY0gmlwhCJaC22Jc2VjcDI1NmsxoQJeCgcfTgmsxPRzYdS7UN-vht34iA5MJBjuSzQhfvxVjYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
 		},
 		&cli.StringFlag{
 			Name:  CLPeerFlag,
@@ -371,18 +372,16 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 		"--chain-config-file=%s",
 		ctx.String(CLChainConfigFlag),
 	))
-	CLArguments = append(CLArguments, fmt.Sprintf(
-		"--bootstrap-node=%s",
-		"enr:-MK4QDs0N4zvh6zIw_OFyVEZgMrV7eOFiNUDM6GQl-8HcudaMvd6sNbW_XdLhgtMDmk8G-z7DanwGR0EbyoBC5Z6NTKGAX6bjzRCh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC4LMihYQAAcAEAAAAAAAAAgmlkgnY0gmlwhCJajJCJc2VjcDI1NmsxoQOloxJG29I8UZ1HTATcMdBI-8dgmbvpb9LiyetaJhi7IYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
-	))
-	CLArguments = append(CLArguments, fmt.Sprintf(
-		"--bootstrap-node=%s",
-		"enr:-MK4QHgZWEZsMnhC7e6ij9PyUrZMnkdSLikJvTqJUJmGEErRM4PML2oKwpbcsB4BPxwLuy7qWiu8RpwYZGS_KxqwwwOGAX6bj8Jmh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC4LMihYQAAcAEAAAAAAAAAgmlkgnY0gmlwhCJbhq2Jc2VjcDI1NmsxoQKSXuCvqFTToX-sQIuu_5TqGPYAGolQqzPkZNZanOh2I4hzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
-	))
-	CLArguments = append(CLArguments, fmt.Sprintf(
-		"--bootstrap-node=%s",
-		"enr:-MK4QMPby9ViWwqoEkaEooY6LR9wrGAE62NV4wSTfoH40uLCHvtBl8jE8epWOMHODIbs3LEcYhnxHQomH2OYl7KoN6eGAX6bjxqoh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC4LMihYQAAcAEAAAAAAAAAgmlkgnY0gmlwhCJaC22Jc2VjcDI1NmsxoQJeCgcfTgmsxPRzYdS7UN-vht34iA5MJBjuSzQhfvxVjYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
-	))
+
+	if len(ctx.String(CLBootnodesFlag)) > 1 {
+		bootstrapNodes := strings.Split(ctx.String(CLBootnodesFlag), ",")
+		for _, enr := range bootstrapNodes {
+			CLArguments = append(CLArguments, fmt.Sprintf(
+				"--bootstrap-node=%s",
+				enr,
+			))
+		}
+	}
 
 	if "" != ctx.String(CLPeerFlag) {
 		CLArguments = append(CLArguments, fmt.Sprintf(
