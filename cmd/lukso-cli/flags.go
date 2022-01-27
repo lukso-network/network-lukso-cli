@@ -73,7 +73,7 @@ const (
 )
 
 var (
-	DefaultNodeName = fmt.Sprintf("local-node-%s", time.Now())
+	DefaultNodeName = fmt.Sprintf("local-node-%d", time.Now().Unix())
 	CLGrpcEndpoint  = fmt.Sprintf("127.0.0.1:%d", DefaultCLGRPCPort)
 	ForceClearDB    = &cli.BoolFlag{
 		Name:  "force-clear-db",
@@ -221,7 +221,7 @@ var (
 		&cli.StringFlag{
 			Name:  validatorLogFileFlag,
 			Usage: "provide output destination of CL",
-			Value: "./logs/CL-Validator.log",
+			Value: "./CL-Validator.log",
 		},
 	}
 	CLFlags = []cli.Flag{
@@ -319,7 +319,7 @@ var (
 		&cli.StringFlag{
 			Name:  CLLogFileFlag,
 			Usage: "provide output destination of CL",
-			Value: "./logs/CL.log",
+			Value: "./CL.log",
 		},
 		&cli.BoolFlag{
 			Name:  CLOutputFlag,
@@ -426,7 +426,7 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 
 	CLArguments = append(CLArguments, fmt.Sprintf(
 		"--log-file=%s",
-		fmt.Sprintf("%s%s", ctx.String(CLLogFileFlag), time.Now().Format(time.RFC3339)),
+		fmt.Sprintf("%s%d", ctx.String(CLLogFileFlag), time.Now().Unix()),
 	))
 
 	CLArguments = append(CLArguments, fmt.Sprintf(
@@ -478,7 +478,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--log-file=%s",
-		fmt.Sprintf("%s%s", ctx.String(validatorLogFileFlag), time.Now().Format(time.RFC3339)),
+		fmt.Sprintf("%s%d", ctx.String(validatorLogFileFlag), time.Now().Unix()),
 	))
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--wallet-password-file=%s",
@@ -505,7 +505,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 func prepareCLStatsClientFlags(ctx *cli.Context) (clStatsClientArguments []string) {
 	clStatsClientArguments = append(clStatsClientArguments, "run")
 	clStatsClientArguments = append(clStatsClientArguments, "--beacon.type=prysm")
-	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.node-name=matt-test-node")
+	clStatsClientArguments = append(clStatsClientArguments, fmt.Sprintf("--eth2stats.node-name=%s", DefaultNodeName))
 	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.addr=34.147.116.58:9090")
 	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.tls=false")
 	clStatsClientArguments = append(clStatsClientArguments, "--beacon.metrics-addr=http://127.0.0.1:8080/metrics")
