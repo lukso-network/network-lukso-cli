@@ -12,6 +12,8 @@ import (
 
 // Execution layer related flag names
 const (
+	nodeNameFlag = "node-name"
+
 	ELTagFlag        = "el-tag"
 	ELDatadirFlag    = "el-datadir"
 	ELEthstatsFlag   = "el-ethstats"
@@ -70,7 +72,8 @@ const (
 	clStatsClientDatadirFlag = "cl-stats-datadir"
 	clStatsOutputFlag        = "cl-stats-output"
 
-	DefaultELRPCEndpoint = "http://127.0.0.1:8598"
+	DefaultELRPCEndpoint        = "http://127.0.0.1:8598"
+	DefaultLogFilenameSeparator = "_"
 )
 
 var (
@@ -85,9 +88,15 @@ var (
 		Name:  "log-file",
 		Usage: "Specify log file name, relative or absolute",
 	}
+	NodeNameFlag = &cli.StringFlag{
+		Name:  nodeNameFlag,
+		Usage: "Specify your node name, this is how you recognize your node on the network stats pages",
+		Value: DefaultNodeName,
+	}
 	appFlags = []cli.Flag{
 		ForceClearDB,
 		LogFileName,
+		NodeNameFlag,
 	}
 	ELFlags = []cli.Flag{
 		&cli.StringFlag{
@@ -425,7 +434,7 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 
 	CLArguments = append(CLArguments, fmt.Sprintf(
 		"--log-file=%s",
-		fmt.Sprintf("%s%d", ctx.String(CLLogFileFlag), time.Now().Unix()),
+		fmt.Sprintf("%s%s%d", ctx.String(CLLogFileFlag), DefaultLogFilenameSeparator, time.Now().Unix()),
 	))
 
 	CLArguments = append(CLArguments, fmt.Sprintf(
@@ -477,7 +486,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--log-file=%s",
-		fmt.Sprintf("%s%d", ctx.String(validatorLogFileFlag), time.Now().Unix()),
+		fmt.Sprintf("%s%s%d", ctx.String(validatorLogFileFlag), DefaultLogFilenameSeparator, time.Now().Unix()),
 	))
 	validatorArguments = append(validatorArguments, fmt.Sprintf(
 		"--wallet-password-file=%s",
@@ -504,7 +513,7 @@ func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 func prepareCLStatsClientFlags(ctx *cli.Context) (clStatsClientArguments []string) {
 	clStatsClientArguments = append(clStatsClientArguments, "run")
 	clStatsClientArguments = append(clStatsClientArguments, "--beacon.type=prysm")
-	clStatsClientArguments = append(clStatsClientArguments, fmt.Sprintf("--eth2stats.node-name=%s", DefaultNodeName))
+	clStatsClientArguments = append(clStatsClientArguments, fmt.Sprintf("--eth2stats.node-name=%s", ctx.String(nodeNameFlag)))
 	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.addr=34.147.116.58:9090")
 	clStatsClientArguments = append(clStatsClientArguments, "--eth2stats.tls=false")
 	clStatsClientArguments = append(clStatsClientArguments, "--beacon.metrics-addr=http://127.0.0.1:8080/metrics")
@@ -523,7 +532,7 @@ func prepareELFlags(ctx *cli.Context) (ELArguments []string) {
 
 	ethstatsArguments := []string{
 		"--ethstats",
-		fmt.Sprintf("%s:@dev.stats.pandora.l15.lukso.network", DefaultNodeName),
+		fmt.Sprintf("%s:@dev.stats.pandora.l15.lukso.network", ctx.String(nodeNameFlag)),
 	}
 
 	ELArguments = append(ELArguments, ethstatsArguments...)

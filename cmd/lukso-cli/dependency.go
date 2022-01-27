@@ -21,6 +21,7 @@ const (
 	CLGenesisDependencyName     = "genesis.ssz"
 	CLConfigDependencyName      = "config.yml"
 	CLStatsClientDependencyName = "eth2stats-client"
+	FirstConfigsVersion         = 6
 )
 
 var (
@@ -30,7 +31,7 @@ var (
 			name:    ELDependencyName,
 		},
 		ELGenesisDependencyName: {
-			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/dev/4/genesis.json",
+			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/dev/%d/genesis.json",
 			name:    ELGenesisDependencyName,
 		},
 		CLDependencyName: {
@@ -42,11 +43,11 @@ var (
 			name:    validatorDependencyName,
 		},
 		CLGenesisDependencyName: {
-			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/dev/4/genesis.ssz",
+			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/dev/%d/genesis.ssz",
 			name:    CLGenesisDependencyName,
 		},
 		CLConfigDependencyName: {
-			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/dev/4/config.yaml",
+			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/dev/%d/config.yaml",
 			name:    CLConfigDependencyName,
 		},
 		CLStatsClientDependencyName: {
@@ -62,11 +63,39 @@ type ClientDependency struct {
 }
 
 func (dependency *ClientDependency) ParseUrl(tagName string) (url string) {
-	sprintOccurrences := strings.Count(dependency.baseUrl, "%s")
-
 	url = dependency.baseUrl
-	if sprintOccurrences > 0 {
+
+	// For go binaries
+	stringOccurrences := strings.Count(dependency.baseUrl, "%s")
+	if stringOccurrences > 0 {
 		url = fmt.Sprintf(dependency.baseUrl, tagName, tagName, systemOs, systemArch)
+	}
+
+	// For configs
+	stringOccurrences = strings.Count(dependency.baseUrl, "%d")
+	if stringOccurrences > 0 {
+		configsVersion := FirstConfigsVersion
+		highestVersion := configsVersion
+		for {
+			url = fmt.Sprintf(dependency.baseUrl, highestVersion)
+
+			response, err := http.Get(url)
+			if nil != err {
+				return
+			}
+
+			if response.StatusCode == 404 {
+				url = fmt.Sprintf(dependency.baseUrl, highestVersion-1)
+
+				response.Body.Close()
+
+				break
+			}
+
+			highestVersion++
+
+			response.Body.Close()
+		}
 	}
 
 	return
