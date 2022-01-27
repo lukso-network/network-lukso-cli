@@ -169,44 +169,44 @@ func downloadAndRunBinaries(ctx *cli.Context) (err error) {
 	if nil != err {
 		return
 	}
-	//
-	//err = downloadCL(ctx)
-	//if nil != err {
-	//	return
-	//}
-	//
-	//err = downloadCLStatsClient(ctx)
-	//if nil != err {
-	//	return
-	//}
-	//
-	//err = startEL(ctx)
-	//if nil != err {
-	//	return
-	//}
-	//
-	//time.Sleep(time.Second * 5)
-	//
-	//err = startCL(ctx)
-	//if nil != err {
-	//	return
-	//}
-	//
-	//time.Sleep(time.Second * 5)
-	//
-	//if !archiveNode {
-	//	err = downloadValidator(ctx)
-	//	if nil != err {
-	//		return
-	//	}
-	//
-	//	err = startValidator(ctx)
-	//	if err != nil {
-	//		return
-	//	}
-	//}
-	//
-	//err = startCLStatsClient(ctx)
+
+	err = downloadCL(ctx)
+	if nil != err {
+		return
+	}
+
+	err = downloadCLStatsClient(ctx)
+	if nil != err {
+		return
+	}
+
+	err = startEL(ctx)
+	if nil != err {
+		return
+	}
+
+	time.Sleep(time.Second * 5)
+
+	err = startCL(ctx)
+	if nil != err {
+		return
+	}
+
+	time.Sleep(time.Second * 5)
+
+	if !archiveNode {
+		err = downloadValidator(ctx)
+		if nil != err {
+			return
+		}
+
+		err = startValidator(ctx)
+		if err != nil {
+			return
+		}
+	}
+
+	err = startCLStatsClient(ctx)
 
 	return
 }
