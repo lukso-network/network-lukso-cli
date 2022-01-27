@@ -1209,7 +1209,7 @@ while getopts "$optspec" optchar; do
     network-version)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      eval OVERRIDE_NETWORK_VERSION=$val
+      NETWORK_VERSION=$val
       ;;
 
     l15-prod)
@@ -1585,11 +1585,6 @@ fi
 if [[ -n $OVERRIDE_PANDORA_VERBOSITY ]]; then
   PANDORA_VERBOSITY=$OVERRIDE_PANDORA_VERBOSITY
 fi
-
-if [[ -n $OVERRIDE_NETWORK_VERSION ]]; then
-  NETWORK_VERSION=$OVERRIDE_NETWORK_VERSION
-fi
-
 
 if [[ -n $OVERRIDE_VANGUARD_BOOTNODES ]]; then
   VANGUARD_BOOTNODES=$OVERRIDE_VANGUARD_BOOTNODES
