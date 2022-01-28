@@ -74,12 +74,12 @@ After that, you can use `--config /path/to/config.yaml` insted of other flags:
 
 | command   | description            | argument |
 |-----------|------------------------|----------------------|
-| start     | Starts up all or specific client(s) | [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status, **all**] |
-| stop      | Stops all or specific client(s)     | [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status, **all**] |
-| reset     | Clears client(s) datadirs (this also removes chain-data) | [orchestrator, pandora, vanguard, validator, all, **none**]
+| start     | Starts up all or specific client(s) | [geth, beacon, validator, eth2stats-client, **all**] |
+| stop      | Stops all or specific client(s)     | [geth, beacon, validator, eth2stats-client, **all**] |
+| reset     | Clears client(s) datadirs (this also removes chain-data) | [geth, beacon, validator, all, **none**]
 | config    | Interactive tool for creating config file | |
-| keygen    | Runs `lukso-deposit-cli` | |
-| wallet    | Imports `lukso-deposit-cli` keys into `lukso-validator` wallet| |
+| keygen    | Runs `network-validator-tools` to generate keystore and wallet | |
+| gen-deposit-data    | Uses `network-validator-tools` to `deposit-keys.json`| |
 | logs      | Show logs | [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status] |
 | bind-binaries      | sets client(s) to desired version | 
 | version      | Shows the LUKSO script version | 
@@ -89,10 +89,10 @@ After that, you can use `--config /path/to/config.yaml` insted of other flags:
 
 | name      | description            | Argument  |
 |-----------|------------------------|---|
-| --network | Picks which setup to use | Name of network from list: `mainnet, l15-prod, l15-staging, l15-dev`
-| --l15-prod | Shorthand alias for `--network l15-prod` | <none\>
-| --l15-staging | Shorthand alias for `--network l15-staging` | <none\>
-| --l15-dev | Shorthand alias for `--network l15-dev` | <none\>
+| --network | Picks which setup to use | Name of network from list: `mainnet, l16-prod, l16-staging, l16-dev`
+| --l16-prod | Shorthand alias for `--network l16-prod` | <none\>
+| --l16-staging | Shorthand alias for `--network l16-staging` | <none\>
+| --l16-dev | Shorthand alias for `--network l16-dev` | <none\>
 | --config | Path to config file     | Path ex. `config.yaml` |
 | --validate | Starts validator      | <none\>
 | --coinbase | Sets pandora coinbase. This is public address for block mining rewards (default = first account created) (default: "0") | ETH1 addres ex. `0x144a9533B3d759d647597762d33a1cD6f9Bf118c`
@@ -100,23 +100,23 @@ After that, you can use `--config /path/to/config.yaml` insted of other flags:
 | --logsdir  | Sets the logs path | String ex. `/mnt/external/lukso-logs` 
 | --datadir  | Sets datadir path | String ex. `/mnt/external/lukso-datadir`
 | --home  | Sets path for datadir and logs in a single location (--datadir and --logs take priority) | String ex. `/var/lukso` 
-| --orchestrator-verbosity  | Sets orchestrator logging depth | String ex. `silent, error, warn, info, debug, trace` 
-| --pandora-verbosity  | Sets pandora logging depth (note: pandora uses integers for that flag, script will convert those to proper values) | String ex. `silent, error, warn, info, debug, trace` 
-| --pandora-bootnodes  | Sets pandora bootnodes | Strings of bootnodes separated by commas: `enode://72caa...,enode://b4a11a...`
-| --pandora-http-port  | Sets pandora RPC (over http) port | Number between 1023-65535
-| --pandora-metrics  | Enables pandora metrics server | <none\>
-| --pandora-nodekey  | P2P node key file | Path to file (relative or absolute)
-| --pandora-rpcvhosts  | Sets pandora rpc virtual hosts (use quotes if you want to set \* `'*'` otherwise shell will resolve it) | Comma-separated list of virtual hosts Ex. `localhost` or `*`
-| --pandora-external-ip  | Sets external IP for pandora (overrides --external-ip if present) | String ex. `72.122.32.234`
-| --pandora-universal-profile-expose  | Exposes "net,eth,txpool,web3" API's on Pandora RPC | <none\>
-| --pandora-unsafe-expose  | Exposes ALL API's ("admin,net,eth,debug,miner,personal,txpool,web3") API's on Pandora RPC | <none\>
-| --vanguard-verbosity  | Sets vanguard logging depth | String ex. `silent, error, warn, info, debug, trace`
-| --vanguard-bootnodes  | Sets vanguard bootnodes | Strings of bootnodes separated by commas: `enr:-Ku4QAmY...,enr:-M23QLmY...`
-| --vanguard-p2p-priv-key  | The file containing the private key to use in communications with other peers. | Path to file (relative or absolute)
-| --vanguard-external-ip  | Sets external IP for vanguard (overrides --external-ip if present) | IP ex. `72.122.32.234`
-| --vanguard-p2p-host-dns  | Sets host DNS vanguard (overrides --external-ip AND --vanguard-external-ip if present) | DNS name ex. `l15-nodes-1.nodes.l15.lukso.network`
-| --vanguard-rpc-host  | Sets vanguard RPC listening interface | IP ex. `127.0.0.1`
-| --vanguard-monitoring-host  | Sets vanguard monitoring listening interface | IP ex. `127.0.0.1`
+| --network-version  | Picup the network version for which configs will be downloaded 
+| --geth-verbosity  | Sets pandora logging depth (note: geth uses integers for that flag, script will convert those to proper values) | String ex. `silent, error, warn, info, debug, trace` 
+| --geth-bootnodes  | Sets geth bootnodes | Strings of bootnodes separated by commas: `enode://72caa...,enode://b4a11a...`
+| --geth-http-port  | Sets geth RPC (over http) port | Number between 1023-65535
+| --geth-metrics  | Enables geth metrics server | <none\>
+| --geth-nodekey  | P2P node key file | Path to file (relative or absolute)
+| --geth-rpcvhosts  | Sets geth rpc virtual hosts (use quotes if you want to set \* `'*'` otherwise shell will resolve it) | Comma-separated list of virtual hosts Ex. `localhost` or `*`
+| --geth-external-ip  | Sets external IP for geth (overrides --external-ip if present) | String ex. `72.122.32.234`
+| --geth-universal-profile-expose  | Exposes "net,eth,txpool,web3" API's on geth RPC | <none\>
+| --geth-unsafe-expose  | Exposes ALL API's ("admin,net,eth,debug,miner,personal,txpool,web3") API's on geth RPC | <none\>
+| --beacon-verbosity  | Sets beacon-client logging depth | String ex. `silent, error, warn, info, debug, trace`
+| --beacon-bootnodes  | Sets beacon-client bootnodes | Strings of bootnodes separated by commas: `enr:-Ku4QAmY...,enr:-M23QLmY...`
+| --beacon-p2p-priv-key  | The file containing the private key to use in communications with other peers. | Path to file (relative or absolute)
+| --beacon-external-ip  | Sets external IP for beacon-client (overrides --external-ip if present) | IP ex. `72.122.32.234`
+| --beacon-p2p-host-dns  | Sets host DNS beacon-client (overrides --external-ip AND --beacon-external-ip if present) | DNS name ex. `l16-nodes-1.nodes.l16.lukso.network`
+| --beacon-rpc-host  | Sets beacon-client RPC listening interface | IP ex. `127.0.0.1`
+| --beacon-monitoring-host  | Sets beacon-client monitoring listening interface | IP ex. `127.0.0.1`
 | --validator-verbosity  | Sets validator logging depth | String ex. `silent, error, warn, info, debug, trace`
 | --wallet-dir  | Sets directory of `lukso-validator` wallet  | Path to directory, relative or absolute
 | --wallet-password-file  | Sets location of password file for validator (without it, it will always prompt for password)  | Path to a file, relative or absolute
@@ -125,32 +125,25 @@ After that, you can use `--config /path/to/config.yaml` insted of other flags:
 | --allow-respin  | Deletes all datadirs IF network config changed (based on genesis time) | <none\>
 | --vanguard-http-web3provider  | An eth1 web3 provider string http endpoint or IPC socket path. (default: http://127.0.0.1:8545) | URL address, e.g. `http://127.0.0.1:8545`
 | --vanguard-rpc-host  | Host on which the RPC server should listen. (default: 127.0.0.1) | IPv4 address, e.g. `127.0.0.1`
-| --van-rpc-port  | Port on which the RPC server should listen. (default: 4000) | Port, e.g. `4000`
-| --van-udp-port  | Vanguard beacon chain client UDP port. The port used by discv5. (default: 12000) | Port number, e.g. `12000`
-| --van-tcp-port   | Vanguard beacon chain client TCP port. The port used by libp2p. (default: 13000) | Port number, e.g. `13000`
-| --van-grpc-gateway-port   | Vanguard gRPC gateway port. The port on which the gateway server runs on (default: 3500) | Gateway port, e.g. `3500`
-| --vanguard-orc-rpc-provider   | A orchestrator rpc endpoint. This is our orchestrator client http endpoint or socket path. (default: http://127.0.0.1:7877) | URL or IPC socket path, e.g. `http://127.0.0.1:7877`
+| --beacon-rpc-port  | Port on which the RPC server should listen. (default: 4000) | Port, e.g. `4000`
+| --beacon-udp-port  | beacon chain client UDP port. The port used by discv5. (default: 12000) | Port number, e.g. `12000`
+| --beacon-tcp-port  | beacon chain client TCP port. The port used by libp2p. (default: 13000) | Port number, e.g. `13000`
+| --beacon-grpc-gateway-port   | Vanguard gRPC gateway port. The port on which the gateway server runs on (default: 3500) | Gateway port, e.g. `3500`
 | --validator-beacon-rpc-provider | Beacon node (vanguard) RPC provider endpoint. (default is: 127.0.0.1:4000) | IPv4 with port, e.g. `127.0.0.1:4000`
-| --validator-pandora-http-provider | A pandora rpc endpoint. This is our pandora client http endpoint. (default is: http://127.0.0.1:8545) | URL or IPC socket path, e.g. `http://127.0.0.1:8545`
-| --orchestrator-vanguard-rpc-endpoint | Enables Vanguard node RPC provider endpoint. (default is: 127.0.0.1:4000) | IPv4 with port, e.g. `127.0.0.1:4000`
-| --orchestrator-pandora-rpc-endpoint | Pandora node RP provider endpoint. (default: ws://127.0.0.1:8546) | Websocket address with port, e.g. `ws://127.0.0.1:8546`
+| --validator-geth-http-provider | A geth rpc endpoint. This is our geth client http endpoint. (default is: http://127.0.0.1:8545) | URL or IPC socket path, e.g. `http://127.0.0.1:8545`
 | --eth2stats-beacon-addr | Beacon node endpoint address for eth2stats-client. (default: 127.0.0.1:4000) | IPv4 with port, e.g. `127.0.0.1:4000`
-| --orc-http-port | Orchestrator HTTP port exposed. Default is: 7877 | Port number, e.g. `7877`
-| --orc-http-addr | Orchestrator HTTP address exposed. Default is: 127.0.0.1 | IPv4 address, e.g. `127.0.0.1`
-| --orc-ws-port | Orchestrator websocket port exposed. Default is: 7878 | Port number, e.g. `7878`
-| --orc-ws-addr | Orchestrator websocket address exposed. Default is: 127.0.0.1 | IPv4 address, e.g. `127.0.0.1`
-| --pan-port | Pandora client TCP/UDP port exposed. Default is: 30405 | Port number, e.g. `30405`
-| --pan-http-addr | Pandora client http address exposed. Default is: 127.0.0.1 | IPv4 address, e.g. `127.0.0.1`
-| --pan-http-port | Pandora client http port exposed. Default is: 8545 | Port number, e.g. `8545`
-| --pan-ws-addr  | Pandora client websocket address exposed. Default is: 127.0.0.1 | IPv4 address, e.g. `127.0.0.1`
-| --pan-ws-port | Pandora client websocket port exposed. Default is: 8546 | Port number, e.g. `8546`
-| --pan-http-miner-addr | Pandora HTTP URL to notify of new work packages. Default is: http://127.0.0.1:7877 | HTTP address, e.g. `http://127.0.0.1:7877`
-| --pan-ws-miner-addr | Pandora Websocket URL to notify of new work packages. Default is: ws://127.0.0.1:7878 | WS address, e.g. `ws://127.0.0.1:7878`
-| --pan-ethstats | Pandora flag to activate ethstats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. (default:  disabled) | Token and address like `token123@stats.example.com`
-| --van-ethstats | Vanguard flag fo activate eth2stats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. (default:  disabled) | Address with port, e.g. `192.168.0.1:9090`
-| --van-min-sync-peers | The required number of valid Vanguard peers to connect with before syncing. (default: 2) | Number of required peers, e.g. `1`
-| --van-max-p2p-peers | The max number of Vanguard p2p peers to maintain. (default: 50) | Peers count, e.g. `70`
-| --van-ethstats-metrics | The metrics address for Vanguard eth2stats-client service (default: http://127.0.0.1:8080/metrics) | HTTP address with port and `metrics` endpoint, e.g. `http://127.0.0.1:8080/metrics`
+| --geth-port | Geth client TCP/UDP port exposed. Default is: 30405 | Port number, e.g. `30405`
+| --geth-http-addr | Geth client http address exposed. Default is: 127.0.0.1 | IPv4 address, e.g. `127.0.0.1`
+| --geth-http-port | Geth client http port exposed. Default is: 8545 | Port number, e.g. `8545`
+| --geth-ws-addr  | Geth client websocket address exposed. Default is: 127.0.0.1 | IPv4 address, e.g. `127.0.0.1`
+| --geth-ws-port | Geth client websocket port exposed. Default is: 8546 | Port number, e.g. `8546`
+| --geth-http-miner-addr | Geth HTTP URL to notify of new work packages. Default is: http://127.0.0.1:7877 | HTTP address, e.g. `http://127.0.0.1:7877`
+| --geth-ws-miner-addr | Geth Websocket URL to notify of new work packages. Default is: ws://127.0.0.1:7878 | WS address, e.g. `ws://127.0.0.1:7878`
+| --geth-ethstats | Geth flag to activate ethstats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. (default:  disabled) | Token and address like `token123@stats.example.com`
+| --beacon-ethstats | Beacon-chain flag fo activate eth2stats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. (default:  disabled) | Address with port, e.g. `192.168.0.1:9090`
+| --beacon-min-sync-peers | The required number of valid beacon-chain peers to connect with before syncing. (default: 2) | Number of required peers, e.g. `1`
+| --beacon-max-p2p-peers | The max number of beacon-chain p2p peers to maintain. (default: 50) | Peers count, e.g. `70`
+| --beacon-ethstats-metrics | The metrics address for beacon-chain eth2stats-client service (default: http://127.0.0.1:8080/metrics) | HTTP address with port and `metrics` endpoint, e.g. `http://127.0.0.1:8080/metrics`
 | --status-page | This flag is for lukso-status activation. With this service you can check your node status over web browser (default: disabled). Default web address is: http://127.0.0.1:8111 | <none\>
 
 How to use flags with values? Provide a flag and value like: `lukso start --datadir /data/network-node`
@@ -160,19 +153,15 @@ How to use flags with values? Provide a flag and value like: `lukso start --data
 |-----------|------------------------|---|
 | --force   | Adds force option to kill commands (may result in corruption of node data)     | <none\> |
 
+### gen-deposit-data
+| name      | description            | Argument  |
+|-----------|------------------------|---|
+| --keys-dir  | Sets directory of `lukso-deposit-cli` keys | Path to directory, relative or absolute
+
 ### keygen
 | name      | description            | Argument  |
 |-----------|------------------------|---|
-| --keys-dir  | Sets directory of `lukso-deposit-cli` keys | Path to directory, relative or absolute
-| --keys-password-file  | Sets directory of `lukso-deposit-cli` keys | Path to directory, relative or absolute
-
-### wallet
-| name      | description            | Argument  |
-|-----------|------------------------|---|
-| --keys-dir  | Sets directory of `lukso-deposit-cli` keys | Path to directory, relative or absolute
-| --keys-password-file  | Sets directory of `lukso-deposit-cli` keys | Path to directory, relative or absolute
 | --wallet-dir  | Sets directory of `lukso-validator` wallet  | Path to directory, relative or absolute
-| --wallet-password-file  | Sets directory of `lukso-validator` wallet  | Path to directory, relative or absolute
 
 
 ### bind-binaries 

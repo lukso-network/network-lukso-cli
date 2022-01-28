@@ -919,15 +919,15 @@ help() {
   echo
   echo "Available flags:"
   echo "--network              Picks config collection to be used (and downloads if it doesn't exist)"
-  echo "                       [l15-prod, l15-staging, l15-dev]"
+  echo "                       [l16-prod, l16-staging, l16-dev]"
   echo
-  echo "--l15-prod             Alias for --network l15-prod"
+  echo "--l16-prod             Alias for --network l16-prod"
   echo
   echo "--network-version      Picup the network version for which configs will be downloaded"
   echo
-  echo "--l15-staging          Alias for --network l15-staging"
+  echo "--l16-staging          Alias for --network l16-staging"
   echo
-  echo "--l15-dev              Alias for --network l15-dev"
+  echo "--l16-dev              Alias for --network l16-dev"
   echo
   echo "--config               Path to config file"
   echo "                       [config.yaml]"
@@ -1212,16 +1212,16 @@ while getopts "$optspec" optchar; do
       NETWORK_VERSION=$val
       ;;
 
-    l15-prod)
-      pick_network l15-prod
+    l16-prod)
+      pick_network l16-prod
       ;;
 
-    l15-staging)
-      pick_network l15-staging
+    l16-staging)
+      pick_network l16-staging
       ;;
 
-    l15-dev)
-      pick_network l15-dev
+    l16-dev)
+      pick_network l16-dev
       ;;
 
     config)
