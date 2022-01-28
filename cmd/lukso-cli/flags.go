@@ -31,6 +31,7 @@ const (
 	ELWsOriginFlag   = "el-ws-origin"
 	ELHttpOriginFlag = "el-http-origin"
 	ELNatFlag        = "el-nat"
+	ELLogFileFlag    = "el-log-file"
 
 	// CLChainConfigFlag Common for CL client(s)
 	CLChainConfigFlag = "cl-chain-config"
@@ -184,6 +185,11 @@ var (
 			Name:  ELNatFlag,
 			Usage: "this flag sets up http nat to assign static ip for geth, default not set. Example `extip:172.16.254.4`",
 			Value: "",
+		},
+		&cli.StringFlag{
+			Name:  ELLogFileFlag,
+			Usage: "provide output destination of EL",
+			Value: "./EL.log",
 		},
 	}
 	validatorFlags = []cli.Flag{

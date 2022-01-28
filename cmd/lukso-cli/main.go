@@ -7,6 +7,7 @@ import (
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 	"google.golang.org/grpc"
 	"os"
+	"os/exec"
 	runtimeDebug "runtime/debug"
 	"sync"
 	"time"
@@ -306,6 +307,7 @@ func startEL(ctx *cli.Context) (err error) {
 		elDataDir,
 		elGenesisArguments,
 		ctx.Bool(ELOutputFlag),
+		nil,
 	)
 	if nil != err {
 		return
@@ -321,6 +323,16 @@ func startEL(ctx *cli.Context) (err error) {
 		elDataDir,
 		ELRuntimeFlags,
 		ctx.Bool(ELOutputFlag),
+		func(cmd *exec.Cmd) error {
+			file, err := os.Create(fmt.Sprintf("%s%s%d", ctx.String(ELLogFileFlag), DefaultLogFilenameSeparator, time.Now().Unix()))
+			if err != nil {
+				return err
+			}
+
+			cmd.Stderr = file
+
+			return nil
+		},
 	)
 	if nil != err {
 		return
@@ -378,6 +390,7 @@ func startCL(ctx *cli.Context) (err error) {
 		CLDataDir,
 		CLRuntimeFlags,
 		ctx.Bool(CLOutputFlag),
+		nil,
 	)
 	if nil != err {
 		return
@@ -426,6 +439,7 @@ func startValidator(ctx *cli.Context) (err error) {
 		validatorDataDir,
 		validatorRuntimeFlags,
 		ctx.Bool(validatorOutputFlag),
+		nil,
 	)
 	if nil != err {
 		return
@@ -458,6 +472,7 @@ func startCLStatsClient(ctx *cli.Context) (err error) {
 		dataDir,
 		CLStatsClientRuntimeFlags,
 		ctx.Bool(clStatsOutputFlag),
+		nil,
 	)
 	if nil != err {
 		return

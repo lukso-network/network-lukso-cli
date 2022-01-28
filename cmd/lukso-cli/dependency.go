@@ -118,6 +118,7 @@ func (dependency *ClientDependency) Run(
 	destination string,
 	arguments []string,
 	attachStdInAndErr bool,
+	loggerFunc func(cmd *exec.Cmd) error,
 ) (pid int, err error) {
 	binaryPath := dependency.ResolveBinaryPath(tagName, destination)
 	command := exec.Command(binaryPath, arguments...)
@@ -125,6 +126,17 @@ func (dependency *ClientDependency) Run(
 	if attachStdInAndErr {
 		command.Stdout = os.Stdout
 		command.Stderr = os.Stderr
+	}
+
+	if nil == loggerFunc {
+		loggerFunc = func(cmd *exec.Cmd) error {
+			return nil
+		}
+	}
+
+	err = loggerFunc(command)
+	if err != nil {
+		return 0, err
 	}
 
 	err = command.Start()
