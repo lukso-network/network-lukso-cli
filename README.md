@@ -60,9 +60,9 @@ Enter `lukso config` in your shell to generate config file.
 Example:
 ~~~yaml
 COINBASE: "0x616e6f6e796d6f75730000000000000000000000"
-WALLET_DIR: "/home/user/.lukso/l15-prod/vanguard-wallet"
-DATADIR: "/home/user/.lukso/l15-prod/datadirs"
-LOGSDIR: "/home/user/.lukso/l15-prod/logs"
+WALLET_DIR: "/home/user/.lukso/l16-prod/beacon-wallet"
+DATADIR: "/home/user/.lukso/l16-prod/datadirs"
+LOGSDIR: "/home/user/.lukso/l16-prod/logs"
 NODE_NAME: "l15-johnsmith123"
 ~~~
 After that, you can use `--config /path/to/config.yaml` insted of other flags:  
@@ -80,7 +80,7 @@ After that, you can use `--config /path/to/config.yaml` insted of other flags:
 | config    | Interactive tool for creating config file | |
 | keygen    | Runs `network-validator-tools` to generate keystore and wallet | |
 | gen-deposit-data    | Uses `network-validator-tools` to `deposit-keys.json`| |
-| logs      | Show logs | [orchestrator, pandora, vanguard, validator, eth2stats-client, lukso-status] |
+| logs      | Show logs | [orchestrator, geth, beacon, validator, eth2stats-client, lukso-status] |
 | bind-binaries      | sets client(s) to desired version | 
 | version      | Shows the LUKSO script version | 
 > In **bold** is a behaviour when argument is skipped (default)
@@ -95,13 +95,13 @@ After that, you can use `--config /path/to/config.yaml` insted of other flags:
 | --l16-dev | Shorthand alias for `--network l16-dev` | <none\>
 | --config | Path to config file     | Path ex. `config.yaml` |
 | --validate | Starts validator      | <none\>
-| --coinbase | Sets pandora coinbase. This is public address for block mining rewards (default = first account created) (default: "0") | ETH1 addres ex. `0x144a9533B3d759d647597762d33a1cD6f9Bf118c`
-| --node-name  | Name of node that's shown on pandora stats and vanguard stats | String ex. `johnsmith123` 
+| --coinbase | Sets geth coinbase. This is public address for block mining rewards (default = first account created) (default: "0") | ETH1 addres ex. `0x144a9533B3d759d647597762d33a1cD6f9Bf118c`
+| --node-name  | Name of node that's shown on geth stats and beacon stats | String ex. `johnsmith123` 
 | --logsdir  | Sets the logs path | String ex. `/mnt/external/lukso-logs` 
 | --datadir  | Sets datadir path | String ex. `/mnt/external/lukso-datadir`
 | --home  | Sets path for datadir and logs in a single location (--datadir and --logs take priority) | String ex. `/var/lukso` 
 | --network-version  | Picup the network version for which configs will be downloaded 
-| --geth-verbosity  | Sets pandora logging depth (note: geth uses integers for that flag, script will convert those to proper values) | String ex. `silent, error, warn, info, debug, trace` 
+| --geth-verbosity  | Sets geth logging depth (note: geth uses integers for that flag, script will convert those to proper values) | String ex. `silent, error, warn, info, debug, trace` 
 | --geth-bootnodes  | Sets geth bootnodes | Strings of bootnodes separated by commas: `enode://72caa...,enode://b4a11a...`
 | --geth-http-port  | Sets geth RPC (over http) port | Number between 1023-65535
 | --geth-metrics  | Enables geth metrics server | <none\>
@@ -121,15 +121,15 @@ After that, you can use `--config /path/to/config.yaml` insted of other flags:
 | --wallet-dir  | Sets directory of `lukso-validator` wallet  | Path to directory, relative or absolute
 | --wallet-password-file  | Sets location of password file for validator (without it, it will always prompt for password)  | Path to a file, relative or absolute
 | --cors-domain  | Sets CORS domain (note: if you want to set every origin you must type asterisk wrapped in quotes `'*'` otherwise shell may try to resolve it | CORS Domain ex. `localhost`, `*`
-| --external-ip  | Sets external IP for pandora and vanguard | String ex. `72.122.32.234`
+| --external-ip  | Sets external IP for geth and beacon-chain | String ex. `72.122.32.234`
 | --allow-respin  | Deletes all datadirs IF network config changed (based on genesis time) | <none\>
-| --vanguard-http-web3provider  | An eth1 web3 provider string http endpoint or IPC socket path. (default: http://127.0.0.1:8545) | URL address, e.g. `http://127.0.0.1:8545`
-| --vanguard-rpc-host  | Host on which the RPC server should listen. (default: 127.0.0.1) | IPv4 address, e.g. `127.0.0.1`
+| --beacon-http-web3provider  | An eth1 web3 provider string http endpoint or IPC socket path. (default: http://127.0.0.1:8545) | URL address, e.g. `http://127.0.0.1:8545`
+| --beacon-rpc-host  | Host on which the RPC server should listen. (default: 127.0.0.1) | IPv4 address, e.g. `127.0.0.1`
 | --beacon-rpc-port  | Port on which the RPC server should listen. (default: 4000) | Port, e.g. `4000`
 | --beacon-udp-port  | beacon chain client UDP port. The port used by discv5. (default: 12000) | Port number, e.g. `12000`
 | --beacon-tcp-port  | beacon chain client TCP port. The port used by libp2p. (default: 13000) | Port number, e.g. `13000`
 | --beacon-grpc-gateway-port   | Vanguard gRPC gateway port. The port on which the gateway server runs on (default: 3500) | Gateway port, e.g. `3500`
-| --validator-beacon-rpc-provider | Beacon node (vanguard) RPC provider endpoint. (default is: 127.0.0.1:4000) | IPv4 with port, e.g. `127.0.0.1:4000`
+| --validator-beacon-rpc-provider | Beacon node RPC provider endpoint. (default is: 127.0.0.1:4000) | IPv4 with port, e.g. `127.0.0.1:4000`
 | --validator-geth-http-provider | A geth rpc endpoint. This is our geth client http endpoint. (default is: http://127.0.0.1:8545) | URL or IPC socket path, e.g. `http://127.0.0.1:8545`
 | --eth2stats-beacon-addr | Beacon node endpoint address for eth2stats-client. (default: 127.0.0.1:4000) | IPv4 with port, e.g. `127.0.0.1:4000`
 | --geth-port | Geth client TCP/UDP port exposed. Default is: 30405 | Port number, e.g. `30405`
@@ -167,12 +167,9 @@ How to use flags with values? Provide a flag and value like: `lukso start --data
 ### bind-binaries 
 | name      | description            | Argument  |
 |-----------|------------------------|---|
-| --orchestrator   | download and set `orchestrator` to given tag  | Tag, ex. `v0.1.0-rc.1` |
-| --pandora   | download and set `pandora` to given tag  | Tag, ex. `v0.1.0-rc.1` |
-| --vanguard   | download and set `vanguard` to given tag  | Tag, ex. `v0.1.0-rc.1` |
+| --geth   | download and set `geth` to given tag  | Tag, ex. `v0.1.0-rc.1` |
+| --beacon   | download and set `beacon-chain` to given tag  | Tag, ex. `v0.1.0-rc.1` |
 | --validator   | download and set `validator` to given tag  | Tag, ex. `v0.1.0-rc.1` |
 | --deposit   | download and set `lukso-deposit-cli` to given tag  | Tag, ex. `v0.1.0-rc.1` |
 | --eth2stats   | download and set `eth2stats` to given tag  | Tag, ex. `v0.1.0-rc.1` |
-| --lukso-status   | download and set `lukso-status` to given tag  | Tag, ex. `v0.1.0-rc.1` |
-
 
