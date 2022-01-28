@@ -14,7 +14,7 @@ In `./shell_scripts` are currently used scripts that will be replaced by proper 
 
 ### Minimum specifications
 
-These specifications must be met in order to successfully run the Vanguard, Pandora, and Orchestrator clients.
+These specifications must be met in order to successfully run the Beacon-chain and Geth clients.
 
 - Operating System: 64-bit Linux, Mac OS X 10.14+
 - Processor: Intel Core i5–760 or AMD FX-8100 or better
@@ -24,7 +24,7 @@ These specifications must be met in order to successfully run the Vanguard, Pand
 
 ### Recommended specifications
 
-These hardware specifications are recommended, but not required to run the Vanguard, Pandora, and Orchestrator clients.
+These hardware specifications are recommended, but not required to run the Beacon-chain and  Geth.
 
 - Processor: Intel Core i7–4770 or AMD FX-8310 or better
 - Memory: 16GB RAM
@@ -128,7 +128,7 @@ After that, you can use `--config /path/to/config.yaml` insted of other flags:
 | --beacon-rpc-port  | Port on which the RPC server should listen. (default: 4000) | Port, e.g. `4000`
 | --beacon-udp-port  | beacon chain client UDP port. The port used by discv5. (default: 12000) | Port number, e.g. `12000`
 | --beacon-tcp-port  | beacon chain client TCP port. The port used by libp2p. (default: 13000) | Port number, e.g. `13000`
-| --beacon-grpc-gateway-port   | Vanguard gRPC gateway port. The port on which the gateway server runs on (default: 3500) | Gateway port, e.g. `3500`
+| --beacon-grpc-gateway-port   | beacon-chain gRPC gateway port. The port on which the gateway server runs on (default: 3500) | Gateway port, e.g. `3500`
 | --validator-beacon-rpc-provider | Beacon node RPC provider endpoint. (default is: 127.0.0.1:4000) | IPv4 with port, e.g. `127.0.0.1:4000`
 | --validator-geth-http-provider | A geth rpc endpoint. This is our geth client http endpoint. (default is: http://127.0.0.1:8545) | URL or IPC socket path, e.g. `http://127.0.0.1:8545`
 | --eth2stats-beacon-addr | Beacon node endpoint address for eth2stats-client. (default: 127.0.0.1:4000) | IPv4 with port, e.g. `127.0.0.1:4000`
