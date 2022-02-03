@@ -31,7 +31,7 @@ var (
 			name:    ELDependencyName,
 		},
 		ELGenesisDependencyName: {
-			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/dev/%d/genesis.json",
+			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/local-setup/%d/genesis.json",
 			name:    ELGenesisDependencyName,
 		},
 		CLDependencyName: {
@@ -43,11 +43,11 @@ var (
 			name:    validatorDependencyName,
 		},
 		CLGenesisDependencyName: {
-			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/dev/%d/genesis.ssz",
+			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/local-setup/%d/genesis.ssz",
 			name:    CLGenesisDependencyName,
 		},
 		CLConfigDependencyName: {
-			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/dev/%d/config.yaml",
+			baseUrl: "https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/l16/local-setup/%d/config.yaml",
 			name:    CLConfigDependencyName,
 		},
 		CLStatsClientDependencyName: {
