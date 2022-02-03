@@ -21,7 +21,7 @@ const (
 	CLGenesisDependencyName     = "genesis.ssz"
 	CLConfigDependencyName      = "config.yml"
 	CLStatsClientDependencyName = "eth2stats-client"
-	FirstConfigsVersion         = 6
+	FirstConfigsVersion         = 1
 )
 
 var (
