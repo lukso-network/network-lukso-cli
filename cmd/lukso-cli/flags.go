@@ -123,7 +123,7 @@ var (
 		&cli.StringFlag{
 			Name:  ELBootnodesFlag,
 			Usage: "Default value should be ok for test network. Otherwise provide Comma separated enode urls, see at https://geth.ethereum.org/docs/getting-started/private-net.",
-			Value: "enode://267c4525064472ccbe34602698d6bae9d90460391ba8d5170c76cd029e3707a823ac5323d8b03a6753649f8f3977656ca9b2ea367a12800f1c58d98b3fd1f857@34.141.166.62:30303,enode://1f92cd45d8577cdc58e6a4f3cc79be3a2277342a372d18d40c499186e83d9bf826dc801c671e27bb9feb6ad3c9e8ab78960237e89df1bd50028939c7a6127e4a@10.0.2.31:44740,enode://5e0a071f4e09acc4f47361d4bb50dfaf86ddf8880e4c2418ee4b34217efc558d523454ae5f6d849819f0c10f09c8e60b670b67995784d41d1eb396b9489b0870@34.90.11.109:30303,enode://925ee0afa854d3a17fac408baeff94ea18f6001a8950ab33e464d65a9ce876233e2fed16263ae1cb1561eeeb52d533fdecd82d60ba5db30c991b3ec43cc83c74@34.91.134.173:30303,enode://ca4f047d5ed08a3a16de52ac88e628b8dbd027e5ddb2f050cd5a64ac6ba3c2d6cb16a34a5d67c278982ef411e6ec59c50935273907ec6e7161ef7ca6159300fd@34.141.234.255:30303",
+			Value: "",
 		},
 		&cli.StringFlag{
 			Name:  ELNetworkIDFlag,
@@ -260,7 +260,7 @@ var (
 		&cli.StringFlag{
 			Name:  CLBootnodesFlag,
 			Usage: `provide coma separated bootnode enr, default: "enr:-Ku4QANldTRLCRUrY9..."`,
-			Value: "enr:-MK4QGgKma0ZlRoYY-Mdfp6OF9q0JT5M5fjcQeh4VahN4rLOTTQO8V1iOzor7jApikcHHFmaV6yGSal4si4YxKHoXkmGAX6b9mBGh2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__________gmlkgnY0gmlwhCJajJCJc2VjcDI1NmsxoQOloxJG29I8UZ1HTATcMdBI-8dgmbvpb9LiyetaJhi7IYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A,enr:-MK4QOFXnJLeMJXH_NkVNZB2Sbq4bEVhpFuDvpGSO5YpCC1kMWCAXeREeCdUy3_Bob_JDPjML9PySkhxhM8p6W6yLt6GAX6b9mIth2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__________gmlkgnY0gmlwhCJbhq2Jc2VjcDI1NmsxoQKSXuCvqFTToX-sQIuu_5TqGPYAGolQqzPkZNZanOh2I4hzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A,enr:-MK4QLeQsiv_gUv3WGnS1QyM-YKkH7-sGKP1k0cfhF3_74q4c6U60kBFCLr93hTnQ7QmgNWBypY3rqlCK9Qkrq9AVniGAX6b9mPWh2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__________gmlkgnY0gmlwhCJaC22Jc2VjcDI1NmsxoQJeCgcfTgmsxPRzYdS7UN-vht34iA5MJBjuSzQhfvxVjYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A",
+			Value: "",
 		},
 		&cli.StringFlag{
 			Name:  CLPeerFlag,
