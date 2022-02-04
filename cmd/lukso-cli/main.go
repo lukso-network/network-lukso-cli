@@ -20,7 +20,7 @@ import (
 // We are also very open to any improvements. Please make some issue or hackmd proposal to make it better.
 
 const (
-	cliVersion = "v1.0.1"
+	cliVersion = "v1.0.3"
 
 	ubuntu  = "linux"
 	macos   = "darwin"

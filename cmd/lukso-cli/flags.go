@@ -206,8 +206,7 @@ var (
 		&cli.StringFlag{
 			Name:  CLChainConfigFlag,
 			Usage: "path to chain config of CL and validator",
-			// TODO: Parse it automatically
-			Value: fmt.Sprintf("./CL/v1.0.0/%s", CLConfigDependencyName),
+			Value: "",
 		},
 		&cli.BoolFlag{
 			Name:  validatorOutputFlag,
@@ -383,10 +382,12 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 	CLArguments = append(CLArguments, ctx.String(CLDatadirFlag))
 
 	// This flag can be shared for sure. There is no possibility to use different specs for validator and CL.
-	CLArguments = append(CLArguments, fmt.Sprintf(
-		"--chain-config-file=%s",
-		ctx.String(CLChainConfigFlag),
-	))
+	if "" != ctx.String(CLChainConfigFlag) {
+		CLArguments = append(CLArguments, fmt.Sprintf(
+			"--chain-config-file=%s",
+			ctx.String(CLChainConfigFlag),
+		))
+	}
 
 	if len(ctx.String(CLBootnodesFlag)) > 1 {
 		bootstrapNodes := strings.Split(ctx.String(CLBootnodesFlag), ",")
@@ -479,14 +480,19 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 	validatorArguments = append(validatorArguments, "--accept-terms-of-use")
 
+	validatorArguments = append(validatorArguments, "--kintsugi-testnet")
+
 	if ctx.IsSet(ForceClearDB.Name) {
 		validatorArguments = append(validatorArguments, "--force-clear-db")
 	}
 
-	validatorArguments = append(validatorArguments, fmt.Sprintf(
-		"--chain-config-file=%s",
-		ctx.String(CLChainConfigFlag),
-	))
+	if "" != ctx.String(CLChainConfigFlag) {
+		validatorArguments = append(validatorArguments, fmt.Sprintf(
+			"--chain-config-file=%s",
+			ctx.String(CLChainConfigFlag),
+		))
+	}
+
 	validatorArguments = append(validatorArguments, "--verbosity")
 	validatorArguments = append(validatorArguments, ctx.String(validatorVerbosityFlag))
 
