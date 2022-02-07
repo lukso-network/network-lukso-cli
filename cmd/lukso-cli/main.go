@@ -390,7 +390,17 @@ func startCL(ctx *cli.Context) (err error) {
 		CLDataDir,
 		CLRuntimeFlags,
 		ctx.Bool(CLOutputFlag),
-		nil,
+		func(cmd *exec.Cmd) error {
+			file, err := os.Create(fmt.Sprintf("%s%s%d", ctx.String(CLLogFileFlag), DefaultLogFilenameSeparator, time.Now().Unix()))
+			if err != nil {
+				return err
+			}
+
+			cmd.Stdout = file
+			cmd.Stderr = file
+
+			return nil
+		},
 	)
 	if nil != err {
 		return

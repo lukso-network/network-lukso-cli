@@ -334,7 +334,7 @@ var (
 		&cli.StringFlag{
 			Name:  CLLogFileFlag,
 			Usage: "provide output destination of CL",
-			Value: "./CL.log",
+			Value: "",
 		},
 		&cli.BoolFlag{
 			Name:  CLOutputFlag,
@@ -439,10 +439,12 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 		))
 	}
 
-	CLArguments = append(CLArguments, fmt.Sprintf(
-		"--log-file=%s",
-		fmt.Sprintf("%s%s%d", ctx.String(CLLogFileFlag), DefaultLogFilenameSeparator, time.Now().Unix()),
-	))
+	if "" != ctx.String(CLLogFileFlag) {
+		CLArguments = append(CLArguments, fmt.Sprintf(
+			"--log-file=%s",
+			fmt.Sprintf("%s%s%d", ctx.String(CLLogFileFlag), DefaultLogFilenameSeparator, time.Now().Unix()),
+		))
+	}
 
 	CLArguments = append(CLArguments, fmt.Sprintf(
 		"--genesis-state=%s",
@@ -479,8 +481,6 @@ func prepareCLFlags(ctx *cli.Context) (CLArguments []string) {
 
 func prepareValidatorFlags(ctx *cli.Context) (validatorArguments []string) {
 	validatorArguments = append(validatorArguments, "--accept-terms-of-use")
-
-	validatorArguments = append(validatorArguments, "--kintsugi-testnet")
 
 	if ctx.IsSet(ForceClearDB.Name) {
 		validatorArguments = append(validatorArguments, "--force-clear-db")
