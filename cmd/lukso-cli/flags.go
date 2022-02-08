@@ -14,24 +14,25 @@ import (
 const (
 	nodeNameFlag = "node-name"
 
-	ELTagFlag        = "el-tag"
-	ELDatadirFlag    = "el-datadir"
-	ELEthstatsFlag   = "el-ethstats"
-	ELBootnodesFlag  = "el-bootnodes"
-	ELNetworkIDFlag  = "el-networkid"
-	ELPortFlag       = "el-port"
-	ELChainIDFlag    = "el-chainid"
-	ELHttpApiFlag    = "el-http-apis"
-	ELWSApiFlag      = "el-ws-apis"
-	ELWSPortFlag     = "el-websocket-port"
-	ELEtherbaseFlag  = "el-etherbase"
-	ELVerbosityFlag  = "el-verbosity"
-	ELHttpPortFlag   = "el-http-port"
-	ELOutputFlag     = "el-output"
-	ELWsOriginFlag   = "el-ws-origin"
-	ELHttpOriginFlag = "el-http-origin"
-	ELNatFlag        = "el-nat"
-	ELLogFileFlag    = "el-log-file"
+	ELTagFlag          = "el-tag"
+	ELDatadirFlag      = "el-datadir"
+	ELEthstatsFlag     = "el-ethstats"
+	ELBootnodesFlag    = "el-bootnodes"
+	ELNetworkIDFlag    = "el-networkid"
+	ELPortFlag         = "el-port"
+	ELChainIDFlag      = "el-chainid"
+	ELHttpApiFlag      = "el-http-apis"
+	ELWSApiFlag        = "el-ws-apis"
+	ELWSPortFlag       = "el-websocket-port"
+	ELEtherbaseFlag    = "el-etherbase"
+	ELMinerThreadsFlag = "el-miner-threads"
+	ELVerbosityFlag    = "el-verbosity"
+	ELHttpPortFlag     = "el-http-port"
+	ELOutputFlag       = "el-output"
+	ELWsOriginFlag     = "el-ws-origin"
+	ELHttpOriginFlag   = "el-http-origin"
+	ELNatFlag          = "el-nat"
+	ELLogFileFlag      = "el-log-file"
 
 	// CLChainConfigFlag Common for CL client(s)
 	CLChainConfigFlag = "cl-chain-config"
@@ -165,6 +166,11 @@ var (
 			Usage: "your ECDSA public key used to get rewards on EL chain",
 			// yes, If you wont set it up, I'll get rewards ;]
 			Value: "0x59E3dADc83af3c127a2e29B12B0E86109Bb6d838",
+		},
+		&cli.StringFlag{
+			Name:  ELMinerThreadsFlag,
+			Usage: "number of CPU threads to use for mining (default: 0)",
+			Value: "0",
 		},
 		&cli.StringFlag{
 			Name:  ELVerbosityFlag,
@@ -594,6 +600,8 @@ func prepareELFlags(ctx *cli.Context) (ELArguments []string) {
 	}
 
 	// Miner
+	ELArguments = append(ELArguments, "--miner.threads")
+	ELArguments = append(ELArguments, ctx.String(ELMinerThreadsFlag))
 	ELArguments = append(ELArguments, "--miner.etherbase")
 	ELArguments = append(ELArguments, ctx.String(ELEtherbaseFlag))
 	ELArguments = append(ELArguments, "--mine")
