@@ -74,5 +74,10 @@ download https://raw.githubusercontent.com/lukso-network/network-lukso-cli/featu
 download https://raw.githubusercontent.com/lukso-network/network-config-gen/l16-dev/validator-activation/cloud-docker-compose-setup/validator/docker-compose.yml?token=GHSAT0AAAAAABQQS5FPENWIOUTGAMKMR7CQYQ6AEGA ./docker-compose.yml;
 download https://raw.githubusercontent.com/lukso-network/network-config-gen/l16-dev/validator-activation/cloud-docker-compose-setup/validator/.env?token=GHSAT0AAAAAABQQS5FPUTOBR4HUFBFXA5EGYQ6AE7A ./.env
 
+# replace node names
+sed "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
+sed "s/ETH_2_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
+
+
 echo "Ready! type \"docker-compose up -d\" to start!";
-echo "Make sure wallet and password.txt is in the keystore directory"
+echo "use \"make help\" to check available options"
