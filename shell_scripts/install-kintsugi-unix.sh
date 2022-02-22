@@ -37,22 +37,15 @@ if [[ "$ARCHITECTURE" == "armv7l" ]]; then
     exit 1
 fi
 
-if [[ $PLATFORM == "linux" ]]; then
-  sudo apt-get update;
-  sudo apt-get install curl \
-  wget \
-  unzip -y;
-fi
-
 download() {
   URL="$1";
   LOCATION="$2";
   if [[ $PLATFORM == "linux" ]]; then
-    sudo wget -O $LOCATION $URL;
+    wget -O $LOCATION $URL;
   fi
 
   if [[ $PLATFORM == "darwin" ]]; then
-    sudo curl -o $LOCATION -Lk $URL;
+    curl -o $LOCATION -Lk $URL;
   fi
 }
 
