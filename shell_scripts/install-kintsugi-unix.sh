@@ -65,16 +65,19 @@ download_network_config() {
 
 mkdir -p ./bin
 
+# download latest configs
 download_network_config l16-dev;
-# TODO: CHANGE THIS LOCATION LATER. IT IS FOR TEST PURPOSE ONLY.
+
+# download eth2 validator tool and give exec permission
 download https://github.com/lukso-network/network-validator-tools/releases/download/v1.0.0/network-validator-tools-v1.0.0-${PLATFORM}-${ARCHITECTURE} ./bin/eth2-val-tools
 chmod +x ./bin/eth2-val-tools
 
+# download makefile docker-compose and .env file
 download https://raw.githubusercontent.com/lukso-network/network-lukso-cli/feature/lukso-cli-with-kintsugi/shell_scripts/Makefile ./Makefile
 download https://raw.githubusercontent.com/lukso-network/network-config-gen/l16-dev/validator-activation/cloud-docker-compose-setup/validator/docker-compose.yml?token=GHSAT0AAAAAABQQS5FPENWIOUTGAMKMR7CQYQ6AEGA ./docker-compose.yml;
 download https://raw.githubusercontent.com/lukso-network/network-config-gen/l16-dev/validator-activation/cloud-docker-compose-setup/validator/.env?token=GHSAT0AAAAAABQQS5FPUTOBR4HUFBFXA5EGYQ6AE7A ./.env
 
-# replace node names
+# replace node names and write them inside the .env file.
 sed -i "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
 sed -i "s/ETH_2_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
 
