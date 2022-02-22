@@ -78,8 +78,8 @@ download https://raw.githubusercontent.com/lukso-network/network-config-gen/l16-
 download https://raw.githubusercontent.com/lukso-network/network-config-gen/l16-dev/validator-activation/cloud-docker-compose-setup/validator/.env?token=GHSAT0AAAAAABQQS5FPUTOBR4HUFBFXA5EGYQ6AE7A ./.env
 
 # replace node names and write them inside the .env file.
-sed -i "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
-sed -i "s/ETH_2_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
+sed -i "" "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
+sed -i "" "s/ETH_2_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
 
 
 echo "Ready! type \"docker-compose up -d\" to start!";
