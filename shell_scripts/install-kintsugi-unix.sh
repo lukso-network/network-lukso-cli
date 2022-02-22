@@ -79,6 +79,7 @@ download https://raw.githubusercontent.com/lukso-network/network-config-gen/l16-
 
 # replace node names and write them inside the .env file.
 sed -i "" "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
+# change eth2 state name. now both geth and beacon stat will show valid name.
 sed -i "" "s/ETH_2_STATS_NAME=.*/ETH_2_STATS_NAME=$(uname -n)/g" .env
 
 
