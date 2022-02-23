@@ -68,6 +68,7 @@ update_env_variables() {
   PUB_IP_ADDRESS=$(curl ident.me)
 
   if [[ $PLATFORM == "linux" ]]; then
+    # for linux platform change variables accordingly
     sed -i "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
     sed -i "s/ETH_2_STATS_NAME=.*/ETH_2_STATS_NAME=$(uname -n)/g" .env
     sed -i "s/PRYSM_HOST_IP=.*/PRYSM_HOST_IP=${PUB_IP_ADDRESS}/g" .env
@@ -76,6 +77,7 @@ update_env_variables() {
   fi
 
   if [[ $PLATFORM == "darwin" ]]; then
+    # for mac platform change variables accordingly
     sed -i "" "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
     sed -i "" "s/ETH_2_STATS_NAME=.*/ETH_2_STATS_NAME=$(uname -n)/g" .env
     sed -i "" "s/PRYSM_HOST_IP=.*/PRYSM_HOST_IP=${PUB_IP_ADDRESS}/g" .env
