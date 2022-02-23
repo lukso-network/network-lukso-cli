@@ -1,9 +1,28 @@
+include .env
+
+VARS:=$(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' .env )
+$(foreach v,$(VARS),$(eval $(shell echo export $(v)="$($(v))")))
+
+
 help:
+	@echo "####################################################"
+	@echo "##                                                ##"
+	@echo "##               Lukso Make Script                ##"
+	@echo "##                                                ##"
+	@echo "####################################################"
+	@echo ""
 	@echo "use \"make FLAGNAME\" to do particular task";
 	@echo "this makefile supports following FLAGNAMEs";
 	@echo "   mnemonic        - Generate a mnemonic";
 	@echo "   create-deposit  - create deposit-data.json"
 	@echo "   create-wallet   - create wallet"
+	@echo "   start           - start all nodes"
+	@echo "   stop            - stop all nodes"
+	@echo "   delete          - delete all data directory"
+	@echo "   log_geth        - show geth log"
+	@echo "   log_beacon      - show beacon log"
+	@echo "   log_validator   - show validator log"
+
 
 mnemonic:
 	@echo "Please copy this mnemonic"; \
@@ -28,8 +47,35 @@ create-wallet:
 	&& ./bin/eth2-val-tools keystores \
 	--insecure \
     --out-loc "./keystore" \
-    --prysm-pass $$PASSWORD \
+    --prysm-pass "$$PASSWORD" \
     --source-max $$NUMBER_OF_VALIDATORS \
     --source-min 0 \
     --source-mnemonic "$$VALIDATOR_MNEMONIC" \
     && echo "$$PASSWORD" > ./keystore/password.txt;
+
+start:
+ifeq ("$(wildcard $(KEYSTORE_VOLUME))", "")
+	$(error  $(KEYSTORE_VOLUME) directory not found)
+endif
+
+ifeq ("$(wildcard $(CONFIGS_VOLUME))", "")
+	$(error  $(CONFIGS_VOLUME) directory not found)
+endif
+	@echo "Starting geth, beacon and validator"
+	docker-compose up -d
+
+stop:
+	@echo "Stopping geth, beacon and validator"
+	docker-compose down
+
+delete:
+	@rm -rf ${EXECUTION_DATA_VOLUME} ${CONSENSUS_DATA_VOLUME} ${VALIDATOR_DATA_VOLUME}
+
+log_geth:
+	ocker logs -f lukso-geth
+
+log_beacon:
+	docker logs -f prysm_beacon
+
+log_validator:
+	docker logs -f prysm_validator
