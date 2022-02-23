@@ -63,6 +63,26 @@ download_network_config() {
   download $CDN/config.yaml?ignoreCache=1 $TARGET/config.yaml
 }
 
+update_env_variables() {
+
+  PUB_IP_ADDRESS=$(curl ident.me)
+
+  if [[ $PLATFORM == "linux" ]]; then
+    sed -i "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
+    sed -i "s/ETH_2_STATS_NAME=.*/ETH_2_STATS_NAME=$(uname -n)/g" .env
+    sed -i "s/PRYSM_HOST_IP=.*/PRYSM_HOST_IP=${PUB_IP_ADDRESS}/g" .env
+    sed -i "s/GETH_EXTERNAL_IP=.*/GETH_EXTERNAL_IP=${PUB_IP_ADDRESS}/g" .env
+
+  fi
+
+  if [[ $PLATFORM == "darwin" ]]; then
+    sed -i "" "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
+    sed -i "" "s/ETH_2_STATS_NAME=.*/ETH_2_STATS_NAME=$(uname -n)/g" .env
+    sed -i "" "s/PRYSM_HOST_IP=.*/PRYSM_HOST_IP=${PUB_IP_ADDRESS}/g" .env
+    sed -i "" "s/GETH_EXTERNAL_IP=.*/GETH_EXTERNAL_IP=${PUB_IP_ADDRESS}/g" .env
+  fi
+}
+
 mkdir -p ./bin
 
 # download latest configs
@@ -77,11 +97,11 @@ download https://raw.githubusercontent.com/lukso-network/network-lukso-cli/featu
 download https://raw.githubusercontent.com/lukso-network/network-config-gen/l16-dev/validator-activation/cloud-docker-compose-setup/validator/docker-compose.yml?token=GHSAT0AAAAAABQQS5FPENWIOUTGAMKMR7CQYQ6AEGA ./docker-compose.yml;
 download https://raw.githubusercontent.com/lukso-network/network-config-gen/l16-dev/validator-activation/cloud-docker-compose-setup/validator/.env?token=GHSAT0AAAAAABQQS5FPUTOBR4HUFBFXA5EGYQ6AE7A ./.env
 
-# replace node names and write them inside the .env file.
-sed -i "" "s/ETH_STATS_NAME=.*/ETH_STATS_NAME=$(uname -n)/g" .env
-# change eth2 state name. now both geth and beacon stat will show valid name.
-sed -i "" "s/ETH_2_STATS_NAME=.*/ETH_2_STATS_NAME=$(uname -n)/g" .env
+update_env_variables
 
-
-echo "Ready! type \"docker-compose up -d\" to start!";
+echo ""
+echo "#################### Please Read Carefully ####################"
+echo "Update \"GETH_ETHERBASE\" with your address \".env\" file"
 echo "use \"make help\" to check available options"
+echo "Ready! type \"docker-compose up -d\" to start!";
+echo "###############################################################"
