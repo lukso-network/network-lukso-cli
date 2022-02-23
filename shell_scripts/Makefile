@@ -16,7 +16,8 @@ help:
 	@echo "   mnemonic        - Generate a mnemonic";
 	@echo "   create-deposit  - create deposit-data.json"
 	@echo "   create-wallet   - create wallet"
-	@echo "   start           - start all nodes"
+	@echo "   start           - start all except the validator nodes"
+	@echo "   start-validator - start only the validator client"
 	@echo "   stop            - stop all nodes"
 	@echo "   delete          - delete all data directory"
 	@echo "   log_geth        - show geth log"
@@ -53,7 +54,15 @@ create-wallet:
     --source-mnemonic "$$VALIDATOR_MNEMONIC" \
     && echo "$$PASSWORD" > ./keystore/password.txt;
 
+
 start:
+ifeq ("$(wildcard $(CONFIGS_VOLUME))", "")
+	$(error  $(CONFIGS_VOLUME) directory not found)
+endif
+	docker-compose up -d init-geth geth prysm_beacon eth2stats-client
+
+
+start-validator:
 ifeq ("$(wildcard $(KEYSTORE_VOLUME))", "")
 	$(error  $(KEYSTORE_VOLUME) directory not found)
 endif
@@ -62,7 +71,7 @@ ifeq ("$(wildcard $(CONFIGS_VOLUME))", "")
 	$(error  $(CONFIGS_VOLUME) directory not found)
 endif
 	@echo "Starting geth, beacon and validator"
-	docker-compose up -d
+	docker-compose up -d prysm_validator
 
 stop:
 	@echo "Stopping geth, beacon and validator"
