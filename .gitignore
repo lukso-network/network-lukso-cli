@@ -1,0 +1,8 @@
+.env
+data
+configs
+bin
+keystore
+deposit_data.json
+docker-compose.yml
+Makefile

@@ -3,7 +3,7 @@
 
 NETWORK="l16-dev"
 PLATFORM="unknown";
-NETWORK_VERSION="16"
+NETWORK_VERSION="17"
 
 # for Apple M1s
 if [ "$(uname -s)" == "Darwin" ] && [ "$(uname -m)" == "arm64" ]
