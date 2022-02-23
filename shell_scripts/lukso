@@ -9,35 +9,62 @@ VALIDATOR_LOOPS=5
 #####
 
 ##### network info
-CHAIN_ID=""
-NETWORK_ID=""
+CHAIN_ID="1337222"
+NETWORK_ID="1337222"
+FORK_VERSION="0x60000069"
+GENESIS_TIME="1642967095"
 #####
 
 ##### default client values
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  PLATFORM="Linux"
-fi
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  PLATFORM="Darwin"
-fi
-
+# for Apple M1s
+if [ "$(uname -s)" == "Darwin" ] && [ "$(uname -m)" == "arm64" ]
+then
+ARCHITECTURE="amd64"
+else
 ARCHITECTURE=$(uname -m)
-LUKSO_SCRIPT_VERSION="v1.7.9"
+ARCHITECTURE=${ARCHITECTURE/x86_64/amd64}
+ARCHITECTURE=${ARCHITECTURE/aarch64/arm64}
+fi
+readonly os_arch_suffix="$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCHITECTURE"
+
+PLATFORM=""
+case "$OSTYPE" in
+darwin*) PLATFORM="darwin" ;;
+linux*) PLATFORM="linux" ;;
+msys*) PLATFORM="windows" ;;
+cygwin*) PLATFORM="windows" ;;
+*) exit 1 ;;
+esac
+readonly PLATFORM
+
+if [ "$PLATFORM" == "windows" ]; then
+    ARCHITECTURE="amd64.exe"
+elif [[ "$os_arch_suffix" == *"arm64"* ]]; then
+    ARCHITECTURE="arm64"
+fi
+
+if [[ "$ARCHITECTURE" == "armv7l" ]]; then
+    color "31" "32-bit ARM is not supported. Please install a 64-bit operating system."
+    exit 1
+fi
+
+LUKSO_SCRIPT_VERSION="v1.7.10"
 
 RUN_DATE=$(date '+%Y-%m-%d__%H-%M-%S')
-NETWORK="l15-prod"
+NETWORK="l16-dev"
+NETWORK_VERSION=""
 IS_VALIDATOR=false
 RUN_LUKSO_STATUS=false
 PAN_ETHSTATS="S2qDE8rYtFVVGZ@stats.pandora.l15.lukso.network"
 VAN_ETHSTATS="34.141.156.125:9090"
 COINBASE=""
 
-if [[ "$PLATFORM" == "Linux" ]]; then
+if [[ "$PLATFORM" == "linux" ]]; then
   LUKSO_HOME="$HOME/.lukso"
 fi
 
-if [[ "$PLATFORM" == "Darwin" ]]; then
+if [[ "$PLATFORM" == "darwin" ]]; then
   LUKSO_HOME="$HOME/Library/LUKSO"
 fi
 
@@ -58,7 +85,7 @@ SECONDS_PER_SLOT=6
 
 ###### Pandora settings
 PANDORA_PORT="30405"
-PANDORA_BOOTNODES=""
+PANDORA_BOOTNODES="enode://267c4525064472ccbe34602698d6bae9d90460391ba8d5170c76cd029e3707a823ac5323d8b03a6753649f8f3977656ca9b2ea367a12800f1c58d98b3fd1f857@34.141.166.62:30303, enode://1f92cd45d8577cdc58e6a4f3cc79be3a2277342a372d18d40c499186e83d9bf826dc801c671e27bb9feb6ad3c9e8ab78960237e89df1bd50028939c7a6127e4a@10.0.2.31:44740, enode://ca4f047d5ed08a3a16de52ac88e628b8dbd027e5ddb2f050cd5a64ac6ba3c2d6cb16a34a5d67c278982ef411e6ec59c50935273907ec6e7161ef7ca6159300fd@34.141.234.255:30303, enode://925ee0afa854d3a17fac408baeff94ea18f6001a8950ab33e464d65a9ce876233e2fed16263ae1cb1561eeeb52d533fdecd82d60ba5db30c991b3ec43cc83c74@34.91.134.173:30303, enode://5e0a071f4e09acc4f47361d4bb50dfaf86ddf8880e4c2418ee4b34217efc558d523454ae5f6d849819f0c10f09c8e60b670b67995784d41d1eb396b9489b0870@34.90.11.109:30303"
 PANDORA_HTTP_ADDR="127.0.0.1"
 PANDORA_HTTP_PORT="8545"
 PANDORA_WS_ADDR="127.0.0.1"
@@ -75,7 +102,7 @@ CORS_DOMAIN=""
 VANGUARD_VERBOSITY=info
 VANGUARD_HTTP_WEB3PROVIDER="http://127.0.0.1:8545"
 VANGUARD_RPC_HOST="127.0.0.1"
-VANGUARD_BOOTNODES=""
+VANGUARD_BOOTNODES="enr:-MK4QCHz26GgDR58dn-JvCq-4EvxoC_wGlXrZTaASr17nioaVmvB_B31cZbZxgM5d4h3gYqHS9rpuFVLptQFqR1MV7qGAX6WHalBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpDAVG-QYgAAcf__gmlkgnY0gmlwhCJajJCJc2VjcDI1NmsxoQOloxJG29I8UZ1HTATcMdBI-8dgmbvpb9LiyetaJhi7IYhzeW5jbmV0cwCDdGNwgjLIg3VkcIIu4A"
 VANGUARD_P2P_PRIV_KEY=""
 VANGUARD_P2P_HOST_DNS=""
 VANGUARD_RPC_PORT="4000"
@@ -91,7 +118,7 @@ VAN_ETHSTATS_METRICS="http://$VANGUARD_MONITORING_HOST:$VANGUARD_MONITORING_PORT
 
 ###### Validator
 KEYS_DIR="$LUKSO_HOME/$NETWORK"
-WALLET_DIR="$LUKSO_HOME/$NETWORK/vanguard_wallet"
+WALLET_DIR="$LUKSO_HOME/$NETWORK/beacon_wallet"
 VALIDATOR_PASSWORD_FILE=""
 VALIDATOR_VERBOSITY=info
 VALIDATOR_BEACON_RPC_PROVIDER=$VANGUARD_RPC
@@ -130,7 +157,7 @@ parse_config() {
 download() {
   URL="$1"
   LOCATION="$2"
-  if [[ $PLATFORM == "Linux" ]]; then
+  if [[ $PLATFORM == "linux" ]]; then
     if ! wget -q --spider "$URL"; then
       echo "File not found, check URL: $URL"
       exit
@@ -138,7 +165,7 @@ download() {
     sudo wget -O $LOCATION $URL
   fi
 
-  if [[ $PLATFORM == "Darwin" ]]; then
+  if [[ $PLATFORM == "darwin" ]]; then
     STATUS_CODE=$(curl -L -s -o /dev/null -I -w "%{http_code}" $URL)
     if [[ $STATUS_CODE != "200" ]]; then
       echo "File not found, check URL: $URL"
@@ -154,30 +181,30 @@ download_binary() {
 
   case $CLIENT in
 
-  pandora)
-    REPO="pandora-execution-engine"
+  geth)
+    REPO="go-ethereum"
     ;;
 
-  vanguard)
-    REPO="vanguard-consensus-engine"
+  beacon-chain)
+    REPO="prysm"
     ;;
 
-  lukso-validator)
-    REPO="vanguard-consensus-engine"
+  network-validator-tools)
+    REPO="network-validator-tools"
     ;;
 
-  lukso-deposit-cli)
-    REPO="network-deposit-cli"
+  validator)
+    REPO="prysm"
     ;;
 
   eth2stats-client)
-    REPO="network-vanguard-stats-client"
+    REPO="network-consensus-stats-client"
     ;;
 
   esac
 
   mkdir -p /opt/lukso/binaries/$CLIENT/$TAG
-  download https://github.com/lukso-network/"$REPO"/releases/download/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
+  download https://github.com/lukso-network/"$REPO"/releases/download/$TAG/$CLIENT-$TAG-$PLATFORM-$ARCHITECTURE /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
   sudo chmod +x /opt/lukso/binaries/$CLIENT/$TAG/$CLIENT-$PLATFORM-$ARCHITECTURE
 }
 
@@ -195,7 +222,7 @@ bind_binaries() {
   echo
 }
 
-generate_keys() {
+generate_deposit_data() {
   read -p "Where to store deposit keys? Default: [$KEYS_DIR] " INPUT
   if [[ -n "$INPUT" ]]; then
     KEYS_DIR=$INPUT
@@ -205,58 +232,68 @@ generate_keys() {
   read -p "How many validators? (Cost for 1 validator = 32 LYXt): " VALIDATORS_NUMBER
   echo "Running lukso-deposit-cli..."
 
-  lukso-deposit-cli new-mnemonic \
-    --chain $NETWORK \
-    --mnemonic_language english \
-    --folder $KEYS_DIR \
-    --num_validators $VALIDATORS_NUMBER
+  VALIDATOR_MNEMONIC=$(network-validator-tools mnemonic)
+  read -p "Enter Validator mnemonic file location. Keep blank to generate atutomatically" INPUT
+  if [[ -n "$INPUT" ]]; then
+    VALIDATOR_MNEMONIC=`cat $INPUT`
+  fi
+  echo "SAVE THIS VALIDATOR MNEMONIC FOR FUTURE USAGE: ${VALIDATOR_MNEMONIC}"
+
+  WITHDRAWAL_MNEMONIC=$(network-validator-tools mnemonic)
+  read -p "Enter Validator mnemonic file location. Keep blank to generate atutomatically" INPUT
+  if [[ -n "$INPUT" ]]; then
+    WITHDRAWAL_MNEMONIC=`cat $INPUT`
+  fi
+  echo "SAVE THIS WITHDRAWAL MNEMONIC FOR FUTURE USAGE: ${WITHDRAWAL_MNEMONIC}"
+
+
+  network-validator-tools deposit-data \
+    --fork-version=${FORK_VERSION} \
+    --source-min=0 \
+    --source-max=${VALIDATORS_NUMBER} \
+    --validators-mnemonic="${VALIDATOR_MNEMONIC}" \
+    --withdrawals-mnemonic="${WITHDRAWAL_MNEMONIC}" > "$KEYS_DIR/deposit-data.json"
 }
 
-import_accounts() {
+generate_keystore() {
 
   if [[ ! -d $WALLET_DIR ]]; then
-    echo "Creating new wallet"
+    echo "Creating new keystore"
     mkdir -p $WALLET_DIR
-  fi
-
-  if [[ -z $OVERRIDE_KEYS_DIR ]]; then
-    KEYS_DIR="$KEYS_DIR/validator_keys"
-    read -p "Where do you have deposit keys? Default: [$KEYS_DIR] " INPUT
-    eval INPUT="$INPUT"
-      if [[ -n "$INPUT" ]]; then
-        KEYS_DIR=$INPUT
-      fi
-  fi
-
-  if [[ ! -d $KEYS_DIR ]]; then
-    echo "Keys directory not found. Make sure to run \"lukso keygen\" first"
-    mkdir -p $WALLET_DIR
-    exit
   fi
 
   if [[ -z $OVERRIDE_WALLET_DIR ]]; then
-    read -p "Where to store wallet? Default: [$WALLET_DIR] " INPUT
+    read -p "Enter keystore location? Default: [$WALLET_DIR] " INPUT
     eval INPUT="$INPUT"
       if [[ -n "$INPUT" ]]; then
         WALLET_DIR=$INPUT
       fi
   fi
 
-  ARGUMENTS=(
-    "--keys-dir=$KEYS_DIR"
-    "--wallet-dir=$WALLET_DIR"
-  )
-
-  if [[ -n $KEYS_PASSWORD_FILE ]]; then
-    ARGUMENTS=("${ARGUMENTS[@]}" "--account-password-file=$KEYS_PASSWORD_FILE")
+  read -p "Enter your keystore password: " KEYSTORE_PASSWORD
+  if [[ -z $KEYSTORE_PASSWORD ]]; then
+    echo "Enter a valid keystore password"
+    exit 1
   fi
 
-  if [[ -n $VALIDATOR_PASSWORD_FILE ]]; then
-    ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$VALIDATOR_PASSWORD_FILE")
-  fi
+  read -p "How many validators? (Cost for 1 validator = 32 LYXt): " VALIDATORS_NUMBER
 
-  lukso-validator accounts import \
-  "${ARGUMENTS[@]}"
+  rm -rf $WALLET_DIR
+
+  VALIDATOR_MNEMONIC=$(network-validator-tools mnemonic)
+  read -p "Enter Validator mnemonic file location. Keep blank to generate atutomatically" INPUT
+  if [[ -n "$INPUT" ]]; then
+    VALIDATOR_MNEMONIC=`cat $INPUT`
+  fi
+  echo "SAVE THIS VALIDATOR MNEMONIC FOR FUTURE USAGE: ${VALIDATOR_MNEMONIC}"
+
+  network-validator-tools keystores \
+    --insecure \
+    --prysm-pass=${KEYSTORE_PASSWORD} \
+    --source-min=0 \
+    --source-max=${VALIDATORS_NUMBER} \
+    --source-mnemonic="${VALIDATOR_MNEMONIC}" \
+    --out-loc=${WALLET_DIR}
 }
 
 parse_config_field() {
@@ -291,7 +328,7 @@ setup_config() {
   fi
 
   parse_config_field "COINBASE" "Enter your coinbase:" "0x616e6f6e796d6f75730000000000000000000000"
-  parse_config_field "WALLET_DIR" "Type wallet location:" "$LUKSO_HOME/$NETWORK/vanguard_wallet"
+  parse_config_field "WALLET_DIR" "Type wallet location:" "$LUKSO_HOME/$NETWORK/beacon_wallet"
   parse_config_field "DATADIR" "Type data directory (chain will be stored there) location:" "$LUKSO_HOME/$NETWORK/datadirs"
   parse_config_field "LOGSDIR" "Type logs location:" "$LUKSO_HOME/$NETWORK/logs"
   parse_config_field "NODE_NAME" "Type name of the node:" "$NETWORK-$NODE_NAME"
@@ -301,15 +338,22 @@ setup_config() {
 }
 
 download_network_config() {
+  if [[ -z ${NETWORK_VERSION} ]]; then
+    echo "Please provide network version: --network-version <NETWORK_VERSION>"
+    exit 1
+  fi
   NETWORK=$1
-  CDN="https://storage.googleapis.com/l15-cdn/networks/$NETWORK"
+  NETWORK_NAME="$(cut -d'-' -f1 <<<"$NETWORK")"
+  NETWORK_MODE="$(cut -d'-' -f2 <<<"$NETWORK")"
+
+  CDN="https://raw.githubusercontent.com/lukso-network/network-configs/l16-dev/${NETWORK_NAME}/${NETWORK_MODE}/${NETWORK_VERSION}"
   sudo mkdir -p /opt/lukso/networks/$NETWORK/config
   TARGET=/opt/lukso/networks/$NETWORK/config
-  download $CDN/network-config.yaml?ignoreCache=1 $TARGET/network-config.yaml
-  download $CDN/pandora-genesis.json?ignoreCache=1 $TARGET/pandora-genesis.json
-  download $CDN/vanguard-genesis.ssz?ignoreCache=1 $TARGET/vanguard-genesis.ssz
-  download $CDN/vanguard-config.yaml?ignoreCache=1 $TARGET/vanguard-config.yaml
-  download $CDN/pandora-nodes.json?ignoreCache=1 $TARGET/pandora-nodes.json
+  download $CDN/genesis.json?ignoreCache=1 $TARGET/geth-genesis.json
+  download $CDN/genesis.ssz?ignoreCache=1 $TARGET/beacon-genesis.ssz
+  download $CDN/config.yaml?ignoreCache=1 $TARGET/beacon-config.yaml
+  # TODO: CHANGE THIS WHEN DEPLOYING REAL NETWORK
+  # download $CDN/pandora-nodes.json?ignoreCache=1 $TARGET/geth-nodes.json
 }
 
 pick_network() {
@@ -329,7 +373,7 @@ check_validator_requirements() {
   fi
 
   if [[ $COMMAND_ARG == "validator" ]] && [[ ! -n $COINBASE ]]; then
-    if [[ ! $(pandora attach $DATADIR/pandora/geth.ipc --exec "eth.coinbase") =~ ^\"0x[a-fA-F0-9]{40}\"$ ]]; then
+    if [[ ! $(geth attach $DATADIR/geth/geth.ipc --exec "eth.coinbase") =~ ^\"0x[a-fA-F0-9]{40}\"$ ]]; then
       echo "ERROR: Coinbase is not set on already running pandora. Please provide it using:"
       echo "--coinbase 0x<ETH1_ADDRESS>"
       CAN_VALIDATE=false
@@ -338,7 +382,7 @@ check_validator_requirements() {
 
   if [[ ! -d $WALLET_DIR ]]; then
     echo "Cannot validate, wallet not found. Your wallet directory is: $WALLET_DIR"
-    echo "Create new wallet using \"lukso wallet\" "
+    echo "Create new wallet using \"lukso keystore\" "
     CAN_VALIDATE=false
     exit
   fi
@@ -359,7 +403,7 @@ check_validator_requirements() {
       echo
       TEMPPASSFILE=$(mktemp)
       echo -n $INPUT > $TEMPPASSFILE
-      lukso-validator accounts list --wallet-dir=$WALLET_DIR --wallet-password-file=$TEMPPASSFILE &> /dev/null
+      validator accounts list --wallet-dir="$WALLET_DIR/prysm" --wallet-password-file=$TEMPPASSFILE &> /dev/null
       PASSWORD_CHECK=$?
       if [[ $PASSWORD_CHECK != 0 ]]; then
         echo "WRONG PASSWORD for wallet in $WALLET_DIR"
@@ -370,7 +414,7 @@ check_validator_requirements() {
 }
 
 
-start_pandora() {
+start_geth() {
 
   case $PANDORA_VERBOSITY in
   silent)
@@ -393,22 +437,27 @@ start_pandora() {
     ;;
   esac
 
-  mkdir -p "$LOGSDIR"/pandora
-  echo -n $RUN_DATE >|"$LOGSDIR"/pandora/current.tmp
-  if [[ ! -d "$DATADIR/pandora" ]]; then
-    mkdir -p "$DATADIR/pandora"
+  mkdir -p "$LOGSDIR"/geth
+  echo -n $RUN_DATE >|"$LOGSDIR"/geth/current.tmp
+  if [[ ! -d "$DATADIR/geth" ]]; then
+    mkdir -p "$DATADIR/geth"
   fi
 
-  pandora --datadir $DATADIR/pandora init /opt/lukso/networks/$NETWORK/config/pandora-genesis.json &>/dev/null
-  cp /opt/lukso/networks/"$NETWORK"/config/pandora-nodes.json $DATADIR/pandora/geth/static-nodes.json
+  geth --datadir $DATADIR/geth init /opt/lukso/networks/$NETWORK/config/geth-genesis.json &>/dev/null
+  # TODO: CHANGE THIS WHEN WE ARE DEPLOYING REAL NETWORK
+  # cp /opt/lukso/networks/"$NETWORK"/config/geth-nodes.json $DATADIR/geth/geth/static-nodes.json
+
+  if [[ -z ${PANDORA_BOOTNODES} ]]; then
+    echo "Please provide geth bootnodes: --geth-bootnodes \"<BOOTNODE_ENODES>\""
+    exit 1
+  fi
 
   ARGUMENTS=(
-    "--datadir=$DATADIR/pandora"
+    "--datadir=$DATADIR/geth"
     "--networkid=$NETWORK_ID"
     "--port=$PANDORA_PORT"
+    "--catalyst"
     "--bootnodes=$PANDORA_BOOTNODES"
-    "--miner.gaslimit=80000000"
-    "--syncmode=full"
     "--verbosity=$PANDORA_VERBOSITY"
     "--http"
     "--http.addr=$PANDORA_HTTP_ADDR"
@@ -416,13 +465,13 @@ start_pandora() {
     "--ws"
     "--ws.addr=$PANDORA_WS_ADDR"
     "--ws.port=$PANDORA_WS_PORT"
-    "--miner.notify=$PAN_WS_MINER_NOTIFY,$PAN_HTTP_MINER_NOTIFY"
   )
 
 
   if [[ $COINBASE ]]; then
     MINER_ARGUMENTS=(
       "--mine"
+      "--miner.threads=2"
       "--miner.etherbase=$COINBASE"
     )
     ARGUMENTS=("${ARGUMENTS[@]}" "${MINER_ARGUMENTS[@]}")
@@ -489,15 +538,21 @@ start_pandora() {
     ARGUMENTS=("${ARGUMENTS[@]}" "${ETHSTATS_FLAG[@]}")
   fi
 
-  nohup pandora \
+  nohup geth \
     "${ARGUMENTS[@]}" \
-    >|$LOGSDIR/pandora/pandora_"$RUN_DATE".log 2>&1 &
+    >|$LOGSDIR/geth/geth_"$RUN_DATE".log 2>&1 &
   disown
 }
 
-start_vanguard() {
-  mkdir -p "$LOGSDIR"/vanguard
-  echo -n $RUN_DATE >|"$LOGSDIR"/vanguard/current.tmp
+start_beacon() {
+
+  if [[ -z ${VANGUARD_BOOTNODES} ]]; then
+    echo "Please provide beacon bootnodes: --beacon-bootnodes <BEACON_BOOTNODE_ENR>"
+    exit 1
+  fi
+
+  mkdir -p "$LOGSDIR"/beacon-chain
+  echo -n $RUN_DATE >|"$LOGSDIR"/beacon-chain/current.tmp
   VANGUARD_BOOTNODES=(${VANGUARD_BOOTNODES//,/ })
   BOOTNODES_ARGS=()
   for n in "${VANGUARD_BOOTNODES[@]}"; do
@@ -505,22 +560,17 @@ start_vanguard() {
   done
   ARGUMENTS=(
     "--accept-terms-of-use"
-    "--chain-id=$CHAIN_ID"
-    "--network-id=$NETWORK_ID"
-    "--genesis-state=/opt/lukso/networks/$NETWORK/config/vanguard-genesis.ssz"
-    "--datadir=$DATADIR/vanguard/"
-    "--chain-config-file=/opt/lukso/networks/$NETWORK/config/vanguard-config.yaml"
+    "--kintsugi-testnet"
+    "--genesis-state=/opt/lukso/networks/$NETWORK/config/beacon-genesis.ssz"
+    "--datadir=$DATADIR/beacon-chain/"
+    "--chain-config-file=/opt/lukso/networks/$NETWORK/config/beacon-config.yaml"
     "${BOOTNODES_ARGS[@]}"
-    "--deposit-contract=0x000000000000000000000000000000000000cafe"
-    "--contract-deployment-block=0"
     "--verbosity=$VANGUARD_VERBOSITY"
     "--min-sync-peers=$VAN_MIN_SYNC_PEERS"
     "--p2p-max-peers=$VAN_MAX_P2P_PEERS"
     "--p2p-udp-port=$VANGUARD_UDP_PORT"
     "--p2p-tcp-port=$VANGUARD_TCP_PORT"
     "--grpc-gateway-port=$VANGUARD_GRPC_GATEWAY_PORT"
-    "--update-head-timely"
-    "--lukso-network"
     "--rpc-host=$VANGUARD_RPC_HOST"
     "--rpc-port=$VANGUARD_RPC_PORT"
     "--http-web3provider=$VANGUARD_HTTP_WEB3PROVIDER"
@@ -541,17 +591,17 @@ start_vanguard() {
     ARGUMENTS=("${ARGUMENTS[@]}" "--p2p-host-ip=$EXTERNAL_IP")
   fi
 
-  nohup vanguard \
+  nohup beacon-chain \
     "${ARGUMENTS[@]}" \
-    >|$LOGSDIR/vanguard/vanguard_"$RUN_DATE".log 2>&1 &
+    >|$LOGSDIR/beacon-chain/beacon-chain_"$RUN_DATE".log 2>&1 &
   disown
 }
 
 start_validator() {
 
   if [[ $COMMAND_ARG == "validator" ]] && [[ $COINBASE ]]; then
-    pandora attach $DATADIR/pandora/geth.ipc --exec "miner.setEtherbase(\"$COINBASE\")" > /dev/null
-    pandora attach $DATADIR/pandora/geth.ipc --exec "miner.start()" > /dev/null
+    geth attach $DATADIR/geth/geth.ipc --exec "miner.setEtherbase(\"$COINBASE\")" > /dev/null
+    geth attach $DATADIR/geth/geth.ipc --exec "miner.start()" > /dev/null
   fi
 
   mkdir -p "$LOGSDIR"/validator
@@ -560,14 +610,10 @@ start_validator() {
   ARGUMENTS=(
     "--datadir=$DATADIR/validator/"
     "--accept-terms-of-use"
-    "--chain-config-file=/opt/lukso/networks/$NETWORK/config/vanguard-config.yaml"
+    "--chain-config-file=/opt/lukso/networks/$NETWORK/config/beacon-config.yaml"
     "--verbosity=$VALIDATOR_VERBOSITY"
-    "--wallet-dir=$WALLET_DIR"
+    "--wallet-dir=$WALLET_DIR/prysm"
     "--log-file=$LOGSDIR/validator/validator_$RUN_DATE.log"
-    "--lukso-network"
-    "--rpc"
-    "--beacon-rpc-provider=$VALIDATOR_BEACON_RPC_PROVIDER"
-    "--pandora-http-provider=$VALIDATOR_PANDORA_HTTP_PROVIDER"
   )
 
   if [[ -n $VALIDATOR_PASSWORD_FILE ]]; then
@@ -578,7 +624,7 @@ start_validator() {
     ARGUMENTS=("${ARGUMENTS[@]}" "--wallet-password-file=$TEMPPASSFILE")
   fi
 
-  nohup lukso-validator \
+  nohup validator \
     "${ARGUMENTS[@]}" \
     >|$LOGSDIR/validator/validator_"$RUN_DATE".log 2>&1 &
   disown
@@ -592,7 +638,7 @@ start_validator() {
       TRIES=$((TRIES+1))
     done
 
-    if [[ ! $(pgrep -x "lukso-validator") ]]; then
+    if [[ ! $(pgrep -x "validator") ]]; then
       echo "ERROR: Cannot start validator"
       exit
     fi
@@ -624,28 +670,17 @@ start_eth2stats_client() {
   disown
 }
 
-start_lukso_status() {
-  mkdir -p "$LOGSDIR"/lukso-status
-  echo -n $RUN_DATE >|"$LOGSDIR"/lukso-status/current.tmp
-
-  ARGUMENTS=()
-  nohup lukso-status \
-    "${ARGUMENTS[@]}" \
-    >|$LOGSDIR/lukso-status/lukso-status"$RUN_DATE".log 2>&1 &
-  disown
-}
-
 start_all() {
   if [[ "$IS_VALIDATOR" == true ]]; then
     check_validator_requirements
   fi
 
-  echo "################# Starting pandora #######################"
-  start_pandora
+  echo "################# Starting geth #######################"
+  start_geth
   sleep 2
 
-  echo "################# Starting vanguard #######################"
-  start_vanguard
+  echo "################# Starting beacon-chain #######################"
+  start_beacon
   sleep 2
 
   if [[ "$IS_VALIDATOR" == true ]]; then
@@ -657,13 +692,6 @@ start_all() {
   if [[ -n $VAN_ETHSTATS ]]; then
     echo "################# Starting eth2stats_client #######################"
     start_eth2stats_client
-    sleep 2
-  fi
-
-  if [[ "$RUN_LUKSO_STATUS" == true ]]; then
-    echo "################# Starting lukso status #######################"
-    sleep 10
-    start_lukso_status
     sleep 2
   fi
 }
@@ -678,13 +706,13 @@ start() {
 
   echo -n "Starting: "
   case $ARGUMENT in
-  pandora)
-    echo "pandora client"
-    start_pandora
+  geth)
+    echo "geth client"
+    start_geth
     ;;
-  vanguard)
-    echo "vanguard client"
-    start_vanguard
+  beacon)
+    echo "beacon-chain client"
+    start_beacon
     ;;
   validator)
     echo "validator client"
@@ -695,10 +723,6 @@ start() {
     echo "eth2stats client"
     start_eth2stats_client
     ;;
-  lukso-status)
-    echo "lukso-status client"
-    start_lukso_status
-    ;;
   *)
     echo "ALL clients"
     start_all
@@ -706,8 +730,8 @@ start() {
   esac
 }
 
-stop_pandora() {
-  echo -n "Stopping pandora client... "
+stop_geth() {
+  echo -n "Stopping geth client... "
   if [[ "$FORCE" == true ]]; then
     echo "[FORCE]"
     sudo kill -9 $(sudo lsof -t -i:30405) &>/dev/null
@@ -719,8 +743,8 @@ stop_pandora() {
   fi
 }
 
-stop_vanguard() {
-  echo -n "Stopping vanguard client... "
+stop_beacon() {
+  echo -n "Stopping beacon-chain client... "
 
   if [[ "$FORCE" == true ]]; then
     echo "[FORCE]"
@@ -767,25 +791,11 @@ stop_eth2stats_client() {
   fi
 }
 
-stop_lukso_status() {
-  echo -n "Stopping lukso-status ... "
-  if [[ "$FORCE" == true ]]; then
-    echo "[FORCE]"
-    sudo pkill -9 "lukso-status*"
-    sleep 1
-  else
-    echo
-    sudo pkill "lukso-status*"
-    sleep 1
-  fi
-}
-
 stop_all() {
   stop_validator &
-  stop_vanguard &
-  stop_pandora &
-  stop_eth2stats_client &
-  stop_lukso_status
+  stop_beacon &
+  stop_geth &
+  stop_eth2stats_client
 }
 
 stop() {
@@ -804,11 +814,11 @@ stop() {
     fi
   fi
   case "$ARGUMENT" in
-  pandora)
-    stop_pandora
+  geth)
+    stop_geth
     ;;
-  vanguard)
-    stop_vanguard
+  beacon)
+    stop_beacon
     ;;
   validator)
     stop_validator
@@ -816,21 +826,18 @@ stop() {
   eth2stats)
     stop_eth2stats_client
     ;;
-  lukso-status)
-    stop_lukso_status
-    ;;
   *)
     stop_all
     ;;
   esac
 }
 
-reset_pandora() {
-  rm -rf $DATADIR/pandora
+reset_geth() {
+  rm -rf $DATADIR/geth
 }
 
-reset_vanguard() {
-  rm -rf $DATADIR/vanguard
+reset_beacon() {
+  rm -rf $DATADIR/beacon-chain
 }
 
 reset_validator() {
@@ -842,8 +849,8 @@ reset_eth2stats_client() {
 }
 
 reset_all() {
-  reset_pandora
-  reset_vanguard
+  reset_geth
+  reset_beacon
   reset_validator
   reset_eth2stats_client
 }
@@ -857,11 +864,11 @@ reset() {
   fi
 
   case "$ARGUMENT" in
-  pandora)
-    reset_pandora
+  geth)
+    reset_geth
     ;;
-  vanguard)
-    reset_vanguard
+  beacon)
+    reset_beacon
     ;;
   validator)
     reset_validator
@@ -873,7 +880,7 @@ reset() {
     reset_all
     ;;
   *)
-    echo "Choose a client: [pandora, vanguard, validator, all] "
+    echo "Choose a client: [geth, beacon, validator, all] "
     ;;
   esac
 }
@@ -884,26 +891,26 @@ help() {
   echo
   echo "Available commands with arguments:"
   echo "start         Starts up all or specific client(s)"
-  echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status, all]"
+  echo "               [geth, beacon, validator, eth2stats-client, all]"
   echo
   echo "stop          Stops all or specific client(s)"
-  echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status, all]"
+  echo "               [geth, beacon, validator, eth2stats-client, all]"
   echo
   echo "reset         Clears client(s) datadirs (this also removes chain-data) 	"
-  echo "               [pandora, vanguard, validator, all, none]"
+  echo "               [geth, beacon, validator, all, none]"
   echo
   echo "config        Interactive tool for creating config file"
   echo
-  echo "keygen        Runs lukso-deposit-cli"
+  echo "gen-deposit-data        generates deposit-data.json"
   echo
-  echo "wallet        Imports lukso-deposit-cli keys"
+  echo "keystore        generates merge keystore"
   echo
-  echo "logs          Shows logs"
-  echo "               [pandora, vanguard, validator, eth2stats-client, lukso-status]"
+  echo "logs            Shows logs"
+  echo "                  [geth, beacon, validator, eth2stats-client]"
   echo
-  echo "attach        Attaches to pandora console via IPC socket (use with --datadir if not default). You cannot reach remote HTTP or WS via this command"
+  echo "attach          Attaches to geth console via IPC socket (use with --datadir if not default). You cannot reach remote HTTP or WS via this command"
   echo
-  echo "bind-binaries sets client(s) to desired version, use with flags for setting tag: --pandora v0.2.0-rc.1, --vanguard v0.2.0-rc.1, --validator v0.2.0-rc.1"
+  echo "bind-binaries   sets client(s) to desired version, use with flags for setting tag: --geth v0.2.0-rc.1, --beacon v0.2.0-rc.1, --validator v0.2.0-rc.1"
   echo
   echo
   echo "Available commands without arguments:"
@@ -912,13 +919,15 @@ help() {
   echo
   echo "Available flags:"
   echo "--network              Picks config collection to be used (and downloads if it doesn't exist)"
-  echo "                       [l15-prod, l15-staging, l15-dev]"
+  echo "                       [l16-prod, l16-staging, l16-dev]"
   echo
-  echo "--l15-prod             Alias for --network l15-prod"
+  echo "--l16-prod             Alias for --network l16-prod"
   echo
-  echo "--l15-staging          Alias for --network l15-staging"
+  echo "--network-version      Picup the network version for which configs will be downloaded"
   echo
-  echo "--l15-dev              Alias for --network l15-dev"
+  echo "--l16-staging          Alias for --network l16-staging"
+  echo
+  echo "--l16-dev              Alias for --network l16-dev"
   echo
   echo "--config               Path to config file"
   echo "                       [config.yaml]"
@@ -937,7 +946,7 @@ help() {
   echo "--coinbase             Sets pandora coinbase"
   echo "                       [ETH1 address ex. 0x616e6f6e796d6f75730000000000000000000777]"
   echo
-  echo "--node-name            Name of node that's shown on pandora stats and vanguard stats"
+  echo "--node-name            Name of node that's shown on geth stats and beacon-chain stats"
   echo "                       [String ex. johnsmith123]"
   echo
   echo "--deposit              Sets lukso-deposit-cli tag to be used"
@@ -946,58 +955,68 @@ help() {
   echo "--eth2stats            Sets eth2stats tag to be used"
   echo "                       [Tag name ex. v0.2.0-rc.1]"
   echo
-  echo "--lukso-status         Sets lukso-status tag to be used"
+  echo "--geth                 Sets pandora tag to be used"
   echo "                       [Tag name ex. v0.2.0-rc.1]"
   echo
-  echo "--pandora              Sets pandora tag to be used"
-  echo "                       [Tag name ex. v0.2.0-rc.1]"
-  echo
-  echo "--pandora-verbosity    Sets pandora logging depth (note: pandora uses integers for that flag, script will convert those to proper values)"
+  echo "--geth-verbosity       Sets geth logging depth (note: geth uses integers for that flag, script will convert those to proper values)"
   echo "                       [silent, error, warn, info, debug, trace]"
   echo
-  echo "--pandora-bootnodes    Sets pandora bootnodes"
+  echo "--geth-bootnodes       Sets geth bootnodes"
   echo "                       [Strings of bootnodes separated by commas: \"enode://72caa...,enode://b4a11a...\"]"
   echo
-  echo "--pandora-http-port    Sets pandora RPC (over http) port"
-  echo "                       [Number between 1023-65535]"
+  echo "--geth-http-port       geth client http port exposed. (default:  8545)"
   echo
-  echo "--pandora-metrics      Enables pandora metrics server"
+  echo "--geth-metrics         Enables geth metrics server"
   echo
-  echo "--pandora-nodekey      P2P node key file"
+  echo "--geth-nodekey         P2P node key file"
   echo "                       [Path to file (relative or absolute)]"
   echo
-  echo "--pandora-rpcvhosts    Sets pandora rpc virtual hosts (use quotes if you want to set * (\"*\") otherwise shell will resolve it"
+  echo "--geth-rpcvhosts       Sets geth rpc virtual hosts (use quotes if you want to set * (\"*\") otherwise shell will resolve it"
   echo "                       [RPC vhosts]"
   echo
-  echo "--pandora-external-ip  Sets external IP for pandora (overrides --external-ip if present)"
+  echo "--geth-external-ip     Sets external IP for geth (overrides --external-ip if present)"
   echo "                       [72.122.32.234]"
   echo
-  echo "--pandora-universal-profile-expose  Exposes \"net,eth,txpool,web3\" API's on Pandora "
+  echo "--geth-universal-profile-expose  Exposes \"net,eth,txpool,web3\" API's on geth "
   echo
-  echo "--pandora-unsafe-expose  Exposes \"admin,net,eth,debug,miner,personal,txpool,web3\" API's on Pandora"
+  echo "--geth-unsafe-expose  Exposes \"admin,net,eth,debug,miner,personal,txpool,web3\" API's on geth"
   echo
-  echo "--vanguard             Sets vanguard tag to be used"
+  echo "--geth-port                           Geth client TCP/UDP port exposed. (default:  30405)"
+  echo
+  echo "--geth-http-addr                      Geth client http address exposed. (default:  127.0.0.1)"
+  echo
+  echo "--geth-ws-addr                        Geth client websocket address exposed. (default:  127.0.0.1)"
+  echo
+  echo "--geth-ws-port                        Geth client websocket port exposed. (default:  8546)"
+  echo
+  echo "--geth-http-miner-addr                [Requires --http-connectivity] Geth HTTP URL to notify of new work packages. (default:  http://127.0.0.1:7877)"
+  echo
+  echo "--geth-ws-miner-addr                  [Requires --http-connectivity] Geth Websocket URL to notify of new work packages. (default:  ws://127.0.0.1:7878)"
+  echo
+  echo "--geth-ethstats                       Geth flag to activate ethstats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. Example: --geth-ethstats token123@stats.example.com. (default:  enabled for l15 testnet)"
+  echo
+  echo "--beacon              Sets beacon-chain tag to be used"
   echo "                       [Tag name ex. v0.2.0-rc.1]"
   echo
-  echo "--vanguard-verbosity   Sets vanguard logging depth"
+  echo "--beacon-verbosity    Sets beacon-chain logging depth"
   echo "                       [silent, error, warn, info, debug, trace]"
   echo
-  echo "--vanguard-bootnodes   Sets vanguard bootnodes"
+  echo "--beacon-bootnodes    Sets beacon-chain bootnodes"
   echo "                       [Strings of bootnodes separated by commas: \"enr:-Ku4QAmY...,enr:-M23QLmY...\"]"
   echo
-  echo "--vanguard-p2p-priv-key The file containing the private key to use in communications with other peers."
+  echo "--beacon-p2p-priv-key The file containing the private key to use in communications with other peers."
   echo "                       [Path to file (relative or absolute)]"
   echo
-  echo "--vanguard-external-ip Sets external IP for vanguard (overrides --external-ip if present)"
+  echo "--beacon-external-ip  Sets external IP for beacon-chain (overrides --external-ip if present)"
   echo "                       [72.122.32.234]"
   echo
-  echo "--vanguard-p2p-host-dns Sets host DNS vanguard (overrides --external-ip AND --vanguard-external-ip if present)"
+  echo "--beacon-p2p-host-dns Sets host DNS beacon-chain (overrides --external-ip AND --beacon-external-ip if present)"
   echo "                       [72.122.32.234]"
   echo
-  echo "--vanguard-monitoring-host Sets vanguard monitoring listening interface"
+  echo "--beacon-monitoring-host Sets beacon-chain monitoring listening interface"
   echo "                       [IP, ex. 127.0.0.1]"
   echo
-  echo "--vanguard-monitoring-port Sets vanguard monitoring port"
+  echo "--beacon-monitoring-port Sets beacon-chain monitoring port"
   echo "                       [Port, ex. 8080]"
   echo
   echo "--validator            Sets validator tag to be used"
@@ -1020,7 +1039,7 @@ help() {
   echo
   echo "--cors-domain          Sets CORS domain (note: if you want to set every origin you must type asterisk wrapped in quotes '*' otherwise shell may try to resolve it"
   echo
-  echo "--external-ip          Sets external IP for pandora and vanguard"
+  echo "--external-ip          Sets external IP for geth and beacon-chain"
   echo "                       [72.122.32.234]"
   echo
   echo "--genesis-time         Overrides network-config provided genesis time"
@@ -1035,47 +1054,31 @@ help() {
   echo
   echo "--http-connectivity                   Switches connectivity between clients from IPC to local HTTP - less secure! (default: uses IPC sockets path like: $DATADIR/pandora/geth.ipc, instead of http://127.0.0.1:8545 endpoint)"
   echo
-  echo "--vanguard-http-web3provider          An eth1 web3 provider string http endpoint or IPC socket path. (default: http://127.0.0.1:8545)"
+  echo "--beacon-http-web3provider            An eth1 web3 provider string http endpoint or IPC socket path. (default: http://127.0.0.1:8545)"
   echo
-  echo "--vanguard-rpc-host                   [Requires --http-connectivity] Host on which the RPC server should listen. (default: 127.0.0.1)"
+  echo "--beacon-rpc-host                     [Requires --http-connectivity] Host on which the RPC server should listen. (default: 127.0.0.1)"
   echo
-  echo "--van-rpc-port                        [Requires --http-connectivity] Port on which the RPC server should listen. (default: 4000)"
+  echo "--beacon-rpc-port                     [Requires --http-connectivity] Port on which the RPC server should listen. (default: 4000)"
   echo
-  echo "--van-udp-port                        Vanguard beacon chain client UDP port. The port used by discv5. (default: 12000)"
+  echo "--beacon-udp-port                     beacon chain client UDP port. The port used by discv5. (default: 12000)"
   echo
-  echo "--van-tcp-port                        Vanguard beacon chain client TCP port. The port used by libp2p. (default: 13000)"
+  echo "--beacon-tcp-port                     beacon chain client TCP port. The port used by libp2p. (default: 13000)"
   echo
-  echo "--van-grpc-gateway-port               Vanguard gRPC gateway port. The port on which the gateway server runs on (default: 3500)"
+  echo "--beacon-grpc-gateway-port            beacon-chain gRPC gateway port. The port on which the gateway server runs on (default: 3500)"
   echo
-  echo "--validator-beacon-rpc-provider       [Requires --http-connectivity] Beacon node (vanguard) RPC provider endpoint. (default: $VANGUARD_RPC)"
+  echo "--validator-beacon-rpc-provider       [Requires --http-connectivity] Beacon node RPC provider endpoint. (default: $VANGUARD_RPC)"
   echo
-  echo "--validator-pandora-http-provider     [Requires --http-connectivity] A pandora string rpc endpoint. This is our pandora client http endpoint. (default: http://127.0.0.1:8545)"
+  echo "--validator-geth-http-provider        [Requires --http-connectivity] A pandora string rpc endpoint. This is our pandora client http endpoint. (default: http://127.0.0.1:8545)"
   echo
   echo "--eth2stats-beacon-addr               Beacon node endpoint address for eth2stats-client. (default: $VANGUARD_RPC)"
   echo
-  echo "--pan-port                            Pandora client TCP/UDP port exposed. (default:  30405)"
+  echo "--beacon-ethstats                     beacon-chain flag to activate eth2stats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. Example: --beacon-ethstats 192.168.0.1:9090. (default:  enabled for l15 testnet)"
   echo
-  echo "--pan-http-addr                       Pandora client http address exposed. (default:  127.0.0.1)"
+  echo "--beacon-min-sync-peers               The required number of valid beacon-chain peers to connect with before syncing. (default: 2)"
   echo
-  echo "--pan-http-port                       Pandora client http port exposed. (default:  8545)"
+  echo "--beacon-max-p2p-peers                The max number of beacon-chain p2p peers to maintain. (default: 50)"
   echo
-  echo "--pan-ws-addr                         Pandora client websocket address exposed. (default:  127.0.0.1)"
-  echo
-  echo "--pan-ws-port                         Pandora client websocket port exposed. (default:  8546)"
-  echo
-  echo "--pan-http-miner-addr                 [Requires --http-connectivity] Pandora HTTP URL to notify of new work packages. (default:  http://127.0.0.1:7877)"
-  echo
-  echo "--pan-ws-miner-addr                   [Requires --http-connectivity] Pandora Websocket URL to notify of new work packages. (default:  ws://127.0.0.1:7878)"
-  echo
-  echo "--pan-ethstats                        Pandora flag to activate ethstats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. Example: --pan-ethstats token123@stats.example.com. (default:  enabled for l15 testnet)"
-  echo
-  echo "--van-ethstats                        Vanguard flag to activate eth2stats listing on remote dashboard. If enabled you should see your node by your node name provided via --node-name flag or lukso config. Example: --van-ethstats 192.168.0.1:9090. (default:  enabled for l15 testnet)"
-  echo
-  echo "--van-min-sync-peers                  The required number of valid Vanguard peers to connect with before syncing. (default: 2)"
-  echo
-  echo "--van-max-p2p-peers                   The max number of Vanguard p2p peers to maintain. (default: 50)"
-  echo
-  echo "--van-ethstats-metrics                The metrics address for Vanguard eth2stats-client service (default: http://127.0.0.1:8080/metrics)"
+  echo "--beacon-ethstats-metrics             The metrics address for beacon-chain eth2stats-client service (default: http://127.0.0.1:8080/metrics)"
   echo
   echo "--status-page                         This flag is for lukso-status activation. With this service you can check your node status over web browser (default: disabled). Default web address is: http://127.0.0.1:8111"
   exit
@@ -1083,11 +1086,11 @@ help() {
 
 logs() {
   case "$1" in
-  pandora)
-    CLIENT="pandora"
+  geth)
+    CLIENT="geth"
     ;;
-  vanguard)
-    CLIENT="vanguard"
+  beacon)
+    CLIENT="beacon-chain"
     ;;
   validator)
     CLIENT="validator"
@@ -1095,11 +1098,8 @@ logs() {
   eth2stats)
     CLIENT="eth2stats"
     ;;
-  lukso-status)
-    CLIENT="lukso-status"
-    ;;
   *)
-    echo "SELECT one of the clients ex. pandora"
+    echo "SELECT one of the clients ex. geth"
     exit
     ;;
   esac
@@ -1128,55 +1128,34 @@ while getopts "$optspec" optchar; do
   -)
     case "${OPTARG}" in
 
-    pandora)
+    geth)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      bind_binary pandora $val
+      bind_binary geth $val
       ;;
 
-    vanguard)
+    beacon)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      bind_binary vanguard $val
+      bind_binary beacon-chain $val
       ;;
 
     validator)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      bind_binary lukso-validator $val
+      bind_binary validator $val
       ;;
 
     deposit)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
-      bind_binary lukso-deposit-cli $val
+      bind_binary network-validator-tools $val
       ;;
 
     eth2stats)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       bind_binary eth2stats-client $val
-      ;;
-
-    lukso-status)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-
-      mkdir -p /opt/lukso/binaries/lukso-status/$val
-
-      if [[ $PLATFORM == "Linux" ]]; then
-        download https://github.com/rryter/node-status/releases/download/$val/lukso-status-$val-linux-amd64.tar.gz /opt/lukso/binaries/lukso-status/$val/lukso-status-$val-linux-amd64.tar.gz
-        tar -xf /opt/lukso/binaries/lukso-status/$val/lukso-status-$val-linux-amd64.tar.gz -C /opt/lukso/binaries/lukso-status/$val/
-      fi
-
-      if [[ $PLATFORM == "Darwin" ]]; then
-        download https://github.com/rryter/node-status/releases/download/$val/lukso-status-$val-darwin-amd64.tar.gz /opt/lukso/binaries/lukso-status/$val/lukso-status-$val-darwin-amd64.tar.gz
-        tar -xf /opt/lukso/binaries/lukso-status/$val/lukso-status-$val-darwin-amd64.tar.gz -C /opt/lukso/binaries/lukso-status/$val/
-      fi
-
-      chmod +x /opt/lukso/binaries/lukso-status/$val/lukso-status
-      ln -sf /opt/lukso/binaries/lukso-status/$val/lukso-status /usr/local/bin/lukso-status
-
       ;;
 
     network)
@@ -1227,16 +1206,22 @@ while getopts "$optspec" optchar; do
       eval OVERRIDE_LOGSDIR=$val
       ;;
 
-    l15-prod)
-      pick_network l15-prod
+    network-version)
+      val="${!OPTIND}"
+      OPTIND=$(($OPTIND + 1))
+      NETWORK_VERSION=$val
       ;;
 
-    l15-staging)
-      pick_network l15-staging
+    l16-prod)
+      pick_network l16-prod
       ;;
 
-    l15-dev)
-      pick_network l15-dev
+    l16-staging)
+      pick_network l16-staging
+      ;;
+
+    l16-dev)
+      pick_network l16-dev
       ;;
 
     config)
@@ -1262,190 +1247,184 @@ while getopts "$optspec" optchar; do
       OVERRIDE_IS_VALIDATOR=true
       ;;
 
-    van-ethstats)
+    beacon-ethstats)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_WITH_ETH2STATS=$val
       ;;
 
-    pandora-bootnodes)
+    geth-bootnodes)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_BOOTNODES=$val
       ;;
 
-    pandora-http-port)
+    geth-http-port)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_HTTP_PORT=$val
       ;;
 
-    pandora-metrics)
+    geth-metrics)
       OVERRIDE_PANDORA_METRICS=true
       ;;
 
-    pandora-nodekey)
+    geth-nodekey)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       eval OVERRIDE_PANDORA_NODEKEY=$val
       ;;
 
-    pandora-external-ip)
+    geth-external-ip)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_EXTERNAL_IP=$val
       ;;
 
-    pandora-universal-profile-expose)
+    geth-universal-profile-expose)
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_UNIVERSAL_PROFILE_EXPOSE=true
       ;;
 
-    pandora-unsafe-expose)
+    geth-unsafe-expose)
       echo "🛑 Unsafe expose enabled! 🛑"
       echo "🛑 Your node may be vulnerable to attacks 🛑"
       OVERRIDE_PANDORA_UNSAFE_EXPOSE=true
       ;;
 
-    pandora-rpcvhosts)
+    geth-rpcvhosts)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_RPCVHOSTS=$val
       ;;
 
-    pan-ethstats)
+    geth-ethstats)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_WITH_ETH1STATS=$val
       ;;
 
-    pandora-verbosity)
+    geth-verbosity)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_VERBOSITY=$val
       ;;
 
-    vanguard-bootnodes)
+    beacon-bootnodes)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_BOOTNODES=$val
       ;;
 
-    vanguard-p2p-priv-key)
+    beacon-p2p-priv-key)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       eval OVERRIDE_VANGUARD_P2P_PRIV_KEY=$val
       ;;
 
-    vanguard-external-ip)
+    beacon-external-ip)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_EXTERNAL_IP=$val
       ;;
 
-    vanguard-p2p-host-dns)
+    beacon-p2p-host-dns)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_P2P_HOST_DNS=$val
       ;;
 
-    vanguard-verbosity)
+    beacon-verbosity)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_VERBOSITY=$val
       ;;
 
-    vanguard-http-web3provider)
+    beacon-http-web3provider)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_HTTP_WEB3PROVIDER=$val
       ;;
 
-    vanguard-rpc-host)
+    beacon-rpc-host)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_RPC_HOST="$val"
       ;;
 
-    van-min-sync-peers)
+    beacon-min-sync-peers )
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VAN_MIN_SYNC_PEERS="$val"
       ;;
 
-    van-max-p2p-peers)
+    beacon-max-p2p-peers)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VAN_MAX_P2P_PEERS=$val
       ;;
 
-    van-ethstats-metrics)
+    beacon-ethstats-metrics)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VAN_ETHSTATS_METRICS=$val
       ;;
 
-    pan-port)
+    geth-port)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_PORT=$val
       ;;
 
-    pan-http-addr)
+    geth-http-addr)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_HTTP_ADDR=$val
       ;;
 
-    pan-http-port)
-      val="${!OPTIND}"
-      OPTIND=$(($OPTIND + 1))
-      OVERRIDE_PANDORA_HTTP_PORT=$val
-      ;;
-
-    pan-ws-addr)
+    geth-ws-addr)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_WS_ADDR=$val
       ;;
 
-    pan-ws-port)
+    geth-ws-port)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PANDORA_WS_PORT=$val
       ;;
 
-    pan-ws-miner-addr)
+    geth-ws-miner-addr)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PAN_WS_MINER_NOTIFY=$val
       ;;
 
-    pan-http-miner-addr)
+    geth-http-miner-addr)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_PAN_HTTP_MINER_NOTIFY=$val
       ;;
 
-    van-rpc-port)
+    beacon-rpc-port)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_RPC_PORT=$val
       ;;
 
-    van-udp-port)
+    beacon-udp-port)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_UDP_PORT=$val
       ;;
 
-    van-tcp-port)
+    beacon-tcp-port)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_TCP_PORT=$val
       ;;
 
-    van-grpc-gateway-port)
+    beacon-grpc-gateway-port)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_GRPC_GATEWAY_PORT=$val
@@ -1457,7 +1436,7 @@ while getopts "$optspec" optchar; do
       OVERRIDE_VALIDATOR_BEACON_RPC_PROVIDER=$val
       ;;
 
-    validator-pandora-http-provider)
+    validator-geth-http-provider)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VALIDATOR_PANDORA_HTTP_PROVIDER=$val
@@ -1469,13 +1448,13 @@ while getopts "$optspec" optchar; do
       OVERRIDE_ETH2STATS_BEACON_ADDR=$val
       ;;
 
-    vanguard-monitoring-host)
+    beacon-monitoring-host)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_MONITORING_HOST="$val"
       ;;
 
-    vanguard-monitoring-port)
+    beacon-monitoring-port)
       val="${!OPTIND}"
       OPTIND=$(($OPTIND + 1))
       OVERRIDE_VANGUARD_MONITORING_PORT="$val"
@@ -1546,8 +1525,6 @@ done
 if [[ "$USE_CONFIG_FILE" == true ]]; then
   parse_config "$CONFIG_FILE_PATH"
 fi
-
-parse_config "/opt/lukso/networks/$NETWORK/config/network-config.yaml"
 
 # Prepare custom genesis timestamp for genesis flag based on downloaded network-config value
 CUSTOM_GENESIS_TIME=$(echo -n $GENESIS_TIME)
@@ -1811,11 +1788,11 @@ reset)
 config)
   setup_config
   ;;
-keygen)
-  generate_keys
+gen-deposit-data)
+  generate_deposit_data
   ;;
-wallet)
-  import_accounts
+keystore)
+  generate_keystore
   ;;
 logs)
   logs "$COMMAND_ARG"
@@ -1824,7 +1801,7 @@ version)
   echo "$LUKSO_SCRIPT_VERSION"
   ;;
 attach)
-  pandora attach $DATADIR/pandora/geth.ipc
+  geth attach $DATADIR/geth/geth.ipc
   ;;
 bind-binaries) ;;
 
