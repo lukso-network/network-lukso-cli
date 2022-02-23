@@ -72,7 +72,7 @@ delete:
 	@rm -rf ${EXECUTION_DATA_VOLUME} ${CONSENSUS_DATA_VOLUME} ${VALIDATOR_DATA_VOLUME}
 
 log_geth:
-	ocker logs -f lukso-geth
+	docker logs -f lukso-geth
 
 log_beacon:
 	docker logs -f prysm_beacon

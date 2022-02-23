@@ -103,5 +103,4 @@ echo ""
 echo "#################### Please Read Carefully ####################"
 echo "Update \"GETH_ETHERBASE\" with your address \".env\" file"
 echo "use \"make help\" to check available options"
-echo "Ready! type \"docker-compose up -d\" to start!";
 echo "###############################################################"
